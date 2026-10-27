@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#EEF0F5;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+button,input,select{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8C80E8;outline-offset:2px}
+@keyframes kd-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes kd-hop{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px)}65%{transform:translateY(0)}}
+@keyframes kd-tilt{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes kd-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes kd-spin{to{transform:rotate(360deg)}}
+@keyframes kd-in{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;padding:28px 32px 48px;display:flex;flex-direction:column;align-items:center;gap:24px">
+  <div style="width:100%;max-width:1080px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:240px"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5D6680">Ekran #1 ve #14</span><span style="font-size:22px;font-weight:600">Onboarding akışları</span></div>
+    <div role="tablist" style="display:flex;gap:4px;background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px">
+      <sc-for list="{{ flows }}" as="f" hint-placeholder-count="2"><button role="tab" aria-selected="{{ f.sel }}" onClick="{{ f.pick }}" style="cursor:pointer;border:0;border-radius:9px;padding:9px 16px;font-size:14px;font-weight:600;background:{{ f.bg }};color:{{ f.color }};display:flex;align-items:center;gap:8px"><i class="ph {{ f.icon }}"></i>{{ f.label }}</button></sc-for>
+    </div>
+    <button onClick="{{ restart }}" style="cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;color:#1A2033;display:flex;align-items:center;gap:6px"><i class="ph ph-arrow-counter-clockwise"></i>Baştan başlat</button>
+  </div>
+
+  <sc-if value="{{ isParent }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Parent Onboarding" style="width:100%;max-width:1080px;min-height:640px;background:#FFFFFF;border-radius:20px;overflow:hidden;display:grid;grid-template-columns:340px minmax(0,1fr);box-shadow:0 24px 64px rgba(26,32,51,.12)">
+      <aside style="background:#5265D8;color:#FFFFFF;padding:32px 28px;display:flex;flex-direction:column;gap:28px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">{{ logo }}</div><span style="font-size:21px;font-weight:700;letter-spacing:-.02em">kindora</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ pSteps }}" as="s" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
+              <span style="width:28px;height:28px;border-radius:999px;background:{{ s.dotBg }};color:{{ s.dotColor }};border:1.5px solid {{ s.dotBorder }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700"><sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check"></i></sc-if><sc-if value="{{ s.notDone }}" hint-placeholder-val="{{ true }}">{{ s.n }}</sc-if></span>
+              <span style="font-size:14px;font-weight:{{ s.weight }};color:{{ s.color }}">{{ s.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:auto;font-size:15px;line-height:1.5;color:#E6E9FF">“Kontrol etmek için değil, güvenle büyümelerine yardımcı olmak için.”</div>
+      </aside>
+      <main style="padding:44px 52px;display:flex;flex-direction:column;gap:24px;min-width:0">
+
+        <sc-if value="{{ p1 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:10px;animation:kd-in .25s ease-out"><span style="font-size:32px;font-weight:600;letter-spacing:-.02em">Kindora'ya hoş geldiniz</span><span style="font-size:16px;line-height:1.6;color:#4A5370;max-width:540px">Birkaç dakikada çocuğunuz için bir profil ve başlangıç planı oluşturacağız, ardından bilgisayarını bağlayacağız.</span></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ principles }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex;gap:14px;align-items:flex-start;border:1px solid #E4E8F1;border-radius:12px;padding:16px"><div style="width:40px;height:40px;border-radius:11px;background:{{ p.bg }};color:{{ p.c }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ p.icon }}" style="font-size:20px"></i></div><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">{{ p.t }}</span><span style="font-size:14px;line-height:1.5;color:#4A5370">{{ p.d }}</span></div></div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;display:flex;align-items:center;gap:16px"><button onClick="{{ pNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:15px;font-weight:600;padding:12px 22px;border-radius:10px" style-hover="background:#3F50B8">Başlayalım</button><span style="font-size:14px;color:#4A5370">Hesabınız var mı? <a href="#">Giriş yapın</a></span></div>
+        </sc-if>
+
+        <sc-if value="{{ p2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;animation:kd-in .25s ease-out"><span style="font-size:26px;font-weight:600">Ebeveyn hesabı</span><span style="font-size:15px;color:#4A5370">Kuralları bu hesaptan yöneteceksiniz.</span></div>
+          <div style="display:flex;flex-direction:column;gap:16px;max-width:460px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Adınız</span><input value="{{ name }}" onChange="{{ setName }}" placeholder="Selin Yılmaz" style="font-size:15px;padding:11px 12px;border:1px solid #D5DAE6;border-radius:8px;color:#1A2033"></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">E-posta</span><input value="{{ email }}" onChange="{{ setEmail }}" placeholder="ornek@eposta.com" style="font-size:15px;padding:11px 12px;border:1px solid {{ emailBorder }};border-radius:8px;color:#1A2033"><sc-if value="{{ emailErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#A8364A">Geçerli bir e-posta adresi girin.</span></sc-if></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Şifre</span><input type="password" value="{{ pass }}" onChange="{{ setPass }}" style="font-size:15px;padding:11px 12px;border:1px solid #D5DAE6;border-radius:8px;color:#1A2033">
+              <div style="display:flex;gap:4px"><sc-for list="{{ passBars }}" as="b" hint-placeholder-count="4"><span style="flex:1;height:4px;border-radius:999px;background:{{ b }}"></span></sc-for></div><span style="font-size:12px;color:{{ passColor }}">{{ passHint }}</span></label>
+            <button onClick="{{ toggleKvkk }}" role="checkbox" aria-checked="{{ kvkkAria }}" style="cursor:pointer;border:0;background:transparent;padding:0;display:flex;gap:10px;align-items:flex-start;text-align:left;color:#1A2033"><span style="width:20px;height:20px;border-radius:5px;border:1.5px solid {{ kvkkBorder }};background:{{ kvkkBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#FFFFFF"><sc-if value="{{ kvkk }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:13px"></i></sc-if></span><span style="font-size:13px;line-height:1.5;color:#4A5370"><a href="#">KVKK aydınlatma metnini</a> okudum. Kindora'nın yalnızca süre, kategori, alan adı kuralları ve talepleri işlediğini biliyorum.</span></button>
+          </div>
+          <div style="margin-top:auto;display:flex;gap:10px"><button onClick="{{ pBack }}" style="cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;color:#1A2033;font-size:15px;font-weight:600;padding:12px 18px;border-radius:10px">Geri</button><button onClick="{{ p2Next }}" aria-disabled="{{ p2Dis }}" style="cursor:{{ p2Cursor }};border:0;background:{{ p2Bg }};color:#FFFFFF;font-size:15px;font-weight:600;padding:12px 22px;border-radius:10px">Hesabı oluştur</button></div>
+        </sc-if>
+
+        <sc-if value="{{ p3 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;animation:kd-in .25s ease-out"><span style="font-size:26px;font-weight:600">Çocuğunuzun profili</span><span style="font-size:15px;color:#4A5370">Başka çocukları daha sonra Ayarlar'dan ekleyebilirsiniz.</span></div>
+          <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+            <div style="width:96px;height:96px;border-radius:26px;background:{{ kidAvBg }};color:{{ kidAvColor }};display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700">{{ kidInitial }}</div>
+            <div style="display:flex;flex-direction:column;gap:16px;flex:1;min-width:280px;max-width:420px">
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Adı</span><input value="{{ kid }}" onChange="{{ setKid }}" placeholder="Ela" style="font-size:15px;padding:11px 12px;border:1px solid #D5DAE6;border-radius:8px;color:#1A2033"></label>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600">Yaşı</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ ages }}" as="a" hint-placeholder-count="8"><button onClick="{{ a.pick }}" style="cursor:pointer;width:44px;height:40px;border:1.5px solid {{ a.border }};background:{{ a.bg }};color:{{ a.color }};border-radius:8px;font-size:14px;font-weight:600">{{ a.v }}</button></sc-for></div><span style="font-size:12px;color:#5D6680">Yaş, önerilen başlangıç planını ve çocuk arayüzünün dilini etkiler.</span></div>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600">Profil rengi</span><div style="display:flex;gap:10px"><sc-for list="{{ kidColors }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" aria-label="Renk" style="cursor:pointer;width:36px;height:36px;border:0;border-radius:10px;background:{{ c.bg }};box-shadow:{{ c.ring }};display:flex;align-items:center;justify-content:center"><span style="width:14px;height:14px;border-radius:999px;background:{{ c.c }}"></span></button></sc-for></div></div>
+            </div>
+          </div>
+          <div style="margin-top:auto;display:flex;gap:10px"><button onClick="{{ pBack }}" style="cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;color:#1A2033;font-size:15px;font-weight:600;padding:12px 18px;border-radius:10px">Geri</button><button onClick="{{ p3Next }}" aria-disabled="{{ p3Dis }}" style="cursor:{{ p3Cursor }};border:0;background:{{ p3Bg }};color:#FFFFFF;font-size:15px;font-weight:600;padding:12px 22px;border-radius:10px">Devam</button></div>
+        </sc-if>
+
+        <sc-if value="{{ p4 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;animation:kd-in .25s ease-out"><span style="font-size:26px;font-weight:600">Başlangıç planı</span><span style="font-size:15px;color:#4A5370;max-width:560px">Bir başlangıç noktası seçin. Her şeyi sonra Ekran Süresi'nden değiştirebilirsiniz; planı {{ kidWith }} birlikte konuşmanızı öneririz.</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+            <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+              <button onClick="{{ p.pick }}" style="cursor:pointer;text-align:left;border:1.5px solid {{ p.border }};background:{{ p.bg }};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;color:#1A2033">
+                <div style="display:flex;align-items:center;gap:8px"><i class="ph {{ p.icon }}" style="font-size:20px;color:#5265D8"></i><span style="font-size:15px;font-weight:600;flex:1">{{ p.t }}</span><sc-if value="{{ p.rec }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:600;color:#127A6A;background:#E3F7F3;padding:3px 8px;border-radius:999px">Önerilen</span></sc-if></div>
+                <sc-for list="{{ p.lines }}" as="l" hint-placeholder-count="4"><span style="font-size:13px;color:#4A5370;display:flex;gap:8px"><i class="ph {{ l.i }}" style="color:#5D6680;margin-top:2px"></i>{{ l.t }}</span></sc-for>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;background:#EEF0FC;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;color:#2A3580"><i class="ph ph-info" style="margin-top:2px"></i><span>Her durumda: kilitlemeden önce 1 dakika kaydetme uyarısı, molaya 5 ve 1 dakika kala hatırlatma. Bunlar kapatılamaz.</span></div>
+          <div style="margin-top:auto;display:flex;gap:10px"><button onClick="{{ pBack }}" style="cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;color:#1A2033;font-size:15px;font-weight:600;padding:12px 18px;border-radius:10px">Geri</button><button onClick="{{ pNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:15px;font-weight:600;padding:12px 22px;border-radius:10px" style-hover="background:#3F50B8">Bu planla devam et</button></div>
+        </sc-if>
+
+        <sc-if value="{{ p5 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;animation:kd-in .25s ease-out"><span style="font-size:26px;font-weight:600">{{ kidGen }} bilgisayarını bağlayın</span><span style="font-size:15px;color:#4A5370">Windows bilgisayarda Kindora'yı kurun ve bu kodu girin.</span></div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:12px;background:#F7F9FC;border-radius:12px;padding:18px">
+              <sc-for list="{{ pairSteps }}" as="s" hint-placeholder-count="3"><div style="display:flex;gap:12px;font-size:14px;line-height:1.5"><span style="width:24px;height:24px;flex-shrink:0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.n }}</span><span>{{ s.t }}</span></div></sc-for>
+            </div>
+            <div style="border:1px solid #E4E8F1;border-radius:12px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+              <span style="font-size:13px;color:#4A5370">Eşleştirme kodu</span>
+              <div style="display:flex;gap:6px"><sc-for list="{{ code }}" as="g" hint-placeholder-count="7"><span style="width:{{ g.w }};height:54px;border-radius:9px;background:{{ g.bg }};display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums">{{ g.v }}</span></sc-for></div>
+              <span style="font-size:12px;color:#5D6680">9:42 dakika geçerli · tek kullanımlık</span>
+              <sc-if value="{{ pairWaiting }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#FDF4E3;color:#8A5A0C;font-size:13px;font-weight:600"><i class="ph ph-circle-notch" style="animation:kd-spin 1s linear infinite"></i>Cihaz bekleniyor…</span></sc-if>
+              <sc-if value="{{ pairDone }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#E3F7F3;color:#127A6A;font-size:13px;font-weight:600"><i class="ph ph-check-circle"></i>DESKTOP-7K2QF bağlandı</span></sc-if>
+            </div>
+          </div>
+          <div style="margin-top:auto;display:flex;gap:10px;align-items:center"><button onClick="{{ pBack }}" style="cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;color:#1A2033;font-size:15px;font-weight:600;padding:12px 18px;border-radius:10px">Geri</button><button onClick="{{ p5Next }}" aria-disabled="{{ p5Dis }}" style="cursor:{{ p5Cursor }};border:0;background:{{ p5Bg }};color:#FFFFFF;font-size:15px;font-weight:600;padding:12px 22px;border-radius:10px">Devam</button><button onClick="{{ pSkip }}" style="cursor:pointer;border:0;background:transparent;color:#3F50B8;font-size:14px;font-weight:600;padding:12px">Sonra eşleştir</button></div>
+        </sc-if>
+
+        <sc-if value="{{ p6 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px;animation:kd-in .25s ease-out"><div style="width:52px;height:52px;border-radius:999px;background:#E3F7F3;color:#127A6A;display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:26px"></i></div><span style="font-size:28px;font-weight:600">Her şey hazır</span><span style="font-size:15px;color:#4A5370">{{ doneSub }}</span></div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px;align-items:start">
+            <div style="border:1px solid #E4E8F1;border-radius:12px;padding:6px 18px">
+              <sc-for list="{{ summary }}" as="s" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid {{ s.line }};font-size:14px"><span style="color:#4A5370">{{ s.k }}</span><span style="font-weight:600;text-align:right">{{ s.v }}</span></div></sc-for>
+            </div>
+            <div style="background:#F1EFFD;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:15px;font-weight:600;color:#2A2370">{{ kidWith }} konuşmak için</span>
+              <sc-for list="{{ tips }}" as="t" hint-placeholder-count="3"><div style="display:flex;gap:10px;font-size:14px;line-height:1.5;color:#2A2370"><i class="ph {{ t.i }}" style="color:#5B4FC0;margin-top:3px"></i><span>{{ t.t }}</span></div></sc-for>
+            </div>
+          </div>
+          <div style="margin-top:auto"><button onClick="{{ toChild }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:15px;font-weight:600;padding:12px 22px;border-radius:10px;display:flex;align-items:center;gap:8px" style-hover="background:#3F50B8">Panele git<i class="ph ph-arrow-right"></i></button></div>
+        </sc-if>
+      </main>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isChild }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Child Onboarding" style="width:100%;max-width:1000px;min-height:640px;background:#F6F5FE;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(26,32,51,.12)">
+      <div style="height:40px;flex-shrink:0;background:#FFFFFF;border-bottom:1px solid #ECEAF8;display:flex;align-items:center;padding:0 16px;gap:10px;font-size:12px;color:#4A5370"><div style="width:20px;height:20px;border-radius:6px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoXs }}</div><span style="flex:1">Kindora</span>
+        <div style="display:flex;gap:5px"><sc-for list="{{ cDots }}" as="d" hint-placeholder-count="7"><span style="width:{{ d.w }};height:6px;border-radius:999px;background:{{ d.c }};transition:width .2s"></span></sc-for></div>
+      </div>
+      <div style="flex:1;padding:36px 48px;display:flex;flex-direction:column;gap:22px">
+
+        <sc-if value="{{ c0 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#FFFFFF;border:1px solid #E4E8F1;font-size:12px;font-weight:600;color:#4A5370"><i class="ph ph-user-gear"></i>Bu adımı ebeveyn yapar</div>
+          <div style="display:flex;flex-direction:column;gap:8px;animation:kd-in .25s ease-out"><span style="font-size:28px;font-weight:600;color:#1F1A5C">Bu bilgisayarı Kindora'ya bağlayın</span><span style="font-size:15px;color:#4A4E78">Ebeveyn panelinde gösterilen 6 haneli kodu girin.</span></div>
+          <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:20px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:16px;max-width:520px;width:100%;align-self:center">
+            <input value="{{ codeIn }}" onChange="{{ setCode }}" inputmode="numeric" maxlength="7" placeholder="000 000" aria-label="Eşleştirme kodu" style="width:260px;text-align:center;font-size:34px;font-weight:700;letter-spacing:.12em;font-variant-numeric:tabular-nums;padding:12px;border:1.5px solid {{ codeBorder }};border-radius:14px;color:#1A2033">
+            <sc-if value="{{ codeErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#A8364A;display:flex;gap:6px;align-items:center"><i class="ph ph-warning-circle"></i>{{ codeErr }}</span></sc-if>
+            <sc-if value="{{ connecting }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#8A5A0C"><i class="ph ph-circle-notch" style="animation:kd-spin 1s linear infinite"></i>Bağlanıyor…</span></sc-if>
+            <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#127A6A"><i class="ph ph-check-circle"></i>Selin Yılmaz hesabına bağlandı</span><span style="font-size:13px;color:#4A5370">Profil: {{ kidC }} · plan yüklendi</span></div></sc-if>
+            <span style="font-size:12px;color:#5D6680;text-align:center;line-height:1.5">Demo: 482 913 yazın. Yanlış kodda hata durumu görünür.</span>
+          </div>
+          <div style="margin-top:auto;display:flex;justify-content:flex-end"><button onClick="{{ c0Next }}" aria-disabled="{{ c0Dis }}" style="cursor:{{ c0Cursor }};border:0;background:{{ c0Bg }};color:#FFFFFF;font-size:15px;font-weight:600;padding:12px 22px;border-radius:12px">{{ c0Label }}</button></div>
+        </sc-if>
+
+        <sc-if value="{{ c1 }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;animation:kd-in .3s ease-out">
+            <div style="background:#FFFFFF;border-radius:22px;padding:14px 20px;font-family:Fredoka,sans-serif;font-size:22px;font-weight:500;color:#1F1A5C;box-shadow:0 6px 18px rgba(31,26,92,.08)">Merhaba {{ kidC }}! Ben {{ mName }}.</div>
+            {{ mGreet }}
+            <span style="font-family:Fredoka,sans-serif;font-size:30px;font-weight:600;color:#1F1A5C">Bilgisayarda vakit geçirirken yanında olacağım.</span>
+            <button onClick="{{ cNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;padding:14px 28px;border-radius:16px" style-hover="background:#3F50B8">Merhaba {{ mName }}!</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ c2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:flex-end;gap:14px;animation:kd-in .25s ease-out">{{ mIdle }}<div style="margin-bottom:30px;background:#FFFFFF;border-radius:20px 20px 20px 6px;padding:12px 16px;font-family:Fredoka,sans-serif;font-size:20px;font-weight:500;color:#1F1A5C">Sana üç şeyde yardım edeceğim.</div></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+            <sc-for list="{{ helps }}" as="h" hint-placeholder-count="3"><div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px"><div style="width:44px;height:44px;border-radius:14px;background:{{ h.bg }};color:{{ h.c }};display:flex;align-items:center;justify-content:center"><i class="ph {{ h.i }}" style="font-size:22px"></i></div><span style="font-family:Fredoka,sans-serif;font-size:18px;font-weight:600">{{ h.t }}</span><span style="font-size:14px;line-height:1.5;color:#4A5370">{{ h.d }}</span></div></sc-for>
+          </div>
+          <div style="background:#E3F7F3;border-radius:18px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start"><i class="ph ph-eye-slash" style="font-size:22px;color:#127A6A"></i><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600;color:#0F5E52">Seni izlemem</span><span style="font-size:14px;line-height:1.5;color:#0F5E52">Ekranını, mesajlarını ya da yazdıklarını görmem. Annen yalnızca ne kadar süre kullandığını ve hangi tür uygulamalar açtığını görür; sen de aynı özeti görürsün.</span></div></div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between"><button onClick="{{ cBack }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;color:#1F1A5C;font-size:15px;font-weight:600;padding:12px 18px;border-radius:12px">Geri</button><button onClick="{{ cNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-family:Fredoka,sans-serif;font-size:17px;font-weight:600;padding:12px 24px;border-radius:14px">Anladım</button></div>
+        </sc-if>
+
+        <sc-if value="{{ c3 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:flex-end;gap:14px;animation:kd-in .25s ease-out">{{ mThink }}<div style="margin-bottom:30px;background:#FFFFFF;border-radius:20px 20px 20px 6px;padding:12px 16px;font-family:Fredoka,sans-serif;font-size:20px;font-weight:500;color:#1F1A5C">Annenle birlikte hazırlanan kullanım planın bu.</div></div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
+            <sc-for list="{{ plan }}" as="p" hint-placeholder-count="4"><div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:20px;padding:18px;display:flex;gap:14px;align-items:center"><div style="width:44px;height:44px;border-radius:14px;background:#F1EFFD;color:#5B4FC0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ p.i }}" style="font-size:22px"></i></div><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fredoka,sans-serif;font-size:19px;font-weight:600">{{ p.t }}</span><span style="font-size:13px;color:#4A5370">{{ p.d }}</span></div></div></sc-for>
+          </div>
+          <span style="font-size:14px;line-height:1.5;color:#4A4E78;display:flex;gap:8px;align-items:center"><i class="ph ph-lock-simple"></i>Planı annen ya da baban değiştirir. Bir şeyin değişmesini istersen benim üzerimden sorabilirsin.</span>
+          <div style="margin-top:auto;display:flex;justify-content:space-between"><button onClick="{{ cBack }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;color:#1F1A5C;font-size:15px;font-weight:600;padding:12px 18px;border-radius:12px">Geri</button><button onClick="{{ cNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-family:Fredoka,sans-serif;font-size:17px;font-weight:600;padding:12px 24px;border-radius:14px">Tamam</button></div>
+        </sc-if>
+
+        <sc-if value="{{ c4 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:28px;align-items:center;flex:1;animation:kd-in .25s ease-out">
+            <div style="background:#E9E6FC;border-radius:28px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:12px"><div style="background:#FFFFFF;border-radius:18px;padding:10px 16px;font-family:Fredoka,sans-serif;font-size:18px;font-weight:500;color:#1F1A5C">Bana bir ad vermek ister misin?</div>{{ mPreview }}</div>
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:15px;font-weight:600">Adı</span><input value="{{ mDraft }}" onChange="{{ setMDraft }}" maxlength="14" style="font-size:18px;padding:12px 14px;border:1.5px solid #DCD8F6;border-radius:14px;color:#1A2033"><span style="font-size:12px;color:#5D6680">İstediğin zaman değiştirebilirsin.</span></label>
+              <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:15px;font-weight:600">Rengi</span><div style="display:flex;gap:12px"><sc-for list="{{ mColors }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:transparent;padding:0;color:#1A2033"><span style="width:48px;height:48px;border-radius:999px;background:{{ c.hex }};box-shadow:{{ c.ring }}"></span><span style="font-size:13px">{{ c.name }}</span></button></sc-for></div></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ cBack }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;color:#1F1A5C;font-size:15px;font-weight:600;padding:12px 18px;border-radius:12px">Geri</button><div style="display:flex;gap:10px"><button onClick="{{ keepFiliz }}" style="cursor:pointer;border:0;background:transparent;color:#5B4FC0;font-size:15px;font-weight:600;padding:12px">Filiz kalsın</button><button onClick="{{ cNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-family:Fredoka,sans-serif;font-size:17px;font-weight:600;padding:12px 24px;border-radius:14px">Devam</button></div></div>
+        </sc-if>
+
+        <sc-if value="{{ c5 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px;animation:kd-in .25s ease-out"><span style="font-family:Fredoka,sans-serif;font-size:28px;font-weight:600;color:#1F1A5C">Ekranda nerede durayım?</span><span style="font-size:15px;color:#4A4E78">Küçük bir pencere olarak köşede beklerim. Sürükleyerek sonra da taşıyabilirsin.</span></div>
+          <div style="align-self:center;width:520px;max-width:100%;aspect-ratio:16/10;background:#3B4A6B;border-radius:18px;position:relative;padding:14px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px">
+            <sc-for list="{{ corners }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" aria-label="{{ c.label }}" aria-pressed="{{ c.pressed }}" style="cursor:pointer;border:2px dashed {{ c.border }};background:{{ c.bg }};border-radius:12px;display:flex;align-items:{{ c.ai }};justify-content:{{ c.jc }};padding:10px;color:#FFFFFF"><sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;background:#FFFFFF;border-radius:999px;padding:3px 10px 3px 3px;color:#1A2033;font-family:Fredoka,sans-serif;font-size:14px;font-weight:600">{{ c.mini }}48 dk</span></sc-if><sc-if value="{{ c.off }}" hint-placeholder-val="{{ true }}"><span style="font-size:12px;color:#C9D0E2">{{ c.label }}</span></sc-if></button></sc-for>
+          </div>
+          <div style="margin-top:auto;display:flex;justify-content:space-between"><button onClick="{{ cBack }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;color:#1F1A5C;font-size:15px;font-weight:600;padding:12px 18px;border-radius:12px">Geri</button><button onClick="{{ cNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-family:Fredoka,sans-serif;font-size:17px;font-weight:600;padding:12px 24px;border-radius:14px">Burası güzel</button></div>
+        </sc-if>
+
+        <sc-if value="{{ c6 }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;animation:kd-in .3s ease-out">
+            {{ mHappy }}
+            <span style="font-family:Fredoka,sans-serif;font-size:34px;font-weight:600;color:#1F1A5C">Hazırız, {{ kidC }}!</span>
+            <div style="display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1px solid #ECEAF8;border-radius:20px;padding:14px 18px;text-align:left"><div style="width:56px;height:56px;border-radius:999px;background:#E3F7F3;border:3px solid #2BBFA7;color:#127A6A;display:flex;align-items:center;justify-content:center"><i class="ph-fill ph-plant" style="font-size:26px"></i></div><div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:Fredoka,sans-serif;font-size:18px;font-weight:600">Harika Başlangıç</span><span style="font-size:13px;color:#4A5370">Kindora ile ilk günün için ilk rozetin.</span></div></div>
+            <span style="font-size:14px;color:#4A4E78">Beni sağ alt köşede bulabilirsin. Bir şeye ihtiyacın olursa bana tıkla.</span>
+            <button onClick="{{ restart }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;padding:14px 28px;border-radius:16px">Başla</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;reducedMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Erişilebilirlik&quot;}}">
+const BODY = { indigo: ['#5265D8', '#2BBFA7', '#3ED0B8'], lavanta: ['#8C80E8', '#2BBFA7', '#3ED0B8'], teal: ['#23A893', '#8C80E8', '#A99FF0'], gece: ['#39437A', '#2BBFA7', '#3ED0B8'] };
+const ANIM = { idle: 'kd-bob 3.4s ease-in-out infinite', greeting: 'kd-hop .8s ease-out 2', happy: 'kd-hop .7s ease-out 3', thinking: 'kd-tilt 2s ease-in-out infinite' };
+function mascot(state, size, o) {
+  const h = React.createElement;
+  const [body, leafA, leafB] = BODY[o.color] || BODY.indigo;
+  const ink = '#1B2150', k = [];
+  const P = (d, a) => k.push(h('path', Object.assign({ d }, a)));
+  const S = d => P(d, { stroke: ink, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+  if (!o.noShadow) k.push(h('ellipse', { cx: 60, cy: 112, rx: 26, ry: 4, fill: 'rgba(26,32,51,.14)' }));
+  P('M60 37 L60 26', { stroke: leafA, strokeWidth: 3, strokeLinecap: 'round' });
+  P('M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', { fill: leafA }); P('M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', { fill: leafB });
+  const arm = d => P(d, { stroke: body, strokeWidth: 8, fill: 'none', strokeLinecap: 'round' });
+  if (state === 'greeting') { arm('M27 80 Q19 86 21 93'); arm('M93 70 Q106 60 104 46'); }
+  else if (state === 'happy') { arm('M29 64 Q17 52 21 40'); arm('M91 64 Q103 52 99 40'); }
+  else { arm('M27 80 Q19 86 21 93'); arm('M93 80 Q101 86 99 93'); }
+  P('M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', { fill: body });
+  P('M42 46 C48 41 54 40 58 40', { stroke: 'rgba(255,255,255,.35)', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  k.push(h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }));
+  const joy = state === 'happy' || state === 'greeting';
+  if (joy) { S('M46 74 Q50 68 54 74'); S('M66 74 Q70 68 74 74'); P('M53 80 Q60 89 67 80 Z', { fill: ink }); }
+  else {
+    const dy = state === 'thinking' ? -3 : 0, dx = state === 'thinking' ? 2 : 0;
+    k.push(h('g', { style: o.motion ? { transformOrigin: '60px 72px', animation: 'kd-blink 5s infinite' } : null }, h('ellipse', { cx: 50 + dx, cy: 72 + dy, rx: 3.6, ry: 4.8, fill: ink }), h('ellipse', { cx: 70 + dx, cy: 72 + dy, rx: 3.6, ry: 4.8, fill: ink })));
+    S(state === 'thinking' ? 'M56 83 Q60 81 64 83' : 'M55 81 Q60 85 65 81');
+  }
+  k.push(h('circle', { cx: 42, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); k.push(h('circle', { cx: 78, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 }));
+  if (state === 'thinking') [[93, 46, 2.5], [100, 38, 3.3], [108, 29, 4.2]].forEach(([cx, cy, r]) => k.push(h('circle', { cx, cy, r, fill: '#B6AEF2' })));
+  if (state === 'happy') { P('M18 30 L20 36 L26 38 L20 40 L18 46 L16 40 L10 38 L16 36 Z', { fill: '#E7A83E' }); P('M104 22 L105.5 26 L109.5 27.5 L105.5 29 L104 33 L102.5 29 L98.5 27.5 L102.5 26 Z', { fill: '#2BBFA7' }); }
+  return h('div', { key: state + size, style: { width: size, height: size, flexShrink: 0, transformOrigin: '50% 90%', animation: o.motion ? ANIM[state] : 'none' } }, h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true }, ...k));
+}
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#FFFFFF' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+function suf(n, a) {
+  n = n || '';
+  const vs = n.toLowerCase().match(/[aeıioöuü]/g) || ['a'];
+  const lv = vs[vs.length - 1], v = /[aeıioöuü]$/i.test(n);
+  if (a === 'gen') return n + "'" + (v ? 'n' : '') + { a: 'ın', ı: 'ın', e: 'in', i: 'in', o: 'un', u: 'un', ö: 'ün', ü: 'ün' }[lv];
+  return n + "'" + (v ? 'y' : '') + ('aıou'.includes(lv) ? 'la' : 'le');
+}
+const PRESETS = {
+  balanced: { t: 'Dengeli', icon: 'ph-scales', rec: true, wd: '2 sa', we: '3 sa', br: 'Her 45 dk\'da 10 dk', sleep: '21:00', study: '—' },
+  school: { t: 'Okul dönemi', icon: 'ph-backpack', wd: '1 sa 30 dk', we: '2 sa 30 dk', br: 'Her 30 dk\'da 5 dk', sleep: '20:30', study: 'Hafta içi 15:00–16:00' },
+  custom: { t: 'Kendim ayarlayacağım', icon: 'ph-sliders-horizontal', wd: '2 sa 30 dk', we: '3 sa', br: 'Her 45 dk\'da 10 dk', sleep: '21:00', study: '—', note: 'Varsayılanlarla başlar, sonra düzenlersiniz' }
+};
+
+class Component extends DCLogic {
+  state = { flow: 'parent', p: 1, name: '', email: '', pass: '', kvkk: false, kid: '', age: 10, kidColor: 'lav', preset: 'balanced', paired: false, skipped: false,
+    c: 0, codeIn: '', conn: 'idle', mDraft: 'Filiz', mName: 'Filiz', mColor: 'indigo', corner: 'br' };
+  timers = [];
+  componentWillUnmount() { this.timers.forEach(clearTimeout); }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  renderVals() {
+    const s = this.state;
+    const motion = !(this.props.reducedMotion ?? false);
+    const m = (st, z, x) => mascot(st, z, Object.assign({ motion, color: s.mColor }, x || {}));
+    const kidN = s.kid.trim() || 'Ela';
+    const KC = { lav: ['#F1EFFD', '#5B4FC0'], teal: ['#E3F7F3', '#127A6A'], ind: ['#EEF0FC', '#3F50B8'], amb: ['#FDF4E3', '#8A5A0C'] };
+    const chip = on => ({ border: on ? '#5265D8' : '#E4E8F1', bg: on ? '#EEF0FC' : '#FFFFFF', color: on ? '#3F50B8' : '#1A2033' });
+    const emailOk = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(s.email);
+    const pw = s.pass, score = Math.min(4, (pw.length >= 8) + /[A-Z]/.test(pw) + /\d/.test(pw) + /[^A-Za-z0-9]/.test(pw));
+    const p2ok = s.name.trim().length > 1 && emailOk && pw.length >= 8 && s.kvkk;
+    const p3ok = s.kid.trim().length > 0;
+    const pr = PRESETS[s.preset];
+    const btn = ok => ({ bg: ok ? '#5265D8' : '#B9C2EE', cursor: ok ? 'pointer' : 'not-allowed', dis: ok ? 'false' : 'true' });
+    const b2 = btn(p2ok), b3 = btn(p3ok), b5 = btn(s.paired);
+    const go = p => this.setState({ p });
+    const codeDigits = s.codeIn.replace(/\D/g, '');
+    const codeFull = codeDigits.length === 6;
+    const b0 = btn(codeFull || s.conn === 'ok');
+    const PSTEPS = ['Hoş geldiniz', 'Hesap', 'Çocuk profili', 'Başlangıç planı', 'Cihaz eşleştirme', 'Hazır'];
+    return {
+      logo: logo(24), logoXs: logo(14),
+      flows: [['parent', 'Ebeveyn', 'ph-briefcase'], ['child', 'Çocuk', 'ph-smiley']].map(([id, label, icon]) => ({ label, icon, sel: s.flow === id ? 'true' : 'false', bg: s.flow === id ? '#5265D8' : 'transparent', color: s.flow === id ? '#FFFFFF' : '#4A5370', pick: () => this.setState({ flow: id }) })),
+      restart: () => this.setState(s.flow === 'parent' ? { p: 1, paired: false, skipped: false } : { c: 0, codeIn: '', conn: 'idle' }),
+      isParent: s.flow === 'parent', isChild: s.flow === 'child',
+      pSteps: PSTEPS.map((label, i) => { const n = i + 1, done = n < s.p, cur = n === s.p; return { n, label, done, notDone: !done, weight: cur ? 600 : 500, color: cur || done ? '#FFFFFF' : '#C9D0FF', dotBg: done ? '#FFFFFF' : cur ? 'rgba(255,255,255,.16)' : 'transparent', dotColor: done ? '#3F50B8' : '#FFFFFF', dotBorder: done || cur ? '#FFFFFF' : 'rgba(255,255,255,.4)' }; }),
+      p1: s.p === 1, p2: s.p === 2, p3: s.p === 3, p4: s.p === 4, p5: s.p === 5, p6: s.p === 6,
+      pNext: () => go(s.p + 1), pBack: () => go(s.p - 1),
+      principles: [
+        { icon: 'ph-plant', bg: '#E3F7F3', c: '#127A6A', t: 'Kontrol değil, destek', d: 'Ani kilitleme yok. Molalar önceden haber verilir, çocuğunuz ek süre veya site için sizden izin isteyebilir.' },
+        { icon: 'ph-eye', bg: '#EEF0FC', c: '#3F50B8', t: 'Şeffaf', d: 'Çocuğunuz kuralları, kalan süresini ve sizin gördüğünüz özeti kendi uygulamasında görür.' },
+        { icon: 'ph-shield-check', bg: '#F1EFFD', c: '#5B4FC0', t: 'Gizlilik', d: 'Ekran görüntüsü, tuş kaydı veya mesaj içeriği toplanmaz. Yalnızca süre, uygulama kategorisi ve site kuralları.' }
+      ],
+      name: s.name, setName: e => this.setState({ name: e.target.value }),
+      email: s.email, setEmail: e => this.setState({ email: e.target.value }), emailErr: s.email.length > 4 && !emailOk, emailBorder: s.email.length > 4 && !emailOk ? '#D95B68' : '#D5DAE6',
+      pass: s.pass, setPass: e => this.setState({ pass: e.target.value }),
+      passBars: [1, 2, 3, 4].map(i => (i <= score ? (score < 2 ? '#E7A83E' : score < 4 ? '#5265D8' : '#2BBFA7') : '#E4E8F1')),
+      passHint: !pw ? 'En az 8 karakter' : pw.length < 8 ? `${8 - pw.length} karakter daha` : score < 3 ? 'Kabul edilir · bir rakam veya simge ekleyin' : 'Güçlü şifre', passColor: pw && pw.length < 8 ? '#8A5A0C' : score >= 3 ? '#127A6A' : '#5D6680',
+      kvkk: s.kvkk, kvkkAria: s.kvkk ? 'true' : 'false', kvkkBg: s.kvkk ? '#5265D8' : '#FFFFFF', kvkkBorder: s.kvkk ? '#5265D8' : '#C9CFDD', toggleKvkk: () => this.setState(p => ({ kvkk: !p.kvkk })),
+      p2Next: () => p2ok && go(3), p2Bg: b2.bg, p2Cursor: b2.cursor, p2Dis: b2.dis,
+      kid: s.kid, setKid: e => this.setState({ kid: e.target.value.slice(0, 20) }), kidInitial: kidN[0].toUpperCase(), kidAvBg: KC[s.kidColor][0], kidAvColor: KC[s.kidColor][1],
+      ages: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(v => Object.assign({ v, pick: () => this.setState({ age: v }) }, chip(s.age === v))),
+      kidColors: Object.entries(KC).map(([id, [bg, c]]) => ({ bg, c, ring: s.kidColor === id ? `0 0 0 2px #FFFFFF, 0 0 0 4px ${c}` : 'none', pick: () => this.setState({ kidColor: id }) })),
+      p3Next: () => p3ok && go(4), p3Bg: b3.bg, p3Cursor: b3.cursor, p3Dis: b3.dis,
+      kidWith: suf(kidN, 'with'), kidGen: suf(kidN, 'gen'),
+      presets: Object.entries(PRESETS).map(([id, x]) => Object.assign({ t: x.t, icon: x.icon, rec: !!x.rec, pick: () => this.setState({ preset: id }),
+        lines: (x.note ? [{ i: 'ph-pencil-simple', t: x.note }] : []).concat([{ i: 'ph-briefcase', t: 'Hafta içi ' + x.wd }, { i: 'ph-sun-horizon', t: 'Hafta sonu ' + x.we }, { i: 'ph-coffee', t: x.br }, { i: 'ph-moon', t: 'Uyku ' + x.sleep }]) }, chip(s.preset === id), { color: undefined })),
+      pairSteps: [{ n: 1, t: `${suf(kidN, 'gen')} bilgisayarında kindora.app/indir adresini açın.` }, { n: 2, t: 'Kurulumda "Ebeveyn hesabına bağlan" seçin.' }, { n: 3, t: 'Yandaki kodu girin. Bağlanınca burada görünür.' }],
+      code: [...'482'.split('').map(v => ({ v, w: '44px', bg: '#F1F3F9' })), { v: '', w: '8px', bg: 'transparent' }, ...'913'.split('').map(v => ({ v, w: '44px', bg: '#F1F3F9' }))],
+      pairWaiting: s.p === 5 && !s.paired, pairDone: s.paired,
+      p5Next: () => s.paired && go(6), p5Bg: b5.bg, p5Cursor: b5.cursor, p5Dis: b5.dis,
+      pSkip: () => this.setState({ p: 6, skipped: true }),
+      doneSub: s.skipped ? `${kidN} profili ve planı hazır. Bilgisayarı istediğiniz zaman Cihazlar'dan eşleştirebilirsiniz.` : `${kidN} profili oluşturuldu ve plan bilgisayara gönderildi. ${kidN} ilk açılışta Filiz ile tanışacak.`,
+      summary: [['Ebeveyn', s.name || 'Selin Yılmaz'], ['Çocuk', `${kidN} · ${s.age} yaş`], ['Plan', `${pr.t} · hafta içi ${pr.wd}`], ['Cihaz', s.skipped ? 'Eşleştirilmedi' : 'DESKTOP-7K2QF']].map(([k, v], i) => ({ k, v, line: i ? '#E4E8F1' : 'transparent' })),
+      tips: [{ i: 'ph-chats-circle', t: 'Planı birlikte okuyun; neden bu süreleri seçtiğinizi anlatın.' }, { i: 'ph-hand-waving', t: `Ek süre veya site isterken Filiz'e nasıl soracağını gösterin.` }, { i: 'ph-scales', t: 'Rozetlerin daha fazla kullanım için değil, denge için olduğunu söyleyin.' }],
+      toChild: () => this.setState({ flow: 'child', c: 0, kid: s.kid }),
+      // child
+      cDots: [0, 1, 2, 3, 4, 5, 6].map(i => ({ w: i === s.c ? '22px' : '6px', c: i <= s.c ? '#5265D8' : '#DCD8F6' })),
+      c0: s.c === 0, c1: s.c === 1, c2: s.c === 2, c3: s.c === 3, c4: s.c === 4, c5: s.c === 5, c6: s.c === 6,
+      cNext: () => this.setState(p => ({ c: p.c + 1 })), cBack: () => this.setState(p => ({ c: p.c - 1 })),
+      codeIn: s.codeIn, setCode: e => { const d = e.target.value.replace(/\D/g, '').slice(0, 6); this.setState({ codeIn: d.length > 3 ? d.slice(0, 3) + ' ' + d.slice(3) : d, conn: 'idle' }); },
+      codeBorder: s.conn === 'err' ? '#D95B68' : s.conn === 'ok' ? '#2BBFA7' : '#DCD8F6',
+      codeErr: s.conn === 'err' ? 'Kod eşleşmedi veya süresi doldu. Ebeveyn panelinden yeni kod alın.' : null,
+      connecting: s.conn === 'wait', connected: s.conn === 'ok', kidC: kidN,
+      c0Label: s.conn === 'ok' ? 'Devam' : 'Bağla',
+      c0Next: () => {
+        if (s.conn === 'ok') return this.setState({ c: 1 });
+        if (!codeFull) return;
+        this.setState({ conn: 'wait' });
+        this.later(() => this.setState({ conn: codeDigits === '482913' ? 'ok' : 'err' }), 1500);
+      },
+      c0Bg: s.conn === 'wait' ? '#B9C2EE' : b0.bg, c0Cursor: b0.cursor, c0Dis: b0.dis,
+      mName: s.mName, mGreet: m('greeting', 180), mIdle: m('idle', 96), mThink: m('thinking', 96), mPreview: m('idle', 160), mHappy: m('happy', 160),
+      helps: [
+        { i: 'ph-hourglass-medium', bg: '#E3F7F3', c: '#127A6A', t: 'Süreni gösteririm', d: 'Bugün ne kadar zamanın kaldığını köşede görebilirsin.' },
+        { i: 'ph-coffee', bg: '#F1EFFD', c: '#5B4FC0', t: 'Molaları hatırlatırım', d: 'Mola gelmeden 5 ve 1 dakika önce haber veririm, işini kaydedebilirsin.' },
+        { i: 'ph-hand-waving', bg: '#EEF0FC', c: '#3F50B8', t: 'İsteklerini iletirim', d: 'Ek süre ya da bir site istersen annene birlikte sorarız.' }
+      ],
+      plan: [{ i: 'ph-hourglass-medium', t: 'Günde ' + pr.wd, d: 'Hafta sonu ' + pr.we }, { i: 'ph-coffee', t: pr.br, d: 'Gözlerin ve sırtın için' }, { i: 'ph-moon', t: 'Uyku ' + pr.sleep, d: 'Bilgisayar sabaha kadar dinlenir' }, { i: 'ph-book-open', t: pr.study === '—' ? 'Ders modu' : pr.study, d: pr.study === '—' ? 'Annen başlattığında' : 'Yalnızca ders siteleri açık' }],
+      mDraft: s.mDraft, setMDraft: e => this.setState({ mDraft: e.target.value.slice(0, 14) }),
+      mColors: [['indigo', 'İndigo'], ['lavanta', 'Lavanta'], ['teal', 'Deniz'], ['gece', 'Gece']].map(([id, name]) => ({ name, hex: BODY[id][0], pressed: s.mColor === id ? 'true' : 'false', ring: s.mColor === id ? `0 0 0 3px #FFFFFF, 0 0 0 5.5px ${BODY[id][0]}` : 'none', pick: () => this.setState({ mColor: id }) })),
+      keepFiliz: () => this.setState({ mDraft: 'Filiz', mName: 'Filiz', c: 5 }),
+      corners: [['tl', 'Sol üst', 'flex-start', 'flex-start'], ['tr', 'Sağ üst', 'flex-start', 'flex-end'], ['bl', 'Sol alt', 'flex-end', 'flex-start'], ['br', 'Sağ alt', 'flex-end', 'flex-end']].map(([id, label, ai, jc]) => ({ label, ai, jc, on: s.corner === id, off: s.corner !== id, pressed: s.corner === id ? 'true' : 'false', border: s.corner === id ? '#B6AEF2' : 'rgba(255,255,255,.25)', bg: s.corner === id ? 'rgba(140,128,232,.22)' : 'transparent', mini: m('idle', 26, { noShadow: true, motion: false }), pick: () => this.setState({ corner: id }) }))
+    };
+  }
+  componentDidUpdate(_, prev) {
+    const s = this.state;
+    if (s.flow === 'parent' && s.p === 5 && !s.paired && prev.p !== 5) this.later(() => this.setState(p => (p.p === 5 ? { paired: true } : null)), 3000);
+    if (s.c === 5 && prev.c === 4 && s.mDraft !== s.mName) this.setState({ mName: s.mDraft.trim() || 'Filiz' });
+  }
+}
+</script>
+</body>
+</html>

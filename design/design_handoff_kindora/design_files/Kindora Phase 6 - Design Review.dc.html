@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#F7F9FC;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+button{font-family:inherit}
+@keyframes kd-spin{to{transform:rotate(360deg)}}
+@keyframes kd-shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+</style>
+</helmet>
+<div role="note" style="display:flex;align-items:center;gap:10px;padding:10px 20px;background:#F4F6FA;border-bottom:1px solid #D5DAE6;color:#1A2033;font-family:Onest,system-ui,sans-serif;font-size:13px;line-height:1.45"><i class="ph ph-info" style="font-size:16px"></i><span>Arşiv · 17 Ekim incelemesi. Bulguların güncel durumu: Kindora Acceptance Report.</span></div>
+
+<div style="max-width:1360px;margin:0 auto;padding:48px 40px 96px;display:flex;flex-direction:column;gap:72px">
+
+<header style="display:flex;flex-direction:column;gap:14px;max-width:860px">
+  <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#7A829C"><span style="padding:4px 10px;border-radius:999px;background:#EEF0FC;color:#3F50B8">Design Phase 6</span><span>Design Review</span></div>
+  <h1 style="margin:0;font-size:36px;font-weight:600;letter-spacing:-.02em">Tutarlılık, erişilebilirlik ve eksikler</h1>
+  <p style="margin:0;font-size:16px;line-height:1.6;color:#4A5370;text-wrap:pretty">Phase 1–5'in toplu incelemesi: hangi ekranların hazır olduğu, bileşenlerin tüm durumları, dark tema, kontrast ölçümleri ve düzeltilmesi gereken bulgular. Sonraki adım için kararınızı bekleyen sorular en altta.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <sc-for list="{{ summary }}" as="x" hint-placeholder-count="4"><div style="display:flex;align-items:baseline;gap:8px;padding:10px 14px;background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px"><span style="font-size:22px;font-weight:700">{{ x.n }}</span><span style="font-size:13px;color:#4A5370">{{ x.l }}</span></div></sc-for>
+  </div>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">01 · Ekran envanteri</div><h2 style="margin:0;font-size:26px;font-weight:600">Briefteki 26 ekran</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start">
+    <sc-for list="{{ inventory }}" as="g" hint-placeholder-count="3">
+      <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:8px 18px 12px">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 0"><i class="ph {{ g.icon }}" style="font-size:18px;color:#5265D8"></i><span style="font-size:15px;font-weight:600;flex:1">{{ g.group }}</span><span style="font-size:12px;color:#7A829C">{{ g.done }}</span></div>
+        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #F1F3F9">
+            <span style="font-size:12px;color:#7A829C;font-variant-numeric:tabular-nums">{{ it.n }}</span>
+            <div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:13px;font-weight:500">{{ it.name }}</span><span style="font-size:11px;color:#7A829C">{{ it.where }}</span></div>
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:{{ it.bg }};color:{{ it.c }};font-size:11px;font-weight:600;white-space:nowrap"><i class="ph {{ it.icon }}"></i>{{ it.status }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:860px"><div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">02 · Bileşen durumları</div><h2 style="margin:0;font-size:26px;font-weight:600">Tekrarlanan bileşenler, tüm durumlarıyla</h2><p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370">Prototiplerde dağınık duran durumlar tek yerde. Bu tablo Vue bileşenlerine (Bootstrap tabanlı) birebir aktarılacak referans.</p></div>
+
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:16px">
+    <span style="font-size:15px;font-weight:600">Button · KdButton</span>
+    <div style="display:grid;grid-template-columns:110px repeat(7,minmax(0,1fr));gap:10px;align-items:center">
+      <span></span>
+      <sc-for list="{{ stateNames }}" as="s" hint-placeholder-count="7"><span style="font-size:11px;font-weight:600;color:#7A829C;text-transform:uppercase;letter-spacing:.04em">{{ s }}</span></sc-for>
+    </div>
+    <sc-for list="{{ buttonRows }}" as="r" hint-placeholder-count="3">
+      <div style="display:grid;grid-template-columns:110px repeat(7,minmax(0,1fr));gap:10px;align-items:center">
+        <span style="font-size:13px;color:#4A5370">{{ r.name }}</span>
+        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7">
+          <span style="display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 10px;border-radius:8px;font-size:13px;font-weight:600;background:{{ c.bg }};color:{{ c.color }};border:{{ c.border }};outline:{{ c.outline }};outline-offset:2px;white-space:nowrap"><i class="ph {{ c.icon }}" style="animation:{{ c.anim }}"></i>{{ c.label }}</span>
+        </sc-for>
+      </div>
+    </sc-for>
+    <span style="font-size:12px;color:#7A829C">Focus: 3 px lavanta halka, 2 px boşluk. Disabled: opaklık yerine açık zemin + #5D6680 metin (kontrast 4.5:1 korunur).</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:15px;font-weight:600">Input · KdInput</span>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
+        <sc-for list="{{ inputs }}" as="i" hint-placeholder-count="6">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <span style="font-size:11px;font-weight:600;color:#7A829C;text-transform:uppercase;letter-spacing:.04em">{{ i.state }}</span>
+            <div style="height:40px;border-radius:8px;border:{{ i.border }};outline:{{ i.outline }};outline-offset:1px;background:{{ i.bg }};padding:0 12px;display:flex;align-items:center;gap:8px;font-size:14px;color:{{ i.color }}"><span style="flex:1">{{ i.value }}</span><i class="ph {{ i.icon }}" style="color:{{ i.iconColor }};animation:{{ i.anim }}"></i></div>
+            <span style="font-size:12px;color:{{ i.hintColor }}">{{ i.hint }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:15px;font-weight:600">Toggle · Segmented · Chip</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+        <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start"><span style="width:44px;height:26px;border-radius:999px;background:{{ t.bg }};padding:3px;display:flex;justify-content:{{ t.j }};outline:{{ t.outline }};outline-offset:2px"><span style="width:20px;height:20px;border-radius:999px;background:#FFFFFF;box-shadow:0 1px 2px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center"><i class="ph {{ t.icon }}" style="font-size:11px;color:#7A829C;animation:{{ t.anim }}"></i></span></span><span style="font-size:11px;color:#7A829C">{{ t.label }}</span></div></sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#F1F3F9;border-radius:10px;padding:4px;max-width:420px">
+        <span style="padding:8px 0;border-radius:7px;background:#FFFFFF;box-shadow:0 1px 3px rgba(26,32,51,.12);font-size:13px;font-weight:600;text-align:center">Seçili</span>
+        <span style="padding:8px 0;border-radius:7px;background:#E7EAF2;font-size:13px;font-weight:600;color:#4A5370;text-align:center">Hover</span>
+        <span style="padding:8px 0;border-radius:7px;background:#FDF4E3;border:1px dashed #F1D49C;font-size:13px;font-weight:600;color:#8A5A0C;text-align:center">Bekliyor</span>
+        <span style="padding:8px 0;border-radius:7px;font-size:13px;font-weight:600;color:#7A829C;text-align:center">Disabled</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="7"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:{{ c.bg }};color:{{ c.c }};font-size:12px;font-weight:600"><i class="ph {{ c.icon }}"></i>{{ c.l }}</span></sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <span style="font-size:15px;font-weight:600">Permission Request Card · KdRequestCard</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px">
+      <sc-for list="{{ reqStates }}" as="r" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;font-weight:600;color:#7A829C;text-transform:uppercase;letter-spacing:.04em">{{ r.state }}</span>
+          <div style="background:#FFFFFF;border:1px solid {{ r.border }};border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:150px">
+            <div style="display:flex;gap:10px;align-items:flex-start"><div style="width:32px;height:32px;border-radius:9px;background:#F1EFFD;color:#5B4FC0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph ph-hourglass-medium"></i></div><div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;font-weight:600">20 dk ek süre</span><span style="font-size:12px;color:#4A5370">“Evi bitirmek istiyorum.”</span></div></div>
+            <sc-if value="{{ r.actions }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:auto"><span style="padding:6px 10px;border-radius:7px;background:{{ r.pBg }};color:#FFFFFF;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px"><i class="ph {{ r.pIcon }}" style="animation:{{ r.anim }}"></i>{{ r.pLabel }}</span><span style="padding:6px 10px;border-radius:7px;border:1px solid #E4E8F1;font-size:12px;font-weight:600;color:{{ r.sColor }}">Reddet</span></div></sc-if>
+            <sc-if value="{{ r.result }}" hint-placeholder-val="{{ false }}"><span style="margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:{{ r.rBg }};color:{{ r.rC }};font-size:11px;font-weight:600;line-height:1.35"><i class="ph {{ r.rIcon }}"></i>{{ r.result }}</span></sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <span style="font-size:15px;font-weight:600">Device Status Card · KdDeviceStatus</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <sc-for list="{{ devStates }}" as="d" hint-placeholder-count="4">
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:10px;background:#EEF0FC;color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph ph-desktop" style="font-size:20px"></i></div>
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><span style="font-size:14px;font-weight:600">ELA-PC</span><span style="font-size:11px;color:#7A829C">{{ d.seen }}</span></div>
+          <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:{{ d.bg }};color:{{ d.c }};font-size:11px;font-weight:600;white-space:nowrap"><i class="ph {{ d.icon }}" style="animation:{{ d.anim }}"></i>{{ d.l }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:15px;font-weight:600">Notification Toast · KdToast</span>
+      <div style="background:#E9ECF3;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="4"><div style="background:#1A2033;color:#FFFFFF;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:13px"><i class="ph {{ t.icon }}" style="font-size:17px;color:{{ t.c }}"></i><span style="flex:1">{{ t.text }}</span><span style="font-size:11px;color:#A9B1C7">{{ t.rule }}</span></div></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:15px;font-weight:600">Empty · Loading · Offline</span>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><div style="width:40px;height:40px;border-radius:12px;background:#E3F7F3;color:#127A6A;display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:20px"></i></div><span style="font-size:13px;font-weight:600">Bekleyen talep yok</span><span style="font-size:12px;color:#7A829C">Yeni istekte bildirim alırsınız.</span></div>
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:16px 14px;display:flex;flex-direction:column;gap:10px" aria-busy="true"><div style="height:12px;width:60%;border-radius:4px;background:linear-gradient(90deg,#EEF0F5 0,#F7F9FC 50%,#EEF0F5 100%);background-size:400px 100%;animation:kd-shimmer 1.4s linear infinite"></div><div style="height:28px;width:80%;border-radius:6px;background:linear-gradient(90deg,#EEF0F5 0,#F7F9FC 50%,#EEF0F5 100%);background-size:400px 100%;animation:kd-shimmer 1.4s linear infinite"></div><div style="height:8px;border-radius:999px;background:#EEF0F5"></div><span style="font-size:11px;color:#7A829C;display:flex;align-items:center;gap:5px"><i class="ph ph-circle-notch" style="animation:kd-spin 1s linear infinite"></i>Cihazdan alınıyor…</span></div>
+        <div style="background:#F4F6FA;border:1px solid #D5DAE6;border-radius:12px;padding:20px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><div style="width:40px;height:40px;border-radius:12px;background:#FFFFFF;color:#4A5370;display:flex;align-items:center;justify-content:center"><i class="ph ph-wifi-slash" style="font-size:20px"></i></div><span style="font-size:13px;font-weight:600">ELA-PC çevrimdışı</span><span style="font-size:12px;color:#4A5370">Komutlar bağlanınca iletilir.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:15px;font-weight:600">Achievement Badge · KdBadge</span>
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:20px;padding:18px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+        <sc-for list="{{ badges }}" as="b" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><div style="width:64px;height:64px;border-radius:999px;background:{{ b.bg }};border:3px {{ b.style }} {{ b.ring }};color:{{ b.c }};display:flex;align-items:center;justify-content:center;outline:{{ b.outline }};outline-offset:3px"><i class="{{ b.icon }}" style="font-size:28px"></i></div><span style="font-family:Fredoka,sans-serif;font-size:14px;font-weight:600">{{ b.name }}</span><span style="font-size:11px;color:{{ b.sc }};font-weight:600">{{ b.state }}</span></div></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:15px;font-weight:600">Usage Progress · KdUsageBar</span>
+      <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px">
+        <sc-for list="{{ bars }}" as="b" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:#4A5370">{{ b.l }}</span><span style="font-weight:600;color:{{ b.tc }}">{{ b.v }}</span></div><div style="height:8px;border-radius:999px;background:#EEF0F5;overflow:hidden"><div style="height:100%;width:{{ b.w }};background:{{ b.c }};border-radius:999px"></div></div></div></sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:860px"><div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">03 · Dark tema</div><h2 style="margin:0;font-size:26px;font-weight:600">Aynı bileşenler, koyu yüzeyde</h2><p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370">Koyu temada durum renklerinin metin tonları açılıyor (ör. teal #127A6A → #5FDCC6); zemin tonları %14 opaklıkta. Primary #5265D8 koyu zeminde metin için yetersiz, #8C9BFF kullanılıyor.</p></div>
+  <div style="background:#111827;border-radius:18px;padding:24px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:16px">
+    <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px;color:#E9ECF5">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(140,128,232,.18);color:#B6AEF2;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">E</div>
+        <div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:16px;font-weight:600">Ela · 10 yaş</span><span style="font-size:13px;color:#A9B1C7;display:flex;align-items:center;gap:6px"><i class="ph ph-desktop"></i>ELA-PC · Windows 11</span></div>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(43,191,167,.14);color:#5FDCC6;font-size:12px;font-weight:600"><i class="ph-fill ph-circle" style="font-size:8px"></i>Çevrimiçi</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#111827;border-radius:10px;padding:4px">
+        <span style="padding:8px 0;border-radius:7px;background:#2E3850;font-size:13px;font-weight:600;text-align:center">Serbest</span><span style="padding:8px 0;font-size:13px;font-weight:600;color:#A9B1C7;text-align:center">Ders</span><span style="padding:8px 0;font-size:13px;font-weight:600;color:#A9B1C7;text-align:center">Mola</span><span style="padding:8px 0;font-size:13px;font-weight:600;color:#A9B1C7;text-align:center">Kısıtlı</span>
+      </div>
+      <div style="display:flex;gap:8px"><span style="padding:9px 14px;border-radius:8px;background:#5265D8;color:#FFFFFF;font-size:13px;font-weight:600">20 dk onayla</span><span style="padding:9px 14px;border-radius:8px;border:1px solid #2E3850;color:#E9ECF5;font-size:13px;font-weight:600">Reddet</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(231,168,62,.14);color:#F3C77A;font-size:12px;font-weight:600"><i class="ph ph-hourglass-medium"></i>Bekliyor</span></div>
+    </div>
+    <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px;color:#E9ECF5">
+      <span style="font-size:13px;color:#A9B1C7">Bugünkü ekran süresi</span>
+      <span style="font-size:30px;font-weight:700;letter-spacing:-.02em">1 sa 42 dk</span>
+      <div style="height:8px;border-radius:999px;background:#2E3850;overflow:hidden"><div style="width:68%;height:100%;background:#7B8BEA;border-radius:999px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#A9B1C7"><span>Limit 2 sa 30 dk</span><span style="font-weight:600;color:#8C9BFF">48 dk kaldı</span></div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:rgba(217,91,104,.14);color:#F29AA6;font-size:12px;font-weight:600"><i class="ph ph-warning-circle"></i>Kilitleme başarısız · tekrar dene</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;justify-content:center;align-items:flex-start">
+      <div style="width:224px;height:58px;background:#232D42;border:1px solid #2E3850;border-radius:999px;padding:4px 6px 4px 4px;display:flex;align-items:center;gap:8px">
+        <div style="width:50px;height:50px;border-radius:999px;background:rgba(82,101,216,.22);display:flex;align-items:center;justify-content:center">{{ mascotDark }}</div>
+        <div style="display:flex;flex-direction:column;gap:1px;flex:1"><span style="font-family:Fredoka,sans-serif;font-size:19px;font-weight:600;color:#E9ECF5">48 dk</span><span style="font-size:11px;color:#A9B1C7;display:flex;align-items:center;gap:5px"><i class="ph ph-sun"></i>Serbest zaman</span></div>
+        <span style="width:38px;height:38px;border-radius:999px;background:#2E3850;display:flex;align-items:center;justify-content:center;color:#A9B1C7"><i class="ph ph-caret-up"></i></span>
+      </div>
+      <div style="width:260px;background:#232D42;border:1px solid #2E3850;border-radius:18px;padding:12px 14px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:500;line-height:1.35;color:#E9ECF5">5 dakika sonra küçük bir mola vereceğiz.</div>
+      <span style="font-size:12px;color:#A9B1C7">Widget koyu temada da maskot gövdesini değiştirmez; yüz ekranı açık kalır.</span>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:860px"><div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">04 · Erişilebilirlik</div><h2 style="margin:0;font-size:26px;font-weight:600">Kontrast ölçümleri ve kurallar</h2><p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370">Oranlar bu sayfada WCAG formülüyle hesaplanıyor. Normal metin için 4.5:1, 18 px üstü kalın başlıklar için 3:1 eşik.</p></div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start">
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:6px 20px">
+      <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 70px 90px;gap:12px;padding:12px 0;font-size:12px;color:#7A829C;font-weight:500"><span>Örnek</span><span>Kullanım</span><span style="text-align:right">Oran</span><span style="text-align:right">Sonuç</span></div>
+      <sc-for list="{{ contrast }}" as="c" hint-placeholder-count="12">
+        <div style="display:grid;grid-template-columns:120px minmax(0,1fr) 70px 90px;gap:12px;padding:9px 0;border-top:1px solid #F1F3F9;align-items:center">
+          <span style="display:inline-flex;align-items:center;justify-content:center;height:30px;border-radius:7px;background:{{ c.bg }};color:{{ c.fg }};font-size:13px;font-weight:600;border:1px solid #E4E8F1;gap:6px"><span>Aa</span><span>{{ c.fgHex }}</span></span>
+          <div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:13px">{{ c.use }}</span><span style="font-size:11px;color:#7A829C">zemin {{ c.bgHex }}</span></div>
+          <span style="text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums">{{ c.ratio }}</span>
+          <span style="justify-self:end;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:{{ c.rbg }};color:{{ c.rc }};font-size:11px;font-weight:600"><i class="ph {{ c.ricon }}"></i>{{ c.res }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ a11y }}" as="a" hint-placeholder-count="6">
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:14px 16px;display:flex;gap:12px"><i class="ph {{ a.icon }}" style="font-size:20px;color:#5265D8;margin-top:1px"></i><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;font-weight:600">{{ a.t }}</span><span style="font-size:13px;line-height:1.5;color:#4A5370">{{ a.d }}</span></div></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:860px"><div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">05 · Bulgular</div><h2 style="margin:0;font-size:26px;font-weight:600">İnceleme bulguları ve önerilen düzeltmeler</h2></div>
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:6px 20px">
+    <div style="display:grid;grid-template-columns:90px 130px minmax(0,1.2fr) minmax(0,1fr);gap:16px;padding:12px 0;font-size:12px;color:#7A829C;font-weight:500"><span>Öncelik</span><span>Alan</span><span>Bulgu</span><span>Öneri</span></div>
+    <sc-for list="{{ findings }}" as="f" hint-placeholder-count="10">
+      <div style="display:grid;grid-template-columns:90px 130px minmax(0,1.2fr) minmax(0,1fr);gap:16px;padding:12px 0;border-top:1px solid #F1F3F9;align-items:start">
+        <span style="justify-self:start;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:{{ f.bg }};color:{{ f.c }};font-size:11px;font-weight:600">{{ f.sev }}</span>
+        <span style="font-size:13px;color:#4A5370">{{ f.area }}</span>
+        <span style="font-size:13px;line-height:1.5">{{ f.issue }}</span>
+        <span style="font-size:13px;line-height:1.5;color:#4A5370">{{ f.fix }}</span>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#127A6A">Korunan kararlar</div>
+    <sc-for list="{{ kept }}" as="k" hint-placeholder-count="6"><div style="display:flex;gap:10px;font-size:14px;line-height:1.55"><i class="ph ph-check" style="color:#127A6A;margin-top:4px"></i><span>{{ k }}</span></div></sc-for>
+  </div>
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8A5A0C">Kararınızı bekleyen sorular</div>
+    <sc-for list="{{ questions }}" as="q" hint-placeholder-count="5"><div style="display:flex;gap:10px;font-size:14px;line-height:1.55"><span style="color:#7A829C;min-width:18px">{{ q.n }}</span><span>{{ q.t }}</span></div></sc-for>
+  </div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function mascotMini(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M60 37 L60 26', stroke: '#21A08B', strokeWidth: 3, strokeLinecap: 'round' }),
+    h('path', { d: 'M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', fill: '#2BBFA7' }),
+    h('path', { d: 'M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', fill: '#3ED0B8' }),
+    h('path', { d: 'M27 80 Q19 86 21 93 M93 80 Q101 86 99 93', stroke: '#5265D8', strokeWidth: 8, fill: 'none', strokeLinecap: 'round' }),
+    h('path', { d: 'M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', fill: '#5265D8' }),
+    h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }),
+    h('ellipse', { cx: 50, cy: 72, rx: 3.6, ry: 4.8, fill: '#1B2150' }), h('ellipse', { cx: 70, cy: 72, rx: 3.6, ry: 4.8, fill: '#1B2150' }),
+    h('path', { d: 'M55 81 Q60 85 65 81', stroke: '#1B2150', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' }));
+}
+function lum(hex) {
+  const v = hex.replace('#', '').match(/../g).map(x => parseInt(x, 16) / 255).map(c => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)));
+  return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+}
+function ratio(a, b) { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+
+class Component extends DCLogic {
+  renderVals() {
+    const OK = ['Tamam', '#E3F7F3', '#127A6A', 'ph-check-circle'], PART = ['Kısmi', '#FDF4E3', '#8A5A0C', 'ph-circle-half'], MISS = ['Eksik', '#FCEBED', '#A8364A', 'ph-circle-dashed'];
+    const P2 = 'Phase 2', P3 = 'Phase 3', P4 = 'Phase 4', P5 = 'Phase 5';
+    const groups = [
+      ['Ebeveyn', 'ph-briefcase', [
+        [1, 'Welcome / Onboarding', 'Onboarding · Ebeveyn', OK], [2, 'Güvenli cihaz eşleştirme', P2 + ' · Cihazlar', OK], [3, 'Dashboard', P2 + ' / ' + P5, OK],
+        [4, 'Çocuk profili', P5 + ' · Ayarlar › Profil', OK], [5, 'Cihaz yönetimi', P2, OK], [6, 'Ekran süresi', P5, OK], [7, 'Haftalık zaman programı', P5, OK],
+        [8, 'Web sitesi kuralları', P5, OK], [9, 'Site kuralı oluşturma', P5 + ' · modal', OK], [10, 'İzin talepleri', P5, OK], [11, 'Kullanım raporları', P5, OK],
+        [12, 'Etkinlik geçmişi', P5, OK], [13, 'Ayarlar', P5, OK]]],
+      ['Çocuk', 'ph-smiley', [
+        [14, 'Welcome / Onboarding', 'Onboarding · Çocuk', OK], [15, 'Ana ekran', P3, OK], [16, 'Kalan süre ve hedefler', P3, OK], [17, 'Ek süre talebi', P3 + ' / ' + P4, OK],
+        [18, 'Site erişim talebi', P3, OK], [19, 'Mola ekranı', P4, OK], [20, 'Başarılar ve rozetler', P3, OK], [21, 'Maskot kişiselleştirme', P3, OK]]],
+      ['Widget', 'ph-app-window', [
+        [22, 'Mini Widget', P4, OK], [23, 'Expanded Widget', P4, OK], [24, 'Mascot Only', P4, OK], [25, 'Konuşma baloncuğu', P4, OK], [26, 'Bildirim / Uyarı durumları', P4, OK]]]
+    ];
+    const inventory = groups.map(([group, icon, items]) => ({ group, icon, done: `${items.filter(i => i[3] === OK).length} / ${items.length}`, items: items.map(([n, name, where, st]) => ({ n, name, where, status: st[0], bg: st[1], c: st[2], icon: st[3] })) }));
+    const all = groups.flatMap(g => g[2]);
+
+    const P = { bg: '#5265D8', color: '#FFFFFF', border: '0', icon: 'ph-check' };
+    const btn = (base, map) => ['Default', 'Hover', 'Active', 'Focus', 'Disabled', 'Loading', 'Error / Success'].map(k => Object.assign({ outline: '0 solid transparent', anim: 'none', label: base.label }, base, map[k] || {}));
+    const buttonRows = [
+      { name: 'Primary', cells: btn(Object.assign({ label: 'Onayla' }, P), { Hover: { bg: '#4657C8' }, Active: { bg: '#3F50B8' }, Focus: { outline: '3px solid #8C80E8' }, Disabled: { bg: '#E4E8F1', color: '#5D6680' }, Loading: { bg: '#4657C8', icon: 'ph-circle-notch', anim: 'kd-spin 1s linear infinite', label: 'Gönder…' }, 'Error / Success': { bg: '#127A6A', icon: 'ph-check-circle', label: 'Tamam' } }) },
+      { name: 'Secondary', cells: btn({ label: 'Reddet', bg: '#FFFFFF', color: '#1A2033', border: '1px solid #E4E8F1', icon: 'ph-x' }, { Hover: { bg: '#F7F9FC', border: '1px solid #B9C2EE' }, Active: { bg: '#EEF0F5' }, Focus: { outline: '3px solid #8C80E8' }, Disabled: { bg: '#F7F9FC', color: '#5D6680' }, Loading: { icon: 'ph-circle-notch', anim: 'kd-spin 1s linear infinite', label: 'Bekleyin' }, 'Error / Success': { border: '1px solid #F0C2CA', color: '#A8364A', icon: 'ph-warning-circle', label: 'Tekrar' } }) },
+      { name: 'Danger', cells: btn({ label: 'Kilitle', bg: '#C9475A', color: '#FFFFFF', border: '0', icon: 'ph-lock-simple' }, { Hover: { bg: '#B83F51' }, Active: { bg: '#A8364A' }, Focus: { outline: '3px solid #8C80E8' }, Disabled: { bg: '#F4E1E4', color: '#7D4A53' }, Loading: { icon: 'ph-hourglass-medium', label: 'Bekliyor', bg: '#FDF4E3', color: '#8A5A0C', border: '1px solid #F1D49C' }, 'Error / Success': { bg: '#FCEBED', color: '#A8364A', border: '1px solid #F0C2CA', icon: 'ph-warning-circle', label: 'Başarısız' } }) }
+    ];
+    const inputs = [
+      { state: 'Default', value: 'ornek.com', border: '1px solid #D5DAE6', bg: '#FFFFFF', color: '#7A829C', icon: 'ph-globe-simple', iconColor: '#7A829C', hint: 'Yalnızca alan adı', hintColor: '#7A829C' },
+      { state: 'Focus', value: 'youtube.com', border: '1px solid #5265D8', outline: '3px solid #C9CFF5', bg: '#FFFFFF', color: '#1A2033', icon: 'ph-globe-simple', iconColor: '#5265D8', hint: 'Yazarken doğrulanır', hintColor: '#7A829C' },
+      { state: 'Uyarı', value: 'youtube.com/watch?v=…', border: '1px solid #E7A83E', bg: '#FFFFFF', color: '#1A2033', icon: 'ph-info', iconColor: '#8A5A0C', hint: 'Kural tüm youtube.com için geçerli olur', hintColor: '#8A5A0C' },
+      { state: 'Error', value: 'youtube', border: '1px solid #D95B68', bg: '#FFFFFF', color: '#1A2033', icon: 'ph-warning-circle', iconColor: '#A8364A', hint: 'Geçerli bir alan adı girin', hintColor: '#A8364A' },
+      { state: 'Loading', value: 'scratch.mit.edu', border: '1px solid #D5DAE6', bg: '#FFFFFF', color: '#1A2033', icon: 'ph-circle-notch', iconColor: '#7A829C', anim: 'kd-spin 1s linear infinite', hint: 'Kontrol ediliyor…', hintColor: '#7A829C' },
+      { state: 'Disabled', value: 'eba.gov.tr', border: '1px solid #E4E8F1', bg: '#F4F6FA', color: '#5D6680', icon: 'ph-lock-simple', iconColor: '#5D6680', hint: 'Ders modunda değiştirilemez', hintColor: '#5D6680' }
+    ].map(i => Object.assign({ outline: '0 solid transparent', anim: 'none' }, i));
+    const toggles = [['Kapalı', '#C9CFDD', 'flex-start'], ['Açık', '#5265D8', 'flex-end'], ['Focus', '#5265D8', 'flex-end', '3px solid #8C80E8'], ['Kilitli', '#9AA6E6', 'flex-end', null, 'ph-lock-simple'], ['Loading', '#C9CFDD', 'center', null, 'ph-circle-notch', 'kd-spin 1s linear infinite']].map(([label, bg, j, outline, icon, anim]) => ({ label, bg, j, outline: outline || '0 solid transparent', icon: icon || '', anim: anim || 'none' }));
+    const chips = [['Çevrimiçi', '#E3F7F3', '#127A6A', 'ph-circle'], ['Çevrimdışı', '#EEF0F5', '#4A5370', 'ph-wifi-slash'], ['Bilinmiyor', '#EEF0F5', '#4A5370', 'ph-question'], ['Bekliyor', '#FDF4E3', '#8A5A0C', 'ph-hourglass-medium'], ['Sırada', '#FDF4E3', '#8A5A0C', 'ph-clock-countdown'], ['Başarısız', '#FCEBED', '#A8364A', 'ph-warning-circle'], ['Ders modu', '#EEF0FC', '#3F50B8', 'ph-book-open']].map(([l, bg, c, icon]) => ({ l, bg, c, icon }));
+    const reqStates = [
+      { state: 'Default', border: '#E4E8F1', actions: true, pBg: '#5265D8', pIcon: 'ph-check', pLabel: '20 dk onayla', sColor: '#1A2033', anim: 'none' },
+      { state: 'Loading', border: '#E4E8F1', actions: true, pBg: '#4657C8', pIcon: 'ph-circle-notch', pLabel: 'Gönderiliyor', sColor: '#5D6680', anim: 'kd-spin 1s linear infinite' },
+      { state: 'Success', border: '#BCEBE1', result: 'Onaylandı · 20 dk eklendi', rBg: '#E3F7F3', rC: '#127A6A', rIcon: 'ph-check-circle' },
+      { state: 'Rejected', border: '#E4E8F1', result: 'Reddedildi · Ela\'ya notla iletildi', rBg: '#EEF0F5', rC: '#4A5370', rIcon: 'ph-minus-circle' },
+      { state: 'Error', border: '#F0C2CA', result: 'Gönderilemedi · bağlantı yok', rBg: '#FCEBED', rC: '#A8364A', rIcon: 'ph-warning-circle' }
+    ].map(r => Object.assign({ actions: false, result: null, anim: 'none' }, r));
+    const devStates = [['Çevrimiçi', 'Son bağlantı: şimdi', '#E3F7F3', '#127A6A', 'ph-circle'], ['Çevrimdışı', '2 sa 14 dk önce', '#EEF0F5', '#4A5370', 'ph-wifi-slash'], ['Bilinmiyor', 'Son bilgi: 10:42', '#EEF0F5', '#4A5370', 'ph-question'], ['Kontrol', 'Test ediliyor…', '#FDF4E3', '#8A5A0C', 'ph-circle-notch', 'kd-spin 1s linear infinite']].map(([l, seen, bg, c, icon, anim]) => ({ l, seen, bg, c, icon, anim: anim || 'none' }));
+    const toasts = [['ph-info', '#8C9BFF', 'Ders modu isteği gönderildi', '3.6 sn'], ['ph-hourglass-medium', '#F3C77A', 'Mola gönderildi · cihaz onayı bekleniyor', 'sonuca kadar'], ['ph-check-circle', '#5FDCC6', 'ELA-PC kilitlendi', '3.6 sn'], ['ph-warning-circle', '#F29AA6', 'ELA-PC yanıt vermedi · kilit uygulanmadı', 'kapatılana kadar']].map(([icon, c, text, rule]) => ({ icon, c, text, rule }));
+    const badges = [['Mola Ustası', 'ph-fill ph-coffee', '#E3F7F3', '#2BBFA7', 'solid', '#127A6A', 'Kazanıldı', '#127A6A'], ['Dijital Denge', 'ph ph-scales', '#F7F8FC', '#C9CFDD', 'dashed', '#4A5370', '3 / 5 gün', '#5B4FC0'], ['Meraklı Kaşif', 'ph ph-compass', '#F7F8FC', '#C9CFDD', 'dashed', '#4A5370', 'Başlanmadı', '#4A5370'], ['Odak Kahramanı', 'ph-fill ph-target', '#E3F7F3', '#2BBFA7', 'solid', '#127A6A', 'Focus', '#127A6A', '3px solid #8C80E8']].map(([name, icon, bg, ring, style, c, state, sc, outline]) => ({ name, icon, bg, ring, style, c, state, sc, outline: outline || '0 solid transparent' }));
+    const bars = [['Normal', '1 sa 42 dk / 2 sa 30 dk', '68%', '#5265D8', '#1A2033'], ['Az kaldı (<%15)', '18 dk kaldı', '88%', '#E7A83E', '#8A5A0C'], ['Ek süre eklendi', '+15 dk · 2 sa 45 dk', '62%', '#2BBFA7', '#127A6A'], ['Doldu', 'Yarın 2 sa 30 dk', '100%', '#8C80E8', '#5B4FC0']].map(([l, v, w, c, tc]) => ({ l, v, w, c, tc }));
+
+    const pairs = [
+      ['#1A2033', '#FFFFFF', 'Gövde metni'], ['#4A5370', '#FFFFFF', 'İkincil metin'], ['#7A829C', '#FFFFFF', 'Yardımcı metin (12 px)'],
+      ['#FFFFFF', '#5265D8', 'Primary buton'], ['#3F50B8', '#EEF0FC', 'Seçili menü'], ['#127A6A', '#E3F7F3', 'Çevrimiçi etiketi'],
+      ['#8A5A0C', '#FDF4E3', 'Bekliyor etiketi'], ['#A8364A', '#FCEBED', 'Başarısız etiketi'], ['#5B4FC0', '#F1EFFD', 'Çocuk vurgu metni'],
+      ['#5D6680', '#E4E8F1', 'Disabled buton (yeni)'], ['#2BBFA7', '#FFFFFF', 'Teal dolgu metin olarak'], ['#E9ECF5', '#1A2233', 'Dark · gövde'],
+      ['#A9B1C7', '#1A2233', 'Dark · ikincil'], ['#5FDCC6', '#1A2233', 'Dark · çevrimiçi'], ['#8C9BFF', '#1A2233', 'Dark · link/primary']
+    ];
+    const contrast = pairs.map(([fg, bg, use]) => { const r = ratio(fg, bg); const res = r >= 4.5 ? 'AA' : r >= 3 ? 'Yalnız başlık' : 'Kullanma'; return { fg, bg, fgHex: fg, bgHex: bg, use, ratio: r.toFixed(2) + ':1', res, rbg: r >= 4.5 ? '#E3F7F3' : r >= 3 ? '#FDF4E3' : '#FCEBED', rc: r >= 4.5 ? '#127A6A' : r >= 3 ? '#8A5A0C' : '#A8364A', ricon: r >= 4.5 ? 'ph-check' : r >= 3 ? 'ph-warning' : 'ph-x' }; });
+    const fails = contrast.filter(c => c.res !== 'AA').length;
+
+    const high = ['Yüksek', '#FCEBED', '#A8364A'], mid = ['Orta', '#FDF4E3', '#8A5A0C'], low = ['Düşük', '#EEF0F5', '#4A5370'];
+    const findings = [
+      [high, 'Onboarding', 'Ebeveyn (#1) ve çocuk (#14) karşılama akışları henüz yok. İlk kurulumda hesap, çocuk profili, eşleştirme ve Filiz tanışması tek akışta olmalı.', 'Ayrı bir Onboarding dosyası: ebeveyn 4 adım, çocuk 3 adım.'],
+      [high, 'Disabled durumları', 'Phase 2 ve 5\'te kapalı hızlı işlemler opacity .5 ile soluklaştırılıyor; metin kontrastı 4.5:1\'in altına düşüyor.', 'Opaklık yerine #F4F6FA zemin + #5D6680 metin (bu sayfadaki yeni Disabled). Neden kapalı olduğu alt satırda yazılı kalsın.'],
+      [high, 'Hata toast\'ları', 'Hata bildirimleri de 3.6 sn sonra kayboluyor; "kilitlenemedi" gibi kritik sonuç kaçırılabilir.', 'Hata toast\'ı kapatılana kadar kalır, aksiyon içerir (Tekrar dene). Bilgi/başarı 3.6 sn.'],
+      [high, 'Yardımcı metin rengi', 'Phase 2–5\'te zaman damgaları, alt başlıklar ve "Son bağlantı" satırları 11–12 px #7A829C; beyaz üzerinde 3.82:1 ile AA\'yı geçmiyor.', 'Yardımcı metin tokenını #5D6680\'e (≈5.9:1) koyulaştır; #7A829C yalnızca ikon ve dekoratif çizgilerde kalsın.'],
+      [mid, 'Dark tema', 'Prototiplerde yalnızca Light uygulanmış; dark tokenlar tanımlı ama ekranlara bağlanmadı.', 'Bootstrap\'ın data-bs-theme yapısıyla CSS değişkenlerine geçiş; bu sayfadaki dark eşlemesi referans.'],
+      [mid, 'Widget klavye erişimi', 'Widget yalnızca fareyle sürükleniyor.', 'Widget odaktayken ok tuşları köşe değiştirir; köşe seçimi ayarlarda da var.'],
+      [mid, 'Küçük metin', 'Widget ve kart alt satırlarında 11 px metin var; %100 ölçekte sınırda okunur.', 'Minimum 12 px; Windows %125–150 ölçeklemede test.'],
+      [mid, 'Çocuk profili (#4)', 'Profil yalnızca Ayarlar\'da bir satır; yaş, maskot, bildirim tercihi ve cihazlar tek ekranda görünmüyor.', 'Ayarlar > Çocuk profilleri içinde detay sayfası.'],
+      [low, 'Maskot çizimi', 'Filiz SVG konsept çizimi; ifade ve kol pozları kaba.', 'İllüstratörle son çizim + Lottie/Rive animasyonları; bu sayfadaki durum tablosu brif olarak kullanılabilir.'],
+      [low, 'Rapor grafiği', 'Çubuk grafiğin değerleri yalnızca görsel; ekran okuyucu için tablo karşılığı yok.', 'Grafiğin altında gizli <table> veya "Tablo olarak göster" bağlantısı.'],
+      [low, 'Tutarlılık', 'Ebeveyn kart köşesi 12 px, çocuk 24–28 px, widget 22 px; kasıtlı ama belgelenmemişti.', 'Radius ölçeği: 8 (kontrol) · 12 (ebeveyn kart) · 22 (widget) · 28 (çocuk kart) · 999 (pill).']
+    ].map(([s, area, issue, fix]) => ({ sev: s[0], bg: s[1], c: s[2], area, issue, fix }));
+
+    return {
+      summary: [
+        { n: `${all.filter(i => i[3] === OK).length} / 26`, l: 'ekran hazır' }, { n: all.filter(i => i[3] === PART).length, l: 'kısmi' },
+        { n: all.filter(i => i[3] === MISS).length, l: 'eksik' }, { n: findings.filter(f => f.sev === 'Yüksek').length, l: 'yüksek öncelikli bulgu' }
+      ],
+      inventory,
+      stateNames: ['Default', 'Hover', 'Active', 'Focus', 'Disabled', 'Loading', 'Sonuç'],
+      buttonRows, inputs, toggles, chips, reqStates, devStates, toasts, badges, bars,
+      mascotDark: mascotMini(42),
+      contrast,
+      a11y: [
+        { icon: 'ph-keyboard', t: 'Klavye', d: 'Tüm eylemler Tab ile erişilebilir; modallar odağı içinde tutar, Esc kapatır. Program ızgarası ok tuşları + Boşluk ile boyanır.' },
+        { icon: 'ph-selection', t: 'Odak göstergesi', d: '3 px #8C80E8 halka, 2 px boşluk; her yüzeyde 3:1 üstü.' },
+        { icon: 'ph-person-simple-walk', t: 'Azaltılmış hareket', d: 'prefers-reduced-motion ve uygulama içi ayar: süzülme, zıplama ve göz kırpma durur.' },
+        { icon: 'ph-hand-tap', t: 'Tıklama alanı', d: 'Ebeveynde en az 32 px, çocuk ve widget düğmelerinde en az 38–44 px.' },
+        { icon: 'ph-palette', t: 'Renk tek başına değil', d: 'Her durum ikon + kelime taşır (Çevrimiçi, Bekliyor, Başarısız).' },
+        { icon: 'ph-speaker-high', t: 'Ekran okuyucu', d: 'Toast ve balonlar role="status"; kalan süre halkası aria-valuenow ile; maskot dekoratif (aria-hidden).' }
+      ],
+      findings,
+      kept: [
+        'Önerilen 7 renk, tint + metin tonu eşleşmeleriyle',
+        'Onest arayüz, Fredoka yalnızca çocuk tarafı',
+        'Filiz: çakıl gövde, yüz ekranı, iki yapraklı filiz; varsayılan ad Filiz, çocuk değiştirebilir',
+        'Belirsiz komutlar amber "bekliyor"; cihaz onayı olmadan başarı yok',
+        'Onaysız ek süre limiti uzatmaz; ret mesajları yargısız',
+        'Mercan (danger) çocuk arayüzünde kullanılmaz',
+        'Ebeveyn paneli Light varsayılan; çocuk seçici üst barda'
+      ],
+      questions: [
+        { n: '1', t: 'Eksik iki onboarding akışını (ebeveyn + çocuk) bir sonraki adımda tasarlayalım mı?' },
+        { n: '2', t: 'Yüksek öncelikli düzeltmeleri (disabled kontrastı, kalıcı hata toast\'ları) Phase 2 ve 5 dosyalarına uygulayayım mı?' },
+        { n: '3', t: 'Dark temayı tüm ebeveyn paneline uygulanmış ayrı bir prototip olarak görmek ister misiniz?' },
+        { n: '4', t: 'Geliştirici devri için bileşen listesi ve token dosyası (Bootstrap SCSS değişkenleri) hazırlayayım mı?' },
+        { n: '5', t: 'Mobil ebeveyn paneli bu aşamaya dahil mi, yoksa sonraki sürüme mi kalsın?' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

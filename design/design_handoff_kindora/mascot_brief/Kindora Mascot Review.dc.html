@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+body{margin:0;background:#F7F9FC;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div data-screen-label="Mascot Review" style="max-width:1200px;margin:0 auto;padding:40px 32px 64px;display:flex;flex-direction:column;gap:36px">
+
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:#FDF4E3;color:#8A5A0C;font-size:13px;font-weight:600"><i class="ph ph-hourglass-medium"></i>Konsept · nihai değil</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:#EEF0F5;color:#4A5370;font-size:13px;font-weight:600">Ayrı kabul kapısı</span>
+    </div>
+    <h1 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-.02em">Filiz · maskot kabul incelemesi</h1>
+    <p style="margin:0;max-width:760px;font-size:16px;line-height:1.6;color:#4A5370;text-wrap:pretty">Filiz şu an SVG konsept çizimidir. Bu sayfadaki altı inceleme konsepti doğrulamak içindir. Nihai illüstrasyon, <a href="Kindora Mascot Brief.dc.html">illüstrasyon brifine</a> göre çizildikten sonra aynı altı başlıkta ayrıca onaylanacaktır. Ürün ekranlarının kabulü maskot kabulüne bağlı değildir.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px">
+      <sc-for list="{{ gates }}" as="g" hint-placeholder-count="6"><a href="#{{ g.id }}" style="text-decoration:none;color:#1A2033;background:#FFFFFF;border:1px solid #E4E8F1;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;font-weight:600">{{ g.n }} · {{ g.t }}</span><span style="font-size:12px;color:#8A5A0C;display:flex;align-items:center;gap:4px"><i class="ph ph-hourglass-medium"></i>Onay bekliyor</span></a></sc-for>
+    </div>
+  </header>
+
+  <section id="m1" style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center">
+    <div style="background:#F1EFFD;border-radius:24px;display:flex;align-items:center;justify-content:center;padding:24px;aspect-ratio:1">{{ full }}</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">1 · Tam görünüm</span>
+      <h2 style="margin:0;font-size:24px;font-weight:600">Silüet, oran ve kimlik</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370">Çakıl gövde, tepede iki yapraklı filiz, açık yüz paneli, kısa tüp kollar. Bacak, parmak ve kaş yok.</p>
+      <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Kontrol soruları</span><sc-for list="{{ q1 }}" as="q" hint-placeholder-count="4"><span style="font-size:14px;color:#4A5370;display:flex;gap:8px"><i class="ph ph-square" style="color:#5D6680;margin-top:3px"></i>{{ q }}</span></sc-for></div>
+    </div>
+  </section>
+
+  <section id="m2" style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">2 · Ölçekler</span><h2 style="margin:0;font-size:24px;font-weight:600">96 · 48 · 32 · 24 px</h2><p style="margin:0;font-size:15px;color:#4A5370">Gerçek piksel boyutunda. 48 px ve altında gölge yok. 24 px'de yaprak çifti ve gövde tanınmalı.</p></div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+      <div style="background:#F7F9FC;border-radius:14px;padding:24px;display:flex;align-items:flex-end;gap:32px;flex-wrap:wrap"><sc-for list="{{ scalesL }}" as="z" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;gap:8px">{{ z.el }}<span style="font-size:13px;font-weight:600;color:#4A5370">{{ z.px }} px</span></div></sc-for></div>
+      <div style="background:#111827;border-radius:14px;padding:24px;display:flex;align-items:flex-end;gap:32px;flex-wrap:wrap"><sc-for list="{{ scalesD }}" as="z" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;gap:8px">{{ z.el }}<span style="font-size:13px;font-weight:600;color:#A9B1C7">{{ z.px }} px</span></div></sc-for></div>
+    </div>
+  </section>
+
+  <section id="m3" style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">3 · Durum pozları</span><h2 style="margin:0;font-size:24px;font-weight:600">10 durum, statik son kare</h2><p style="margin:0;font-size:15px;color:#4A5370">Hareketi azalt açıkken görünen kare budur; her durum hareketsiz de anlaşılmalı. Animasyonlar Phase 4'teki tabloya göre.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+      <sc-for list="{{ poses }}" as="p" hint-placeholder-count="10"><div style="background:#F6F5FE;border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">{{ p.el }}<span style="font-family:Fredoka,sans-serif;font-size:17px;font-weight:600;color:#1F1A5C">{{ p.tr }}</span><span style="font-size:13px;color:#4A5370">{{ p.trig }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <section id="m4" style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">4 · Konuşma balonu</span><h2 style="margin:0;font-size:24px;font-weight:600">Balonla birlikte</h2><p style="margin:0;font-size:15px;color:#4A5370">Balon maskotun yönüne bakar; kuyruk maskota değer. Metin en fazla iki satır.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+      <sc-for list="{{ bubbles }}" as="b" hint-placeholder-count="3">
+        <div style="background:#F7F9FC;border-radius:14px;padding:20px;display:flex;align-items:flex-end;gap:10px">
+          {{ b.el }}
+          <div style="position:relative;flex:1;background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px 16px 16px 4px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 20px rgba(26,32,51,.08)">
+            <span style="font-family:Fredoka,sans-serif;font-size:16px;font-weight:500;line-height:1.35;color:#1A2033">{{ b.text }}</span>
+            <sc-if value="{{ b.act }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="padding:6px 12px;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:13px;font-weight:600">{{ b.a1 }}</span><span style="padding:6px 12px;border-radius:999px;background:#F1F3F9;color:#1A2033;font-size:13px;font-weight:600">{{ b.a2 }}</span></div></sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="m5" style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">5 · Compact widget</span><h2 style="margin:0;font-size:24px;font-weight:600">224 × 58 içinde 32 px Filiz</h2><p style="margin:0;font-size:15px;color:#4A5370">Gerçek boyutta, açık ve koyu masaüstü üstünde. Uyarı durumunda çerçeve amber.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+      <sc-for list="{{ widgets }}" as="w" hint-placeholder-count="3">
+        <div style="background:{{ w.desk }};border-radius:14px;padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div style="width:224px;height:58px;background:#FFFFFF;border-radius:999px;padding:4px 6px 4px 4px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 28px rgba(0,0,0,.28);outline:{{ w.outline }}">
+            <div style="width:50px;height:50px;border-radius:999px;background:#F1EFFD;display:flex;align-items:center;justify-content:center">{{ w.el }}</div>
+            <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0"><span style="font-family:Fredoka,sans-serif;font-size:19px;font-weight:600;line-height:1.1">{{ w.left }}</span><span style="font-size:12px;color:{{ w.subC }}">{{ w.sub }}</span></div>
+            <span style="width:38px;height:38px;border-radius:999px;background:#F1F3F9;display:flex;align-items:center;justify-content:center;color:#4A5370"><i class="ph ph-caret-up"></i></span>
+          </div>
+          <span style="font-size:13px;font-weight:600;color:{{ w.labelC }}">{{ w.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="m6" style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">6 · Açık ve koyu zemin</span><h2 style="margin:0;font-size:24px;font-weight:600">4 renk × 4 zemin</h2><p style="margin:0;font-size:15px;color:#4A5370">Çocuğun seçebildiği gövde renkleri, ürünün kullandığı zeminlerde. Gece gövde koyu zeminde sınırda; 1 px açık kontur önerisi açık soru.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+      <sc-for list="{{ grounds }}" as="g" hint-placeholder-count="4">
+        <div style="background:{{ g.bg }};border:1px solid {{ g.bd }};border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px">
+          <span style="font-size:13px;font-weight:600;color:{{ g.c }}">{{ g.name }} · {{ g.bg }}</span>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;justify-items:center"><sc-for list="{{ g.items }}" as="it" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;gap:4px">{{ it.el }}<span style="font-size:12px;color:{{ g.c }}">{{ it.n }}</span></div></sc-for></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer style="background:#FDF4E3;border:1px solid #F1D49C;border-radius:14px;padding:18px 20px;display:flex;gap:12px;color:#6B4508;font-size:15px;line-height:1.55">
+    <i class="ph ph-info" style="font-size:20px;margin-top:2px"></i>
+    <span>Bu sayfadaki onaylar yalnızca konsept yönünü kabul eder. İllüstratörden gelen nihai çizim ve animasyon dosyaları aynı altı başlıkta yeniden incelenir; onaylanana kadar ürün dosyalarındaki Filiz yer tutucu sayılır.</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ANIM = {
+  idle: 'kd-bob 3.4s ease-in-out infinite', greeting: 'kd-hop .8s ease-out 2', reminder: 'kd-nudge .5s ease-in-out 2',
+  break: 'kd-stretch 2.6s ease-in-out infinite', happy: 'kd-hop .7s ease-out 3', thinking: 'kd-tilt 2s ease-in-out infinite',
+  sleeping: 'kd-breathe 4s ease-in-out infinite', permission: 'kd-bob 2.4s ease-in-out infinite', approved: 'kd-hop .7s ease-out 2', encourage: 'kd-nudge .6s ease-in-out 2'
+};
+function mascot(state, size, o) {
+  const h = React.createElement;
+  const body = ({ indigo: '#5265D8', lavanta: '#8C80E8', teal: '#23A893', gece: '#39437A' })[o.color] || '#5265D8', ink = '#1B2150', k = [];
+  const lA = o.color === 'teal' ? '#8C80E8' : '#2BBFA7', lB = o.color === 'teal' ? '#A99FF0' : '#3ED0B8';
+  const P = (d, a) => k.push(h('path', Object.assign({ d }, a)));
+  const S = (d, w) => P(d, { stroke: w || ink, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+  if (!o.noShadow) k.push(h('ellipse', { cx: 60, cy: 112, rx: 26, ry: 4, fill: 'rgba(26,32,51,.14)' }));
+  const sleepy = state === 'sleeping';
+  if (sleepy) { S('M60 37 Q60 30 65 27', '#21A08B'); P('M65 27 C71 22 78 25 79 27 C75 33 68 32 65 27Z', { fill: lA }); }
+  else { S('M60 37 L60 26', '#21A08B'); P('M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', { fill: lA }); P('M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', { fill: lB }); }
+  const arm = (d, wave) => k.push(h('path', { d, stroke: body, strokeWidth: 8, fill: 'none', strokeLinecap: 'round', style: wave && o.motion ? { transformOrigin: '93px 70px', animation: 'kd-wave .6s ease-in-out 3' } : null }));
+  if (state === 'greeting') { arm('M27 80 Q19 86 21 93'); arm('M93 70 Q106 60 104 46', true); }
+  else if (state === 'break' || state === 'happy') { arm('M29 64 Q17 52 21 40'); arm('M91 64 Q103 52 99 40'); }
+  else if (state === 'permission') { arm('M30 86 Q38 96 48 96'); arm('M90 86 Q82 96 72 96'); }
+  else { arm('M27 80 Q19 86 21 93'); arm('M93 80 Q101 86 99 93'); }
+  P('M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', { fill: body });
+  P('M42 46 C48 41 54 40 58 40', { stroke: 'rgba(255,255,255,.35)', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  k.push(h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }));
+  const joy = ['happy', 'approved', 'greeting'].includes(state), closed = sleepy || state === 'break';
+  const eyes = (dx, dy, ry) => k.push(h('g', { style: o.motion && !closed ? { transformOrigin: '60px 72px', animation: 'kd-blink 5s infinite' } : null },
+    h('ellipse', { cx: 50 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink }), h('ellipse', { cx: 70 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink })));
+  if (joy) { S('M46 74 Q50 68 54 74'); S('M66 74 Q70 68 74 74'); }
+  else if (closed) { S('M46 72 Q50 76 54 72'); S('M66 72 Q70 76 74 72'); }
+  else if (state === 'thinking') eyes(2, -3, 4);
+  else if (state === 'encourage') { k.push(h('ellipse', { cx: 50, cy: 72, rx: 3.6, ry: 4.8, fill: ink })); S('M66 73 Q70 69 74 73'); }
+  else eyes(0, 0, 4.8);
+  if (!sleepy) { k.push(h('circle', { cx: 42, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); k.push(h('circle', { cx: 78, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); }
+  if (joy || state === 'encourage') P('M53 80 Q60 89 67 80 Z', { fill: ink });
+  else if (state === 'permission') k.push(h('ellipse', { cx: 60, cy: 83, rx: 2.6, ry: 3, fill: ink }));
+  else if (sleepy) S('M57 83 L63 83');
+  else if (state === 'thinking') S('M56 83 Q60 81 64 83');
+  else S('M55 81 Q60 85 65 81');
+  const badge = (fill, kid) => k.push(h('g', null, h('circle', { cx: 99, cy: 40, r: 11, fill, stroke: '#FFFFFF', strokeWidth: 2.5 }), kid));
+  if (state === 'reminder') badge('#E7A83E', h('path', { d: 'M99 34 L99 40 L103 43', stroke: '#FFFFFF', strokeWidth: 2.5, fill: 'none', strokeLinecap: 'round' }));
+  if (state === 'approved') badge('#2BBFA7', h('path', { d: 'M94 40 L98 44 L104 36', stroke: '#FFFFFF', strokeWidth: 2.8, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }));
+  if (state === 'permission') badge('#8C80E8', h('path', { d: 'M95.5 34 L102.5 34 L95.5 46 L102.5 46 Z', stroke: '#FFFFFF', strokeWidth: 2, fill: 'none', strokeLinejoin: 'round' }));
+  if (state === 'encourage') P('M99 28 L102 36 L110 36 L104 41 L106 49 L99 44 L92 49 L94 41 L88 36 L96 36 Z', { fill: '#E7A83E' });
+  if (state === 'thinking') [[93, 46, 2.5], [100, 38, 3.3], [108, 29, 4.2]].forEach(([cx, cy, r]) => k.push(h('circle', { cx, cy, r, fill: '#B6AEF2' })));
+  if (sleepy) { k.push(h('text', { x: 90, y: 44, fontSize: 15, fontWeight: 700, fill: '#8C80E8', fontFamily: 'Fredoka,sans-serif' }, 'z')); k.push(h('text', { x: 101, y: 32, fontSize: 11, fontWeight: 700, fill: '#B6AEF2', fontFamily: 'Fredoka,sans-serif' }, 'z')); }
+  if (state === 'happy') { P('M18 30 L20 36 L26 38 L20 40 L18 46 L16 40 L10 38 L16 36 Z', { fill: '#E7A83E' }); P('M104 22 L105.5 26 L109.5 27.5 L105.5 29 L104 33 L102.5 29 L98.5 27.5 L102.5 26 Z', { fill: lA }); }
+  return h('div', { key: state + (o.k || ''), style: { width: size, height: size, flexShrink: 0, transformOrigin: '50% 90%', animation: o.motion ? ANIM[state] : 'none' } }, h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true }, ...k));
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const m = (st, z, x) => mascot(st, z, Object.assign({ motion: false, noShadow: z <= 48 }, x || {}));
+    const sc = [96, 48, 32, 24];
+    const V = [['indigo', 'İndigo'], ['lavanta', 'Lavanta'], ['teal', 'Deniz'], ['gece', 'Gece']];
+    return {
+      gates: [['m1', 'Tam görünüm'], ['m2', 'Ölçekler'], ['m3', '10 durum'], ['m4', 'Konuşma balonu'], ['m5', 'Compact widget'], ['m6', 'Açık / koyu zemin']].map(([id, t], i) => ({ id, t, n: i + 1 })),
+      full: m('idle', 360, { noShadow: false }),
+      q1: ['Clippy veya başka bir maskotu çağrıştırmıyor mu?', '8–13 yaşa uygun mu, bebeksi değil mi?', 'Cinsiyet ve yaş açısından nötr mü?', 'Siyah dolguyla silüet tanınıyor mu?'],
+      scalesL: sc.map(px => ({ px, el: m('idle', px, { k: 'l' + px }) })),
+      scalesD: sc.map(px => ({ px, el: m('idle', px, { k: 'd' + px }) })),
+      poses: [['idle', 'Bekleme', 'Varsayılan'], ['greeting', 'Karşılama', 'Açılış'], ['reminder', 'Hatırlatma', '5 / 1 dk kala'], ['break', 'Mola', 'Mola başladı'], ['happy', 'Mutlu', 'Hedef, rozet'], ['thinking', 'Düşünüyor', 'Eşitleme'], ['sleeping', 'Sessiz mod', 'Sessiz mod'], ['permission', 'İzin bekliyor', 'Talep gönderildi'], ['approved', 'Onaylandı', 'Ebeveyn onayı'], ['encourage', 'Cesaret', 'Ders modu, ret sonrası']].map(([id, tr, trig]) => ({ tr, trig, el: m(id, 120) })),
+      bubbles: [
+        { st: 'reminder', text: '5 dakika sonra küçük bir mola vereceğiz.', act: false },
+        { st: 'permission', text: 'Biraz daha zamana mı ihtiyacın var? Birlikte soralım.', act: true, a1: 'Ek süre iste', a2: 'Şimdilik yok' },
+        { st: 'encourage', text: 'Bu site şu anda kullanım planında yok. Erişim isteyebilirsin.', act: true, a1: 'Erişim iste', a2: 'Tamam' }
+      ].map(b => Object.assign(b, { el: m(b.st, 72) })),
+      widgets: [
+        { desk: '#DCE3F2', left: '48 dk', sub: 'Mola 14:30', subC: '#4A5370', outline: '0 solid transparent', el: m('idle', 32, { k: 'w1' }), label: 'Açık masaüstü · normal', labelC: '#1A2033' },
+        { desk: '#1B2440', left: '48 dk', sub: 'Mola 14:30', subC: '#4A5370', outline: '0 solid transparent', el: m('idle', 32, { k: 'w2' }), label: 'Koyu masaüstü · normal', labelC: '#E9ECF5' },
+        { desk: '#1B2440', left: '4 dk', sub: 'Mola yaklaşıyor', subC: '#8A5A0C', outline: '2px solid #E7A83E', el: m('reminder', 32, { k: 'w3' }), label: 'Koyu masaüstü · uyarı', labelC: '#E9ECF5' }
+      ],
+      grounds: [['Ebeveyn zemini', '#F7F9FC', '#E4E8F1', '#4A5370'], ['Kart', '#FFFFFF', '#E4E8F1', '#4A5370'], ['Dark zemin', '#111827', '#111827', '#A9B1C7'], ['Dark kart', '#1A2233', '#2E3850', '#A9B1C7']].map(([name, bg, bd, c]) => ({ name, bg, bd, c, items: V.map(([id, n]) => ({ n, el: m('idle', 64, { color: id, k: bg + id }) })) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

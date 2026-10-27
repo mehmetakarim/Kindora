@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#111827;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <section data-label="01 Kapak" data-screen-label="01" data-speaker-notes="Kindora: Windows kullanan 8–13 yaş çocuklar için dijital ebeveyn asistanı. Bu sunum Phase 1–6 tasarımlarının özeti." style="background:#5265D8;color:#FFFFFF;display:grid;grid-template-columns:1.2fr 1fr;align-items:center;padding:120px 140px;gap:80px">
+    <div style="display:flex;flex-direction:column;gap:36px">
+      <div style="display:flex;align-items:center;gap:18px"><div style="width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">{{ logo }}</div><span style="font-size:44px;font-weight:700;letter-spacing:-.02em">kindora</span></div>
+      <h1 style="margin:0;font-size:96px;font-weight:600;line-height:1.05;letter-spacing:-.025em;text-wrap:pretty">Dijital Ebeveyn Asistanı</h1>
+      <p style="margin:0;font-size:36px;line-height:1.4;color:#E6E9FF;max-width:900px">“Kontrol etmek için değil, güvenle büyümelerine yardımcı olmak için.”</p>
+      <span style="font-size:26px;color:#C9D0FF">Tasarım incelemesi · Phase 1–6 · Ekim 2026</span>
+    </div>
+    <div style="display:flex;justify-content:center;align-items:center;background:rgba(255,255,255,.1);border-radius:64px;aspect-ratio:1">{{ heroMascot }}</div>
+  </section>
+
+  <section data-label="02 Ürün" data-screen-label="02" data-speaker-notes="Üç yüzey, tek marka. Ebeveyn sade ve profesyonel; çocuk aynı kimlikle daha sıcak." style="background:#F7F9FC;color:#1A2033;padding:110px 140px;display:flex;flex-direction:column;gap:64px">
+    <div style="display:flex;flex-direction:column;gap:16px"><span style="font-size:26px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#3F50B8">Ürün</span><h2 style="margin:0;font-size:72px;font-weight:600;letter-spacing:-.02em">Üç yüzey, tek kimlik</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;flex:1">
+      <sc-for list="{{ surfaces }}" as="s" hint-placeholder-count="3">
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:32px;padding:48px;display:flex;flex-direction:column;gap:22px">
+          <span style="font-size:26px;font-weight:600;color:{{ s.c }}">{{ s.tag }}</span>
+          <span style="font-size:44px;font-weight:600;line-height:1.15">{{ s.t }}</span>
+          <span style="font-size:28px;line-height:1.5;color:#4A5370">{{ s.d }}</span>
+          <span style="margin-top:auto;font-size:24px;color:#5D6680;font-family:ui-monospace,Menlo,monospace">{{ s.tech }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-label="03 Filiz" data-screen-label="03" data-speaker-notes="Filiz: çakıl gövde + filiz yaprakları. Clippy'den tamamen bağımsız. 10 olay bağlı durum; hareketi azalt ve sessiz mod var. Çocuk adını ve rengini değiştirebilir." style="background:#F6F5FE;color:#1F1A5C;padding:100px 140px;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:60px"><div style="display:flex;flex-direction:column;gap:16px"><span style="font-size:26px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5B4FC0">Maskot</span><h2 style="margin:0;font-family:Fredoka,sans-serif;font-size:80px;font-weight:600">Filiz ve 10 durumu</h2></div><span style="font-size:28px;line-height:1.5;color:#4A4E78;max-width:700px;text-align:right">Varsayılan adı Filiz; çocuk adını ve rengini değiştirebilir. Her durum tek bir olaya bağlı.</span></div>
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:28px;flex:1">
+      <sc-for list="{{ states }}" as="s" hint-placeholder-count="10"><div style="background:#FFFFFF;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px">{{ s.el }}<span style="font-family:Fredoka,sans-serif;font-size:30px;font-weight:600">{{ s.t }}</span><span style="font-size:22px;color:#4A5370;text-align:center">{{ s.d }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <section data-label="04 Görsel temel" data-screen-label="04" data-speaker-notes="Canlı dosya: Phase 1. Palet, tipografi (Onest + Fredoka), Phosphor ikonları." style="background:#111827;padding:64px 80px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:28px;color:#FFFFFF"><span style="font-size:24px;font-weight:600;color:#A9B4FF">Phase 1</span><h2 style="margin:0;font-size:52px;font-weight:600">Görsel temel</h2><span style="margin-left:auto;font-size:24px;color:#A9B1C7">Canlı · kaydırılabilir</span></div>
+    <iframe src="Kindora Phase 1 - Visual Foundation.dc.html" title="Phase 1" style="flex:1;width:100%;border:0;border-radius:24px;background:#FFFFFF"></iframe>
+  </section>
+
+  <section data-label="05 Ebeveyn paneli" data-screen-label="05" data-speaker-notes="Canlı prototip: Phase 5. Tüm sayfalar tıklanabilir; demo durumları sağ üstte. Belirsiz durum asla başarı olarak gösterilmez." style="background:#111827;padding:64px 80px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:28px;color:#FFFFFF"><span style="font-size:24px;font-weight:600;color:#A9B4FF">Phase 2 + 5</span><h2 style="margin:0;font-size:52px;font-weight:600">Ebeveyn paneli</h2><span style="margin-left:auto;font-size:24px;color:#A9B1C7">Canlı prototip · tıklanabilir</span></div>
+    <iframe src="Kindora Phase 5 - Management.dc.html" title="Ebeveyn paneli" style="flex:1;width:100%;border:0;border-radius:24px;background:#FFFFFF"></iframe>
+  </section>
+
+  <section data-label="06 Dark tema" data-screen-label="06" data-speaker-notes="Ebeveyn paneli dark varyantı. Light varsayılan." style="background:#111827;padding:64px 80px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:28px;color:#FFFFFF"><span style="font-size:24px;font-weight:600;color:#A9B4FF">Tema</span><h2 style="margin:0;font-size:52px;font-weight:600">Ebeveyn paneli · dark</h2><span style="margin-left:auto;font-size:24px;color:#A9B1C7">Canlı prototip</span></div>
+    <iframe src="Kindora Parent Panel - Dark.dc.html" title="Dark panel" style="flex:1;width:100%;border:0;border-radius:24px;background:#111827"></iframe>
+  </section>
+
+  <section data-label="07 Çocuk uygulaması" data-screen-label="07" data-speaker-notes="Çocuk ana ekranı, hedefler, rozetler, Filiz kişiselleştirme. Ek süre isterken neden zorunlu." style="background:#111827;padding:64px 80px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:28px;color:#FFFFFF"><span style="font-size:24px;font-weight:600;color:#A9B4FF">Phase 3</span><h2 style="margin:0;font-size:52px;font-weight:600">Çocuk uygulaması</h2><span style="margin-left:auto;font-size:24px;color:#A9B1C7">Canlı prototip</span></div>
+    <iframe src="Kindora Phase 3 - Child Experience.dc.html" title="Çocuk uygulaması" style="flex:1;width:100%;border:0;border-radius:24px;background:#F6F5FE"></iframe>
+  </section>
+
+  <section data-label="08 Widget ve mola" data-screen-label="08" data-speaker-notes="Compact, Expanded, Mascot Only. Mola akışı: 5 dk, 1 dk, mola ekranı, ek süre isteği, onay/ret." style="background:#111827;padding:64px 80px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:28px;color:#FFFFFF"><span style="font-size:24px;font-weight:600;color:#A9B4FF">Phase 4</span><h2 style="margin:0;font-size:52px;font-weight:600">Masaüstü widget ve mola akışı</h2><span style="margin-left:auto;font-size:24px;color:#A9B1C7">Canlı prototip</span></div>
+    <iframe src="Kindora Phase 4 - Desktop Companion.dc.html" title="Widget" style="flex:1;width:100%;border:0;border-radius:24px;background:#FFFFFF"></iframe>
+  </section>
+
+  <section data-label="09 Onboarding" data-screen-label="09" data-speaker-notes="Ebeveyn 6 adım, çocuk 7 adım. Demo eşleştirme kodu 482 913." style="background:#111827;padding:64px 80px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:28px;color:#FFFFFF"><span style="font-size:24px;font-weight:600;color:#A9B4FF">Akış</span><h2 style="margin:0;font-size:52px;font-weight:600">Onboarding · ebeveyn ve çocuk</h2><span style="margin-left:auto;font-size:24px;color:#A9B1C7">Canlı prototip</span></div>
+    <iframe src="Kindora Onboarding.dc.html" title="Onboarding" style="flex:1;width:100%;border:0;border-radius:24px;background:#EEF0F5"></iframe>
+  </section>
+
+  <section data-label="10 Mobil" data-screen-label="10" data-speaker-notes="Sonraki sürüm adayı, MVP dışı. Flutter öneri; teknoloji onaylanmadı." style="background:#111827;padding:64px 80px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:28px;color:#FFFFFF"><span style="font-size:24px;font-weight:600;color:#F3C77A">MVP dışı</span><h2 style="margin:0;font-size:52px;font-weight:600">Mobil ebeveyn · sonraki sürüm adayı</h2><span style="margin-left:auto;font-size:24px;color:#A9B1C7">Canlı prototip · light / dark</span></div>
+    <iframe src="Kindora Mobile Parent - Prototype.dc.html" title="Mobil" style="flex:1;width:100%;border:0;border-radius:24px;background:#E9ECF3"></iframe>
+  </section>
+
+  <section data-label="11 Kurallar" data-screen-label="11" data-speaker-notes="Tüm yüzeylerde geçerli değişmez ürün kuralları." style="background:#F7F9FC;color:#1A2033;padding:110px 140px;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-direction:column;gap:16px"><span style="font-size:26px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#3F50B8">İlkeler</span><h2 style="margin:0;font-size:72px;font-weight:600;letter-spacing:-.02em">Her ekranda değişmeyenler</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 64px">
+      <sc-for list="{{ rules }}" as="r" hint-placeholder-count="6"><div style="display:flex;gap:24px;align-items:flex-start;padding:24px 0;border-top:2px solid #E4E8F1"><span style="font-size:32px;font-weight:700;color:#5265D8;font-variant-numeric:tabular-nums;width:48px">{{ r.n }}</span><div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:34px;font-weight:600">{{ r.t }}</span><span style="font-size:26px;line-height:1.45;color:#4A5370">{{ r.d }}</span></div></div></sc-for>
+    </div>
+  </section>
+
+  <section data-label="12 Sonraki adımlar" data-screen-label="12" data-speaker-notes="Devir paketi hazır. Açık kararlar ve sıradaki işler." style="background:#5265D8;color:#FFFFFF;padding:110px 140px;display:grid;grid-template-columns:1fr 1fr;gap:96px">
+    <div style="display:flex;flex-direction:column;gap:36px">
+      <span style="font-size:26px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#C9D0FF">Hazır</span>
+      <h2 style="margin:0;font-size:72px;font-weight:600;letter-spacing:-.02em;line-height:1.1">Geliştirici devri</h2>
+      <sc-for list="{{ ready }}" as="r" hint-placeholder-count="5"><div style="display:flex;gap:18px;align-items:baseline;font-size:30px;line-height:1.4"><span style="color:#7FE3D2">✓</span><span>{{ r }}</span></div></sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:36px">
+      <span style="font-size:26px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#C9D0FF">Sıradaki</span>
+      <h2 style="margin:0;font-size:72px;font-weight:600;letter-spacing:-.02em;line-height:1.1">Açık kararlar</h2>
+      <sc-for list="{{ next }}" as="r" hint-placeholder-count="5"><div style="display:flex;gap:18px;align-items:baseline;font-size:30px;line-height:1.4"><span style="color:#C9D0FF">→</span><span>{{ r }}</span></div></sc-for>
+    </div>
+  </section>
+
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ANIM = {
+  idle: 'kd-bob 3.4s ease-in-out infinite', greeting: 'kd-hop .8s ease-out 2', reminder: 'kd-nudge .5s ease-in-out 2',
+  break: 'kd-stretch 2.6s ease-in-out infinite', happy: 'kd-hop .7s ease-out 3', thinking: 'kd-tilt 2s ease-in-out infinite',
+  sleeping: 'kd-breathe 4s ease-in-out infinite', permission: 'kd-bob 2.4s ease-in-out infinite', approved: 'kd-hop .7s ease-out 2', encourage: 'kd-nudge .6s ease-in-out 2'
+};
+function mascot(state, size, o) {
+  const h = React.createElement;
+  const body = ({ indigo: '#5265D8', lavanta: '#8C80E8', teal: '#23A893', gece: '#39437A' })[o.color] || '#5265D8', ink = '#1B2150', k = [];
+  const lA = o.color === 'teal' ? '#8C80E8' : '#2BBFA7', lB = o.color === 'teal' ? '#A99FF0' : '#3ED0B8';
+  const P = (d, a) => k.push(h('path', Object.assign({ d }, a)));
+  const S = (d, w) => P(d, { stroke: w || ink, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+  if (!o.noShadow) k.push(h('ellipse', { cx: 60, cy: 112, rx: 26, ry: 4, fill: 'rgba(26,32,51,.14)' }));
+  const sleepy = state === 'sleeping';
+  if (sleepy) { S('M60 37 Q60 30 65 27', '#21A08B'); P('M65 27 C71 22 78 25 79 27 C75 33 68 32 65 27Z', { fill: lA }); }
+  else { S('M60 37 L60 26', '#21A08B'); P('M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', { fill: lA }); P('M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', { fill: lB }); }
+  const arm = (d, wave) => k.push(h('path', { d, stroke: body, strokeWidth: 8, fill: 'none', strokeLinecap: 'round', style: wave && o.motion ? { transformOrigin: '93px 70px', animation: 'kd-wave .6s ease-in-out 3' } : null }));
+  if (state === 'greeting') { arm('M27 80 Q19 86 21 93'); arm('M93 70 Q106 60 104 46', true); }
+  else if (state === 'break' || state === 'happy') { arm('M29 64 Q17 52 21 40'); arm('M91 64 Q103 52 99 40'); }
+  else if (state === 'permission') { arm('M30 86 Q38 96 48 96'); arm('M90 86 Q82 96 72 96'); }
+  else { arm('M27 80 Q19 86 21 93'); arm('M93 80 Q101 86 99 93'); }
+  P('M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', { fill: body });
+  P('M42 46 C48 41 54 40 58 40', { stroke: 'rgba(255,255,255,.35)', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  k.push(h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }));
+  const joy = ['happy', 'approved', 'greeting'].includes(state), closed = sleepy || state === 'break';
+  const eyes = (dx, dy, ry) => k.push(h('g', { style: o.motion && !closed ? { transformOrigin: '60px 72px', animation: 'kd-blink 5s infinite' } : null },
+    h('ellipse', { cx: 50 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink }), h('ellipse', { cx: 70 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink })));
+  if (joy) { S('M46 74 Q50 68 54 74'); S('M66 74 Q70 68 74 74'); }
+  else if (closed) { S('M46 72 Q50 76 54 72'); S('M66 72 Q70 76 74 72'); }
+  else if (state === 'thinking') eyes(2, -3, 4);
+  else if (state === 'encourage') { k.push(h('ellipse', { cx: 50, cy: 72, rx: 3.6, ry: 4.8, fill: ink })); S('M66 73 Q70 69 74 73'); }
+  else eyes(0, 0, 4.8);
+  if (!sleepy) { k.push(h('circle', { cx: 42, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); k.push(h('circle', { cx: 78, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); }
+  if (joy || state === 'encourage') P('M53 80 Q60 89 67 80 Z', { fill: ink });
+  else if (state === 'permission') k.push(h('ellipse', { cx: 60, cy: 83, rx: 2.6, ry: 3, fill: ink }));
+  else if (sleepy) S('M57 83 L63 83');
+  else if (state === 'thinking') S('M56 83 Q60 81 64 83');
+  else S('M55 81 Q60 85 65 81');
+  const badge = (fill, kid) => k.push(h('g', null, h('circle', { cx: 99, cy: 40, r: 11, fill, stroke: '#FFFFFF', strokeWidth: 2.5 }), kid));
+  if (state === 'reminder') badge('#E7A83E', h('path', { d: 'M99 34 L99 40 L103 43', stroke: '#FFFFFF', strokeWidth: 2.5, fill: 'none', strokeLinecap: 'round' }));
+  if (state === 'approved') badge('#2BBFA7', h('path', { d: 'M94 40 L98 44 L104 36', stroke: '#FFFFFF', strokeWidth: 2.8, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }));
+  if (state === 'permission') badge('#8C80E8', h('path', { d: 'M95.5 34 L102.5 34 L95.5 46 L102.5 46 Z', stroke: '#FFFFFF', strokeWidth: 2, fill: 'none', strokeLinejoin: 'round' }));
+  if (state === 'encourage') P('M99 28 L102 36 L110 36 L104 41 L106 49 L99 44 L92 49 L94 41 L88 36 L96 36 Z', { fill: '#E7A83E' });
+  if (state === 'thinking') [[93, 46, 2.5], [100, 38, 3.3], [108, 29, 4.2]].forEach(([cx, cy, r]) => k.push(h('circle', { cx, cy, r, fill: '#B6AEF2' })));
+  if (sleepy) { k.push(h('text', { x: 90, y: 44, fontSize: 15, fontWeight: 700, fill: '#8C80E8', fontFamily: 'Fredoka,sans-serif' }, 'z')); k.push(h('text', { x: 101, y: 32, fontSize: 11, fontWeight: 700, fill: '#B6AEF2', fontFamily: 'Fredoka,sans-serif' }, 'z')); }
+  if (state === 'happy') { P('M18 30 L20 36 L26 38 L20 40 L18 46 L16 40 L10 38 L16 36 Z', { fill: '#E7A83E' }); P('M104 22 L105.5 26 L109.5 27.5 L105.5 29 L104 33 L102.5 29 L98.5 27.5 L102.5 26 Z', { fill: lA }); }
+  return h('div', { key: state + (o.k || ''), style: { width: size, height: size, flexShrink: 0, transformOrigin: '50% 90%', animation: o.motion ? ANIM[state] : 'none' } }, h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true }, ...k));
+}
+
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#FFFFFF' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+class Component extends DCLogic {
+  renderVals() {
+    const m = (st, z) => mascot(st, z, { motion: false });
+    return {
+      logo: logo(40), heroMascot: m('greeting', 520),
+      surfaces: [
+        { tag: 'Ebeveyn · masaüstü', c: '#3F50B8', t: 'Sade bir kontrol paneli', d: 'Durum, hızlı işlemler, talepler ve kurallar. Kritik eylemler onay ister; belirsiz durum başarı sayılmaz.', tech: 'Tauri 2 · Vue 3 · Bootstrap' },
+        { tag: 'Çocuk · Windows', c: '#5B4FC0', t: 'Filiz ile sıcak bir yardımcı', d: 'Kalan süre, molalar, hedefler ve rozetler. Ek süre veya site için nedenini yazarak sorar.', tech: 'Tauri 2 · Vue 3 · widget' },
+        { tag: 'Ebeveyn · mobil · sonraki sürüm adayı', c: '#8A5A0C', t: 'Cepten hızlı yanıt', d: 'MVP dışı. Talebe bildirimden yanıt, kilit ve mola, süre ve site kuralları. Light ve dark.', tech: 'Teknoloji onaylanmadı (öneri: Flutter)' }
+      ],
+      states: [['idle', 'Bekleme', 'Varsayılan'], ['greeting', 'Karşılama', 'Açılış'], ['reminder', 'Hatırlatma', '5 / 1 dk kala'], ['break', 'Mola', 'Mola başladı'], ['happy', 'Mutlu', 'Hedef, rozet'], ['thinking', 'Düşünüyor', 'Eşitleme'], ['sleeping', 'Sessiz', 'Sessiz mod'], ['permission', 'İzin bekliyor', 'Talep gönderildi'], ['approved', 'Onaylandı', 'Ebeveyn onayı'], ['encourage', 'Cesaret', 'Ret sonrası']].map(([id, t, d]) => ({ t, d, el: m(id, 150) })),
+      rules: [
+        ['Belirsiz durum başarı değildir', 'Yanıt gelmeyen komut “Doğrulanamadı” olur; başarı ya da başarısızlık sayılmaz.'],
+        ['Onaysız süre uzamaz', 'İstek gönderilmesi limiti değiştirmez; mola zamanında başlar.'],
+        ['Ani kilit yok', 'Molaya 5 ve 1 dk kala uyarı, kilitten önce 1 dk kaydetme süresi.'],
+        ['Yargısız dil', 'Çocuk tarafında kırmızı yok; ret mesajları ebeveyn notuyla, nazik.'],
+        ['Gözetim yok', 'Ekran görüntüsü, tuş kaydı, mesaj içeriği toplanmaz.'],
+        ['Oyunlaştırma dengeyi ödüllendirir', 'Daha uzun kullanım rozet kazandırmaz; seri ve kaybetme korkusu yok.']
+      ].map(([t, d], i) => ({ n: String(i + 1).padStart(2, '0'), t, d })),
+      ready: ['26 ekran tasarımı (onay bekliyor)', 'Bootstrap SCSS token\'ları (light + dark)', 'Kabul raporu ve maskot inceleme kapısı', 'Bileşen envanteri ve durumları', 'Maskot illüstrasyon brifi'],
+      next: ['Maskot illüstratör seçimi ve 1. tur eskiz', 'Bootstrap 6 kararlılığına göre sürüm kararı', 'Supabase şeması ve komut onay protokolü', 'Mobil sürüm ve teknoloji kararı (MVP sonrası)', '8–13 yaş kullanılabilirlik testi']
+    };
+  }
+}
+</script>
+</body>
+</html>

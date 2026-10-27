@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#F6F5FE;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#5B4FC0}a:hover{color:#3F50B8}
+*{box-sizing:border-box}
+button,input,textarea{font-family:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #8C80E8;outline-offset:2px}
+@keyframes kd-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes kd-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes kd-pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+
+<div data-screen-label="Child App" style="min-height:100vh;display:flex;flex-direction:column;position:relative">
+
+  <header style="padding:16px 28px;display:flex;align-items:center;gap:20px;position:relative;z-index:5">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:12px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoSm }}</div>
+      <span style="font-size:19px;font-weight:700;letter-spacing:-.02em">kindora</span>
+    </div>
+    <nav style="margin:0 auto;display:flex;gap:4px;background:#FFFFFF;border:1px solid #E7E4FA;border-radius:999px;padding:5px">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.go }}" aria-current="{{ t.current }}" style="cursor:pointer;border:0;border-radius:999px;padding:9px 18px;display:flex;align-items:center;gap:8px;font-family:Fredoka,Onest,sans-serif;font-size:16px;font-weight:600;background:{{ t.bg }};color:{{ t.color }};transition:background .15s" style-hover="background:#F1EFFD"><i class="ph {{ t.icon }}" style="font-size:18px"></i>{{ t.label }}</button>
+      </sc-for>
+    </nav>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:{{ modeBg }};color:{{ modeColor }};font-size:13px;font-weight:600"><i class="ph {{ modeIcon }}"></i>{{ modeLabel }}</span>
+      <div style="width:38px;height:38px;border-radius:999px;background:#F1EFFD;color:#5B4FC0;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:16px">E</div>
+    </div>
+  </header>
+
+  <main style="flex:1;padding:8px 28px 40px;display:flex;justify-content:center">
+  <div style="width:100%;max-width:1180px;display:flex;flex-direction:column;gap:20px">
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;align-items:stretch">
+
+      <div style="background:{{ heroBg }};border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:18px;min-height:380px;position:relative;overflow:hidden">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-family:Fredoka,sans-serif;font-size:30px;font-weight:600;color:#1F1A5C;line-height:1.15">{{ heroTitle }}</span>
+          <span style="font-size:15px;color:#4A4E78">{{ heroSub }}</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:flex-end;gap:16px">
+          <button onClick="{{ pokeMascot }}" aria-label="{{ mascotAria }}" style="cursor:pointer;border:0;background:transparent;padding:0;flex-shrink:0">{{ heroMascot }}</button>
+          <div style="flex:1;margin-bottom:96px;display:flex;flex-direction:column;gap:8px">
+            <div style="background:#FFFFFF;border-radius:20px 20px 20px 6px;padding:14px 16px;font-family:Fredoka,sans-serif;font-size:18px;font-weight:500;line-height:1.35;color:#1F1A5C;box-shadow:0 6px 18px rgba(31,26,92,.08)">{{ bubble }}</div>
+            <span style="font-size:12px;color:#5B5F86;padding-left:6px">{{ mascotName }} · bana tıklayabilirsin</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:18px">
+        <span style="align-self:flex-start;font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">Bugünkü süren</span>
+        <div style="position:relative;width:200px;height:200px">
+          <svg viewBox="0 0 200 200" width="200" height="200" aria-hidden="true" style="transform:rotate(-90deg)">
+            <circle cx="100" cy="100" r="84" fill="none" stroke="#EEF0F5" stroke-width="16"></circle>
+            <circle cx="100" cy="100" r="84" fill="none" stroke="{{ ringColor }}" stroke-width="16" stroke-linecap="round" stroke-dasharray="{{ ringDash }}" style="transition:stroke-dasharray .6s"></circle>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">
+            <span style="font-family:Fredoka,sans-serif;font-size:44px;font-weight:600;line-height:1;color:#1A2033">{{ leftBig }}</span>
+            <span style="font-size:14px;color:#4A5370">{{ leftSmall }}</span>
+          </div>
+        </div>
+        <div style="align-self:stretch;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:#F1EFFD;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#5B4FC0;display:flex;align-items:center;gap:6px"><i class="ph ph-coffee"></i>Sonraki mola</span><span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">{{ nextBreak }}</span></div>
+          <div style="background:#F4F6FA;border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#4A5370;display:flex;align-items:center;gap:6px"><i class="ph ph-clock"></i>Kullandığın</span><span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">{{ usedText }}</span></div>
+        </div>
+        <sc-if value="{{ pendingReq }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ openPending }}" style="cursor:pointer;align-self:stretch;border:1px solid #F1D49C;background:#FDF4E3;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;color:#8A5A0C;font-size:14px;font-weight:600;text-align:left"><i class="ph ph-hourglass-medium" style="font-size:18px"></i><span style="flex:1">{{ pendingReq }}</span><i class="ph ph-caret-right"></i></button>
+        </sc-if>
+        <div style="align-self:stretch;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto">
+          <button onClick="{{ openTime }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;border-radius:16px;padding:13px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px" style-hover="background:#3F50B8"><i class="ph ph-hand-waving"></i>Ek süre iste</button>
+          <button onClick="{{ openSite }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;color:#1F1A5C;border-radius:16px;padding:13px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px" style-hover="border-color:#8C80E8"><i class="ph ph-globe-simple"></i>Site iste</button>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">Bugünkü hedeflerin</span><span style="font-size:13px;color:#4A5370">{{ goalsDone }}</span></div>
+          <sc-for list="{{ goals }}" as="g" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:36px;height:36px;border-radius:12px;background:{{ g.bg }};color:{{ g.color }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="{{ g.iconCls }}" style="font-size:18px"></i></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;min-width:0">
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-size:14px;font-weight:600">{{ g.label }}</span><span style="font-size:12px;color:#4A5370;white-space:nowrap">{{ g.count }}</span></div>
+                <div style="height:6px;border-radius:999px;background:#EEF0F5;overflow:hidden"><div style="height:100%;width:{{ g.pct }};background:{{ g.bar }};border-radius:999px"></div></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">Son rozetin</span><button onClick="{{ goBadges }}" style="cursor:pointer;border:0;background:transparent;color:#5B4FC0;font-size:13px;font-weight:600;padding:0">Tümü</button></div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:64px;height:64px;border-radius:999px;background:#E3F7F3;border:3px solid #2BBFA7;color:#127A6A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph-fill ph-coffee" style="font-size:28px"></i></div>
+            <div style="display:flex;flex-direction:column;gap:3px"><span style="font-family:Fredoka,sans-serif;font-size:18px;font-weight:600">Mola Ustası</span><span style="font-size:13px;color:#4A5370;line-height:1.45">Bu hafta 10 molayı zamanında verdin.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px">
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px"><i class="ph ph-list-checks" style="font-size:22px;color:#5265D8"></i><span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600;flex:1">Kullanım planım</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#4A5370;background:#F4F6FA;padding:5px 10px;border-radius:999px"><i class="ph ph-lock-simple"></i>Ailenle birlikte belirlendi</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+          <sc-for list="{{ rules }}" as="r" hint-placeholder-count="4">
+            <div style="background:#F7F8FC;border-radius:16px;padding:14px;display:flex;gap:10px;align-items:flex-start"><i class="ph {{ r.icon }}" style="font-size:20px;color:#5B4FC0;margin-top:1px"></i><div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">{{ r.t }}</span><span style="font-size:13px;color:#4A5370;line-height:1.4">{{ r.d }}</span></div></div>
+          </sc-for>
+        </div>
+        <span style="font-size:13px;color:#4A5370;line-height:1.5">Bu planı annen ya da baban değiştirebilir. Bir şeyin değişmesini istersen talep gönderebilirsin.</span>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px"><i class="ph ph-calendar-blank" style="font-size:22px;color:#5265D8"></i><span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600;flex:1">Bugünün akışı</span><span style="font-size:13px;color:#4A5370">Salı</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ schedule }}" as="b" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-radius:14px;background:{{ b.bg }};border:1.5px solid {{ b.border }}">
+              <span style="font-size:13px;color:#4A5370;font-variant-numeric:tabular-nums">{{ b.time }}</span>
+              <span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px"><i class="ph {{ b.icon }}" style="color:{{ b.color }}"></i>{{ b.label }}</span>
+              <span style="font-size:12px;font-weight:600;color:{{ b.color }}">{{ b.tag }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isGoals }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fredoka,sans-serif;font-size:30px;font-weight:600;color:#1F1A5C">Süren ve hedeflerin</span><span style="font-size:15px;color:#4A5370">Hedefler kendini dengede tutman için. Kaçırırsan hiçbir şey kaybetmezsin.</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px">
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">Bugün nereye harcadın</span>
+        <div style="display:flex;height:14px;border-radius:999px;overflow:hidden;gap:3px"><div style="width:46%;background:#2BBFA7"></div><div style="width:32%;background:#8C80E8"></div><div style="width:22%;background:#C9CFDD"></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:12px;height:12px;border-radius:4px;background:#2BBFA7"></span><span style="flex:1">Öğrenme · Khan Academy, Scratch</span><b>47 dk</b></div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:12px;height:12px;border-radius:4px;background:#8C80E8"></span><span style="flex:1">Oyun · Minecraft</span><b>33 dk</b></div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:12px;height:12px;border-radius:4px;background:#C9CFDD"></span><span style="flex:1">Diğer</span><b>22 dk</b></div>
+        </div>
+        <div style="background:#F1EFFD;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center">{{ miniThinking }}<span style="font-family:Fredoka,sans-serif;font-size:16px;font-weight:500;color:#1F1A5C;line-height:1.35">Bugün öğrenmeye oyundan daha çok zaman ayırdın. Güzel denge!</span></div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">Günlük hedefler</span>
+        <sc-for list="{{ goals }}" as="g" hint-placeholder-count="3">
+          <div style="border:1.5px solid {{ g.border }};background:{{ g.cardBg }};border-radius:18px;padding:14px;display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;border-radius:12px;background:{{ g.bg }};color:{{ g.color }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="{{ g.iconCls }}" style="font-size:20px"></i></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">{{ g.label }}</span><span style="font-size:13px;color:#4A5370">{{ g.hint }}</span></div>
+            <span style="font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;color:{{ g.color }}">{{ g.count }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fredoka,sans-serif;font-size:20px;font-weight:600">Bu hafta</span><span style="font-size:13px;color:#4A5370">Dengeli gün: süreni aşmadan ve molalarını vererek geçen gün.</span></div>
+        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px">
+          <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+              <div style="width:100%;aspect-ratio:1;max-width:44px;border-radius:14px;background:{{ d.bg }};border:1.5px solid {{ d.border }};color:{{ d.color }};display:flex;align-items:center;justify-content:center"><i class="{{ d.icon }}" style="font-size:18px"></i></div>
+              <span style="font-size:12px;color:#4A5370;font-weight:{{ d.weight }}">{{ d.d }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#E3F7F3;border-radius:16px;padding:14px;font-size:14px;line-height:1.5;color:#0F5E52">Bu hafta <b>3 dengeli gün</b>. Sayı her pazartesi sıfırdan başlar; kaçırılan gün bir şey eksiltmez.</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isBadges }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fredoka,sans-serif;font-size:30px;font-weight:600;color:#1F1A5C">Rozetlerin</span><span style="font-size:15px;color:#4A5370">Rozetler dengeyi kutlar. Daha uzun süre kullanmak rozet kazandırmaz.</span></div>
+    <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:20px;align-items:start">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px">
+        <sc-for list="{{ badges }}" as="b" hint-placeholder-count="5">
+          <button onClick="{{ b.pick }}" style="cursor:pointer;text-align:center;background:#FFFFFF;border:2px solid {{ b.sel }};border-radius:24px;padding:22px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#1A2033" style-hover="border-color:#C9C2F4">
+            <div style="width:84px;height:84px;border-radius:999px;background:{{ b.bg }};border:3px {{ b.ringStyle }} {{ b.ring }};color:{{ b.color }};display:flex;align-items:center;justify-content:center"><i class="{{ b.iconCls }}" style="font-size:36px"></i></div>
+            <span style="font-family:Fredoka,sans-serif;font-size:18px;font-weight:600">{{ b.name }}</span>
+            <span style="font-size:12px;font-weight:600;color:{{ b.statusColor }}">{{ b.status }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+        {{ badgeMascot }}
+        <span style="font-family:Fredoka,sans-serif;font-size:22px;font-weight:600">{{ badgeName }}</span>
+        <span style="font-size:14px;color:#4A5370;line-height:1.55">{{ badgeHow }}</span>
+        <div style="align-self:stretch;background:#F1EFFD;border-radius:16px;padding:12px 14px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:500;color:#1F1A5C;line-height:1.35">{{ badgeSay }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isFiliz }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:Fredoka,sans-serif;font-size:30px;font-weight:600;color:#1F1A5C">{{ mascotName }}'i kişiselleştir</span><span style="font-size:15px;color:#4A5370">Yol arkadaşın senin. Adını, rengini ve ne kadar konuşacağını sen seç.</span></div>
+    <div style="display:grid;grid-template-columns:minmax(300px,1fr) minmax(0,1.4fr);gap:20px;align-items:start">
+      <div style="background:{{ previewBg }};border-radius:28px;padding:32px;display:flex;flex-direction:column;align-items:center;gap:16px;min-height:380px;justify-content:center">
+        <div style="background:#FFFFFF;border-radius:20px;padding:12px 16px;font-family:Fredoka,sans-serif;font-size:18px;font-weight:500;color:#1F1A5C;box-shadow:0 6px 18px rgba(31,26,92,.08);text-align:center">Merhaba! Ben {{ mascotName }}.</div>
+        {{ previewMascot }}
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #ECEAF8;border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:24px">
+        <label style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:600">Adı</span>
+          <div style="display:flex;gap:8px">
+            <input value="{{ nameDraft }}" onChange="{{ setNameDraft }}" maxlength="14" style="flex:1;font-size:16px;padding:12px 14px;border:1.5px solid #DCD8F6;border-radius:14px;color:#1A2033">
+            <button onClick="{{ resetName }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;border-radius:14px;padding:0 14px;font-size:14px;font-weight:600;color:#4A5370">Filiz'e dön</button>
+          </div>
+          <span style="font-size:12px;color:#4A5370">En fazla 14 harf. Varsayılan ad: Filiz.</span>
+        </label>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:15px;font-weight:600">Rengi</span>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <sc-for list="{{ colors }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:transparent;padding:0;color:#1A2033">
+                <span style="width:52px;height:52px;border-radius:999px;background:{{ c.hex }};box-shadow:{{ c.ring }};display:flex;align-items:center;justify-content:center;color:#FFFFFF"><sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:20px"></i></sc-if></span>
+                <span style="font-size:13px">{{ c.name }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:15px;font-weight:600">Ne kadar konuşsun?</span>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+            <sc-for list="{{ talk }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.pick }}" style="cursor:pointer;text-align:left;border:1.5px solid {{ t.border }};background:{{ t.bg }};border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:4px;color:#1A2033"><span style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px"><i class="ph {{ t.icon }}"></i>{{ t.label }}</span><span style="font-size:12px;color:#4A5370;line-height:1.4">{{ t.d }}</span></button>
+            </sc-for>
+          </div>
+        </div>
+        <button onClick="{{ toggleMotion }}" role="switch" aria-checked="{{ motionAria }}" style="cursor:pointer;border:0;background:#F7F8FC;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;text-align:left;color:#1A2033">
+          <i class="ph ph-person-simple-walk" style="font-size:22px;color:#5B4FC0"></i>
+          <span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Hareketi azalt</span><span style="font-size:13px;color:#4A5370">{{ mascotName }} süzülmeyi ve göz kırpmayı bırakır.</span></span>
+          <span style="width:46px;height:28px;border-radius:999px;background:{{ swBg }};padding:3px;display:flex;justify-content:{{ swJustify }};transition:background .15s"><span style="width:22px;height:22px;border-radius:999px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span></span>
+        </button>
+        <div style="display:flex;justify-content:flex-end;gap:10px;align-items:center">
+          <sc-if value="{{ savedNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#127A6A;display:flex;align-items:center;gap:6px"><i class="ph ph-check-circle"></i>{{ savedNote }}</span></sc-if>
+          <button onClick="{{ saveName }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;border-radius:14px;padding:12px 20px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:600" style-hover="background:#3F50B8">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="align-self:flex-start;font-size:12px;color:#5B5F86;background:#FFFFFF;border:1px dashed #C9C2F4;border-radius:8px;padding:5px 10px">Demo · ebeveyn yanıtları simüle ediliyor · senaryoyu Tweaks'ten değiştirin</div>
+  </div>
+  </main>
+
+  <sc-if value="{{ sheet }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(31,26,92,.32);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px">
+      <div role="dialog" aria-modal="true" style="width:520px;max-width:100%;background:#FFFFFF;border-radius:28px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(31,26,92,.25);animation:kd-pop .18s ease-out">
+        <div style="padding:20px 24px 0;display:flex;align-items:center;gap:10px">
+          <span style="font-family:Fredoka,sans-serif;font-size:22px;font-weight:600;flex:1">{{ sheetTitle }}</span>
+          <button onClick="{{ closeSheet }}" aria-label="Kapat" style="cursor:pointer;width:36px;height:36px;border:0;border-radius:12px;background:#F4F6FA;color:#4A5370;display:flex;align-items:center;justify-content:center"><i class="ph ph-x" style="font-size:18px"></i></button>
+        </div>
+        <div style="padding:16px 24px 0;display:flex;align-items:flex-end;gap:12px">
+          {{ sheetMascot }}
+          <div style="flex:1;margin-bottom:28px;background:#F1EFFD;border-radius:20px 20px 20px 6px;padding:12px 14px;font-family:Fredoka,sans-serif;font-size:17px;font-weight:500;line-height:1.35;color:#1F1A5C">{{ sheetSay }}</div>
+        </div>
+
+        <sc-if value="{{ stepForm }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:8px 24px 24px;display:flex;flex-direction:column;gap:16px">
+            <sc-if value="{{ isTimeSheet }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:14px;font-weight:600">Ne kadar?</span>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                  <sc-for list="{{ amounts }}" as="a" hint-placeholder-count="3">
+                    <button onClick="{{ a.pick }}" aria-pressed="{{ a.pressed }}" style="cursor:pointer;border:1.5px solid {{ a.border }};background:{{ a.bg }};color:{{ a.color }};border-radius:14px;padding:12px;font-family:Fredoka,sans-serif;font-size:18px;font-weight:600">{{ a.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isSiteSheet }}" hint-placeholder-val="{{ false }}">
+              <label style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:14px;font-weight:600">Hangi site?</span>
+                <input value="{{ siteDraft }}" onChange="{{ setSite }}" placeholder="ornek.com" style="font-size:16px;padding:12px 14px;border:1.5px solid #DCD8F6;border-radius:14px;color:#1A2033">
+                <span style="font-size:12px;color:#4A5370">İzin sitenin tamamı için verilir (alan adı). Sayfa veya video seçmek henüz mümkün değil.</span>
+              </label>
+            </sc-if>
+            <label style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:14px;font-weight:600">Neden istiyorsun?</span>
+              <textarea value="{{ reason }}" onChange="{{ setReason }}" rows="3" placeholder="{{ reasonPh }}" style="font-size:15px;line-height:1.5;padding:12px 14px;border:1.5px solid {{ reasonBorder }};border-radius:14px;resize:none;color:#1A2033"></textarea>
+              <span style="font-size:12px;color:{{ reasonHintColor }}">{{ reasonHint }}</span>
+            </label>
+            <button onClick="{{ sendReq }}" aria-disabled="{{ sendDisabled }}" style="cursor:{{ sendCursor }};border:0;background:{{ sendBg }};color:#FFFFFF;border-radius:16px;padding:14px;font-family:Fredoka,sans-serif;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-paper-plane-tilt"></i>Annene gönder</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ stepWait }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:8px 24px 24px;display:flex;flex-direction:column;gap:14px">
+            <div style="border:1px solid #F1D49C;background:#FDF4E3;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:14px;font-weight:600;color:#8A5A0C;display:flex;align-items:center;gap:8px"><i class="ph ph-hourglass-medium"></i>{{ waitTitle }}</span>
+              <span style="font-size:14px;color:#4A5370;line-height:1.5">“{{ reasonShown }}”</span>
+            </div>
+            <span style="font-size:13px;color:#4A5370;line-height:1.5">{{ waitNote }}</span>
+            <button onClick="{{ closeSheet }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;color:#1F1A5C;border-radius:16px;padding:13px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:600">Tamam, beklerim</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ stepDone }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:8px 24px 24px;display:flex;flex-direction:column;gap:14px">
+            <div style="border:1px solid {{ doneBorder }};background:{{ doneBg }};border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:14px;font-weight:600;color:{{ doneColor }};display:flex;align-items:center;gap:8px"><i class="ph {{ doneIcon }}"></i>{{ doneTitle }}</span>
+              <sc-if value="{{ parentNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:#4A5370;line-height:1.5">Annenin notu: “{{ parentNote }}”</span></sc-if>
+            </div>
+            <button onClick="{{ closeSheet }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;border-radius:16px;padding:13px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:600">{{ doneCta }}</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scenario&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Normal&quot;,&quot;Ders modu aktif&quot;,&quot;Günlük süre doldu&quot;],&quot;default&quot;:&quot;Normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo senaryosu&quot;},&quot;parentAnswer&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Onay&quot;,&quot;Ret&quot;,&quot;Yanıt yok&quot;],&quot;default&quot;:&quot;Onay&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo senaryosu&quot;},&quot;reducedMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Erişilebilirlik&quot;}}">
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#FFFFFF' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+const BODY = { indigo: ['#5265D8', '#2BBFA7', '#3ED0B8'], lavanta: ['#8C80E8', '#2BBFA7', '#3ED0B8'], teal: ['#23A893', '#8C80E8', '#A99FF0'], gece: ['#39437A', '#2BBFA7', '#3ED0B8'] };
+
+function mascot(state, size, o) {
+  const h = React.createElement;
+  const [body, leafA, leafB] = BODY[o.color] || BODY.indigo;
+  const ink = '#1B2150', k = [];
+  const P = (d, a) => k.push(h('path', Object.assign({ d }, a)));
+  const S = (d, w) => P(d, { stroke: w || ink, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+  k.push(h('ellipse', { cx: 60, cy: 112, rx: 26, ry: 4, fill: 'rgba(26,32,51,.14)' }));
+  const sleepy = state === 'sleeping';
+  if (sleepy) { S('M60 37 Q60 30 65 27', leafA); P('M65 27 C71 22 78 25 79 27 C75 33 68 32 65 27Z', { fill: leafA }); }
+  else { S('M60 37 L60 26', leafA); P('M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', { fill: leafA }); P('M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', { fill: leafB }); }
+  const arm = d => P(d, { stroke: body, strokeWidth: 8, fill: 'none', strokeLinecap: 'round' });
+  if (state === 'greeting') { arm('M27 80 Q19 86 21 93'); arm('M93 70 Q106 60 104 46'); }
+  else if (state === 'break' || state === 'happy') { arm('M29 64 Q17 52 21 40'); arm('M91 64 Q103 52 99 40'); }
+  else if (state === 'permission') { arm('M30 86 Q38 96 48 96'); arm('M90 86 Q82 96 72 96'); }
+  else { arm('M27 80 Q19 86 21 93'); arm('M93 80 Q101 86 99 93'); }
+  P('M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', { fill: body });
+  P('M42 46 C48 41 54 40 58 40', { stroke: 'rgba(255,255,255,.35)', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  k.push(h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }));
+  const joy = ['happy', 'approved', 'greeting'].includes(state), closed = sleepy || state === 'break';
+  const eyes = (dx, dy, ry) => k.push(h('g', { style: o.motion && !closed ? { transformOrigin: '60px 72px', animation: 'kd-blink 5s infinite' } : null },
+    h('ellipse', { cx: 50 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink }), h('ellipse', { cx: 70 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink })));
+  if (joy) { S('M46 74 Q50 68 54 74'); S('M66 74 Q70 68 74 74'); }
+  else if (closed) { S('M46 72 Q50 76 54 72'); S('M66 72 Q70 76 74 72'); }
+  else if (state === 'thinking') eyes(2, -3, 4);
+  else if (state === 'encourage') { k.push(h('ellipse', { cx: 50, cy: 72, rx: 3.6, ry: 4.8, fill: ink })); S('M66 73 Q70 69 74 73'); }
+  else eyes(0, 0, 4.8);
+  if (!sleepy) { k.push(h('circle', { cx: 42, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); k.push(h('circle', { cx: 78, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); }
+  if (joy || state === 'encourage') P('M53 80 Q60 89 67 80 Z', { fill: ink });
+  else if (state === 'permission') k.push(h('ellipse', { cx: 60, cy: 83, rx: 2.6, ry: 3, fill: ink }));
+  else if (sleepy) S('M57 83 L63 83');
+  else if (state === 'thinking') S('M56 83 Q60 81 64 83');
+  else S('M55 81 Q60 85 65 81');
+  const badge = (fill, kid) => k.push(h('g', null, h('circle', { cx: 99, cy: 40, r: 11, fill, stroke: '#FFFFFF', strokeWidth: 2.5 }), kid));
+  if (state === 'reminder') badge('#E7A83E', h('path', { d: 'M99 34 L99 40 L103 43', stroke: '#FFFFFF', strokeWidth: 2.5, fill: 'none', strokeLinecap: 'round' }));
+  if (state === 'approved') badge('#2BBFA7', h('path', { d: 'M94 40 L98 44 L104 36', stroke: '#FFFFFF', strokeWidth: 2.8, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }));
+  if (state === 'permission') badge('#8C80E8', h('path', { d: 'M95.5 34 L102.5 34 L95.5 46 L102.5 46 Z', stroke: '#FFFFFF', strokeWidth: 2, fill: 'none', strokeLinejoin: 'round' }));
+  if (state === 'encourage') P('M99 28 L102 36 L110 36 L104 41 L106 49 L99 44 L92 49 L94 41 L88 36 L96 36 Z', { fill: '#E7A83E' });
+  if (state === 'thinking') { [[93, 46, 2.5], [100, 38, 3.3], [108, 29, 4.2]].forEach(([cx, cy, r]) => k.push(h('circle', { cx, cy, r, fill: '#B6AEF2' }))); }
+  if (sleepy) { k.push(h('text', { x: 90, y: 44, fontSize: 15, fontWeight: 700, fill: '#8C80E8', fontFamily: 'Fredoka,sans-serif' }, 'z')); k.push(h('text', { x: 101, y: 32, fontSize: 11, fontWeight: 700, fill: '#B6AEF2', fontFamily: 'Fredoka,sans-serif' }, 'z')); }
+  if (state === 'happy') { P('M18 30 L20 36 L26 38 L20 40 L18 46 L16 40 L10 38 L16 36 Z', { fill: '#E7A83E' }); P('M104 22 L105.5 26 L109.5 27.5 L105.5 29 L104 33 L102.5 29 L98.5 27.5 L102.5 26 Z', { fill: '#2BBFA7' }); }
+  const anim = o.motion && !sleepy ? 'kd-bob 3.4s ease-in-out infinite' : 'none';
+  return h('div', { style: { width: size, height: size, animation: anim, flexShrink: 0 } }, h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true }, ...k));
+}
+
+const TIPS = [
+  ['greeting', 'Merhaba Ela! Bugün neler keşfediyoruz?'],
+  ['idle', 'Kalan süreni sağdaki halkada görebilirsin.'],
+  ['thinking', 'Bir siteye girmek istersen "Site iste" ile annene sorabiliriz.'],
+  ['encourage', 'Molalar gözlerini dinlendirir. Bir sonraki 18 dakika sonra.'],
+  ['happy', 'Bugün 2 molanı verdin bile. Harika gidiyorsun!']
+];
+const BADGES = [
+  { id: 'start', name: 'Harika Başlangıç', icon: 'ph-plant', got: true, how: 'Kindora\'yı ilk kez kurduğun gün kazandın.', say: 'Tanıştığımız gün! O günden beri buradayım.' },
+  { id: 'break', name: 'Mola Ustası', icon: 'ph-coffee', got: true, how: 'Bir hafta içinde 10 molayı zamanında verdin.', say: 'Gözlerin ve sırtın sana teşekkür ediyor!' },
+  { id: 'focus', name: 'Odak Kahramanı', icon: 'ph-target', got: true, how: 'Ders modunu 30 dakika boyunca kesintisiz tamamladın.', say: 'O 30 dakika çok verimliydi. Tebrikler!' },
+  { id: 'balance', name: 'Dijital Denge', icon: 'ph-scales', got: false, progress: '3 / 5 dengeli gün', how: 'Bir haftada 5 dengeli gün geçir: süreni aşmadan, molalarını vererek.', say: 'Bu hafta 3 dengeli günün var. Acele yok, hafta bitmeden de olur, sonra da.' },
+  { id: 'explore', name: 'Meraklı Kaşif', icon: 'ph-compass', got: false, progress: '2 / 3 öğrenme sitesi', how: 'Bir haftada 3 farklı öğrenme sitesinde vakit geçir.', say: 'Khan Academy ve Scratch\'i denedin. Bir tane daha?' }
+];
+
+class Component extends DCLogic {
+  state = { tab: 'home', tip: 0, sheet: null, step: 'form', amount: 15, reason: '', site: '', extra: 0, pending: null, result: null, badge: 'break', name: 'Filiz', nameDraft: 'Filiz', color: 'indigo', talk: 'normal', motionOff: false, saved: '' };
+  timers = [];
+  componentWillUnmount() { this.timers.forEach(clearTimeout); }
+
+  renderVals() {
+    const s = this.state;
+    const scen = this.props.scenario ?? 'Normal';
+    const answer = this.props.parentAnswer ?? 'Onay';
+    const study = scen === 'Ders modu aktif', over = scen === 'Günlük süre doldu';
+    const motion = !s.motionOff && !(this.props.reducedMotion ?? false);
+    const o = { motion, color: s.color };
+    const m = (st, z) => mascot(st, z, o);
+    const N = s.name;
+    const limit = 150 + s.extra, used = over ? 150 + s.extra : 102;
+    const left = Math.max(0, limit - used);
+    const fmt = x => (x >= 60 ? `${Math.floor(x / 60)} sa ${x % 60} dk` : `${x} dk`);
+    const C2 = 2 * Math.PI * 84;
+    const frac = limit ? left / limit : 0;
+
+    let heroState = TIPS[s.tip][0], bubble = TIPS[s.tip][1];
+    if (study && s.tip === 0) { heroState = 'encourage'; bubble = 'Ders zamanı başladı. Hazırsan odaklanalım!'; }
+    if (over && s.tip === 0) { heroState = 'break'; bubble = 'Bugünkü süren doldu. Yarın kaldığın yerden devam edersin.'; }
+    if (s.result === 'ok' && s.tip === 0) { heroState = 'approved'; bubble = s.sheet === 'site' || s.lastKind === 'site' ? 'Annen siteye 1 saatlik izin verdi.' : `Annen ${s.amount} dakika ek süre verdi. İyi eğlenceler!`; }
+
+    const sheetCopy = () => {
+      const isT = s.sheet === 'time';
+      if (s.step === 'form') return { st: 'permission', say: isT ? 'Biraz daha zamana mı ihtiyacın var? Birlikte soralım.' : 'Bu site şu anda kullanım planında yok. Annene sorabiliriz.' };
+      if (s.step === 'wait') return { st: 'thinking', say: 'İsteğini ilettim. Yanıt gelince sana haber veririm.' };
+      if (s.result === 'ok') return { st: 'approved', say: isT ? `Harika! ${s.amount} dakika eklendi.` : `${s.site || 'Site'} şimdi açık. 1 saat kullanabilirsin.` };
+      if (s.result === 'no') return { st: 'encourage', say: 'Bu sefer olmadı. Sorun değil, sormak her zaman iyi bir fikir.' };
+      return { st: 'idle', say: '' };
+    };
+    const sc = sheetCopy();
+    const reasonOk = s.reason.trim().length >= 5 && (s.sheet !== 'site' || s.site.trim().length > 3);
+    const send = () => {
+      if (!reasonOk) return;
+      const kind = s.sheet;
+      this.setState({ step: 'wait', pending: kind, result: null, lastKind: kind });
+      if (answer === 'Yanıt yok') return;
+      this.timers.push(setTimeout(() => {
+        this.setState(p => ({ step: p.sheet ? 'done' : p.step, pending: null, result: answer === 'Onay' ? 'ok' : 'no', extra: answer === 'Onay' && kind === 'time' ? p.extra + p.amount : p.extra, tip: 0 }));
+      }, 3000));
+    };
+    const openSheet = kind => this.setState({ sheet: kind, step: s.pending === kind ? 'wait' : 'form', reason: s.pending === kind ? s.reason : '', site: kind === 'site' && s.pending !== 'site' ? '' : s.site });
+
+    const goalsRaw = [
+      { label: '3 mola ver', icon: 'ph-coffee', n: 2, of: 3, hint: 'Sonraki mola 18 dk sonra' },
+      { label: '30 dk öğrenmeye ayır', icon: 'ph-book-open', n: 30, of: 30, hint: 'Khan Academy ile tamamladın', unit: ' dk' },
+      { label: 'Süren bitmeden kendin kapat', icon: 'ph-power', n: 0, of: 1, hint: 'Akşam bitirirken sayılır' }
+    ];
+    const goals = goalsRaw.map(g => { const done = g.n >= g.of; return { label: g.label, hint: g.hint, iconCls: (done ? 'ph-fill ' : 'ph ') + (done ? 'ph-check-circle' : g.icon), count: g.unit ? `${g.n}${g.unit}` : `${g.n} / ${g.of}`, pct: Math.round((g.n / g.of) * 100) + '%', bg: done ? '#E3F7F3' : '#F1EFFD', color: done ? '#127A6A' : '#5B4FC0', bar: done ? '#2BBFA7' : '#8C80E8', border: done ? '#BCEBE1' : '#ECEAF8', cardBg: done ? '#F4FCFA' : '#FFFFFF' }; });
+
+    const sched = [
+      ['14:00 – 15:00', 'Serbest zaman', 'ph-sun', 'done'],
+      ['15:00 – 15:45', 'Ders modu', 'ph-book-open', study ? 'now' : 'done'],
+      ['15:45 – 17:30', 'Serbest zaman', 'ph-sun', study ? 'next' : 'now'],
+      ['21:00', 'Bilgisayar uykuya geçer', 'ph-moon', 'next']
+    ];
+    const schedule = sched.map(([time, label, icon, st]) => ({ time, label, icon, tag: st === 'now' ? 'Şimdi' : st === 'done' ? 'Bitti' : '', bg: st === 'now' ? '#EEF0FC' : '#FFFFFF', border: st === 'now' ? '#5265D8' : '#ECEAF8', color: st === 'now' ? '#3F50B8' : st === 'done' ? '#7A829C' : '#4A5370' }));
+
+    const bSel = BADGES.find(b => b.id === s.badge);
+    const isT = s.sheet === 'time';
+    const doneOk = s.result === 'ok';
+    return {
+      logoSm: logo(26),
+      tabs: [['home', 'Ana Sayfa', 'ph-house'], ['goals', 'Hedefler', 'ph-flag-banner'], ['badges', 'Rozetler', 'ph-medal'], ['filiz', N, 'ph-smiley']].map(([id, label, icon]) => ({ label, icon, current: s.tab === id ? 'page' : 'false', bg: s.tab === id ? '#5265D8' : 'transparent', color: s.tab === id ? '#FFFFFF' : '#4A4E78', go: () => this.setState({ tab: id }) })),
+      modeLabel: over ? 'Süre doldu' : study ? 'Ders modu · 32 dk' : 'Serbest zaman', modeIcon: over ? 'ph-moon' : study ? 'ph-book-open' : 'ph-sun',
+      modeBg: over ? '#F1EFFD' : study ? '#EEF0FC' : '#E3F7F3', modeColor: over ? '#5B4FC0' : study ? '#3F50B8' : '#127A6A',
+      isHome: s.tab === 'home', isGoals: s.tab === 'goals', isBadges: s.tab === 'badges', isFiliz: s.tab === 'filiz',
+      heroBg: over ? '#ECE9FC' : study ? '#E6EAFB' : '#E9E6FC',
+      heroTitle: over ? 'Bugünlük bu kadar, Ela' : study ? 'Odak zamanı, Ela' : 'Merhaba Ela!',
+      heroSub: over ? 'Süren 17:30\'da doldu. Yarın 2 sa 30 dk ile başlıyorsun.' : study ? 'Ders modunda yalnızca ders siteleri açık. 15:45\'te biter.' : 'Salı, 20 Ekim · Serbest zaman',
+      heroMascot: m(heroState, 180), bubble, mascotName: N, mascotAria: `${N} ile konuş`,
+      pokeMascot: () => this.setState(p => ({ tip: (p.tip + 1) % TIPS.length, result: p.tip === 0 ? null : p.result })),
+      ringDash: `${(C2 * frac).toFixed(1)} ${C2.toFixed(1)}`, ringColor: frac < .15 ? '#E7A83E' : '#2BBFA7',
+      leftBig: over ? '0 dk' : fmt(left), leftSmall: over ? 'yarın yeniden' : 'kaldı', usedText: fmt(used), nextBreak: over ? '—' : study ? '15:45' : '18 dk',
+      pendingReq: s.pending ? (s.pending === 'time' ? `${s.amount} dk ek süre isteğin bekliyor` : `${s.site} isteğin bekliyor`) : null,
+      openPending: () => openSheet(s.pending),
+      openTime: () => openSheet('time'), openSite: () => openSheet('site'), goBadges: () => this.setState({ tab: 'badges' }),
+      goals, goalsDone: `${goals.filter(g => g.color === '#127A6A').length} / 3 tamam`,
+      rules: [
+        { icon: 'ph-hourglass-medium', t: 'Günlük 2 sa 30 dk', d: 'Hafta sonu 3 saat' },
+        { icon: 'ph-coffee', t: 'Her 45 dk\'da mola', d: '10 dakika, gözlerin için' },
+        { icon: 'ph-book-open', t: 'Ders saati 15:00', d: 'Ders siteleri açık kalır' },
+        { icon: 'ph-moon', t: '21:00\'de uyku', d: 'Bilgisayar sabaha kadar dinlenir' }
+      ],
+      schedule,
+      miniThinking: m('happy', 56),
+      week: [['Pt', 'b'], ['Sa', 'b'], ['Ça', 'n'], ['Pe', 'b'], ['Cu', 't'], ['Ct', 'f'], ['Pz', 'f']].map(([d, k], i) => ({ d, weight: k === 't' ? 700 : 500,
+        icon: k === 'b' ? 'ph-fill ph-leaf' : k === 't' ? 'ph ph-sun' : k === 'n' ? 'ph ph-minus' : 'ph ph-dot-outline',
+        bg: k === 'b' ? '#E3F7F3' : k === 't' ? '#EEF0FC' : '#F7F8FC', border: k === 'b' ? '#BCEBE1' : k === 't' ? '#5265D8' : '#ECEAF8', color: k === 'b' ? '#127A6A' : k === 't' ? '#3F50B8' : '#A0A7BC' })),
+      badges: BADGES.map(b => ({ name: b.name, iconCls: (b.got ? 'ph-fill ' : 'ph ') + b.icon, bg: b.got ? '#E3F7F3' : '#F7F8FC', ring: b.got ? '#2BBFA7' : '#C9CFDD', ringStyle: b.got ? 'solid' : 'dashed', color: b.got ? '#127A6A' : '#7A829C', status: b.got ? 'Kazandın' : b.progress, statusColor: b.got ? '#127A6A' : '#5B4FC0', sel: b.id === s.badge ? '#8C80E8' : '#ECEAF8', pick: () => this.setState({ badge: b.id }) })),
+      badgeMascot: m(bSel.got ? 'happy' : 'encourage', 120), badgeName: bSel.name, badgeHow: bSel.how, badgeSay: bSel.say,
+      previewBg: '#E9E6FC', previewMascot: m('greeting', 200),
+      nameDraft: s.nameDraft, setNameDraft: e => this.setState({ nameDraft: e.target.value.slice(0, 14), saved: '' }),
+      resetName: () => this.setState({ nameDraft: 'Filiz', saved: '' }),
+      saveName: () => { const v = s.nameDraft.trim() || 'Filiz'; this.setState({ name: v, nameDraft: v, saved: 'Kaydedildi' }); },
+      savedNote: s.saved,
+      colors: [['indigo', 'İndigo'], ['lavanta', 'Lavanta'], ['teal', 'Deniz'], ['gece', 'Gece']].map(([id, name]) => ({ name, hex: BODY[id][0], on: s.color === id, pressed: s.color === id ? 'true' : 'false', ring: s.color === id ? '0 0 0 3px #FFFFFF, 0 0 0 5.5px ' + BODY[id][0] : 'none', pick: () => this.setState({ color: id, saved: '' }) })),
+      talk: [['quiet', 'Sessiz', 'ph-speaker-slash', 'Sadece mola ve süre uyarıları'], ['normal', 'Normal', 'ph-chat-circle', 'Uyarılar ve ara sıra ipucu'], ['chatty', 'Konuşkan', 'ph-chats-circle', 'Kutlamalar ve ipuçları da']].map(([id, label, icon, d]) => ({ label, icon, d, border: s.talk === id ? '#5265D8' : '#ECEAF8', bg: s.talk === id ? '#EEF0FC' : '#FFFFFF', pick: () => this.setState({ talk: id, saved: '' }) })),
+      toggleMotion: () => this.setState(p => ({ motionOff: !p.motionOff })), motionAria: s.motionOff ? 'true' : 'false', swBg: s.motionOff ? '#5265D8' : '#C9CFDD', swJustify: s.motionOff ? 'flex-end' : 'flex-start',
+      sheet: !!s.sheet, isTimeSheet: isT, isSiteSheet: s.sheet === 'site',
+      sheetTitle: isT ? 'Ek süre iste' : 'Site iste', sheetMascot: m(sc.st, 96), sheetSay: sc.say,
+      closeSheet: () => this.setState(p => ({ sheet: null, step: 'form', result: p.step === 'done' ? p.result : p.result })),
+      stepForm: s.step === 'form', stepWait: s.step === 'wait', stepDone: s.step === 'done',
+      amounts: [10, 15, 30].map(v => ({ label: v + ' dk', pressed: s.amount === v ? 'true' : 'false', border: s.amount === v ? '#5265D8' : '#DCD8F6', bg: s.amount === v ? '#EEF0FC' : '#FFFFFF', color: s.amount === v ? '#3F50B8' : '#1F1A5C', pick: () => this.setState({ amount: v }) })),
+      siteDraft: s.site, setSite: e => this.setState({ site: e.target.value }),
+      reason: s.reason, setReason: e => this.setState({ reason: e.target.value }),
+      reasonPh: isT ? 'Örn. Ödevimi bitirmek üzereyim' : 'Örn. Öğretmenim bu siteyi önerdi',
+      reasonBorder: s.reason && !reasonOk ? '#E7A83E' : '#DCD8F6',
+      reasonHint: reasonOk ? 'Hazır! Annen nedenini görecek.' : 'Birkaç kelimeyle yaz. Annen nedenini görecek.', reasonHintColor: reasonOk ? '#127A6A' : '#4A5370',
+      sendReq: send, sendDisabled: reasonOk ? 'false' : 'true', sendBg: reasonOk ? '#5265D8' : '#B9C2EE', sendCursor: reasonOk ? 'pointer' : 'not-allowed',
+      waitTitle: isT ? `${s.amount} dk ek süre · annene iletildi` : `${s.site} · annene iletildi`, reasonShown: s.reason,
+      waitNote: answer === 'Yanıt yok' ? 'Annen henüz yanıt vermedi. Yanıt gelene kadar süren değişmez; süre dolarsa mola başlar ve yanıt gelince haber veririm.' : 'Yanıt gelene kadar süren değişmez. Bu pencereyi kapatabilirsin, ana ekranda bekleyen isteğini görürsün.',
+      doneTitle: doneOk ? (isT ? `${s.amount} dk eklendi · yeni süren ${fmt(left)}` : `${s.site} · 1 saat açık`) : 'Bu sefer onaylanmadı',
+      doneIcon: doneOk ? 'ph-check-circle' : 'ph-chat-circle-text', doneBg: doneOk ? '#E3F7F3' : '#F1EFFD', doneBorder: doneOk ? '#BCEBE1' : '#DCD8F6', doneColor: doneOk ? '#127A6A' : '#5B4FC0',
+      parentNote: doneOk ? null : (isT ? 'Akşam yemeğinden sonra devam edersin, söz.' : 'Bu siteye hafta sonu birlikte bakalım.'),
+      doneCta: doneOk ? 'Süper, teşekkürler!' : 'Tamam'
+    };
+  }
+}
+</script>
+</body>
+</html>

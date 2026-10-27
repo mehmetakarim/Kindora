@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+</style>
+</helmet>
+<x-import component-from-global-scope="doc-page" from="./doc-page.js" size="a4" margin="18mm" hint-size="100%,1200px">
+  <div style="display:flex;flex-direction:column;gap:28px;font-size:10.5pt;line-height:1.55">
+
+    <header style="display:flex;align-items:center;gap:24px;padding-bottom:20px;border-bottom:1px solid #E4E8F1">
+      <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+        <span style="font-size:9pt;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#3F50B8">Kindora · İllüstrasyon brifi · v1.0 · Ekim 2026</span>
+        <span style="align-self:flex-start;padding:3px 10px;border-radius:999px;background:#FDF4E3;color:#8A5A0C;font-size:9pt;font-weight:600">Durum: konsept · nihai illüstrasyon ayrıca onaylanacak</span>
+        <h1 style="margin:0;font-family:Fredoka,sans-serif;font-size:30pt;font-weight:600;line-height:1.1;color:#1F1A5C">Filiz — maskot illüstrasyonu</h1>
+        <p style="margin:0;font-size:11pt;color:#4A5370;max-width:440px;text-wrap:pretty">Kindora'nın masaüstünde yaşayan yardımcı karakteri için son çizim, 10 durum ve animasyon dosyaları.</p>
+      </div>
+      <div style="width:140px;height:140px;border-radius:28px;background:#F1EFFD;display:flex;align-items:center;justify-content:center">{{ hero }}</div>
+    </header>
+
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">1. Bağlam</h2>
+      <p style="margin:0;text-wrap:pretty">Kindora, 8–13 yaş arası çocukların Windows bilgisayar kullanımını destekleyici biçimde yöneten bir ebeveyn asistanıdır. Filiz, çocuğun ekranının köşesinde küçük bir widget olarak durur; kalan süreyi gösterir, molaları önceden haber verir ve çocuğun ek süre veya site isteklerini ebeveyne iletir. Ürün ilkesi: <em>“Kontrol etmek için değil, güvenle büyümelerine yardımcı olmak için.”</em></p>
+      <p style="margin:0;text-wrap:pretty">Bu brifteki çizimler tasarım ekibinin SVG konseptleridir. Oranları, silüeti ve durum mantığını sabitler; çizgi kalitesi, hacim ve hareket illüstratöre bırakılmıştır.</p>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">2. Karakter</h2>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <sc-for list="{{ traits }}" as="t" hint-placeholder-count="6"><div style="border:1px solid #E4E8F1;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;break-inside:avoid"><span style="font-weight:600">{{ t.k }}</span><span style="color:#4A5370;font-size:10pt">{{ t.v }}</span></div></sc-for>
+      </div>
+      <p style="margin:0;color:#4A5370;text-wrap:pretty">Ses tonu: kısa, doğal Türkçe cümleler; çocuğa “sen” diye hitap eder, ebeveyni “annen / baban” diye anar. Asla yargılamaz, utandırmaz, korkutmaz. Örnek: “5 dakika sonra küçük bir mola vereceğiz.”</p>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:12px;break-inside:avoid">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">3. Silüet ve yapı</h2>
+      <div style="display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;align-items:start">
+        <div style="background:#F7F9FC;border:1px solid #E4E8F1;border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px">{{ anatomy }}<span style="font-size:8.5pt;color:#5D6680">120 × 120 çizim alanı</span></div>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <sc-for list="{{ parts }}" as="p" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding:7px 0;border-top:1px solid #F1F3F9"><span style="font-weight:600">{{ p.k }}</span><span style="color:#4A5370">{{ p.v }}</span></div></sc-for>
+        </div>
+      </div>
+      <p style="margin:0;font-size:10pt;color:#4A5370">Siluet testi: dolgu tek renk siyah yapıldığında, 24 px'de bile yaprak çifti ve çakıl gövde tanınabilmeli.</p>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:12px;break-inside:avoid">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">4. Renk</h2>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ colors }}" as="c" hint-placeholder-count="6"><div style="display:flex;flex-direction:column;gap:6px"><span style="height:44px;border-radius:8px;background:{{ c.hex }};border:1px solid #E4E8F1"></span><span style="font-size:9pt;font-weight:600">{{ c.k }}</span><span style="font-size:8.5pt;color:#5D6680;font-family:ui-monospace,Menlo,monospace">{{ c.hex }}</span></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span style="font-weight:600">Çocuğun seçebildiği gövde renkleri</span>
+        <div style="display:flex;gap:16px;flex-wrap:wrap"><sc-for list="{{ variants }}" as="v" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;align-items:center;gap:4px">{{ v.el }}<span style="font-size:9pt;font-weight:600">{{ v.name }}</span><span style="font-size:8.5pt;color:#5D6680;font-family:ui-monospace,Menlo,monospace">{{ v.hex }}</span></div></sc-for></div>
+        <span style="font-size:10pt;color:#4A5370">Yalnızca gövde ve kollar değişir. Yüz paneli, mürekkep ve yapraklar sabittir (Deniz varyantında yapraklar lavantaya döner). Dark zeminde gövdeye 1 px açık kontur eklenebilir.</span>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:10px;break-inside:avoid">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">5. Özgünlük kuralları</h2>
+      <p style="margin:0;color:#4A5370;text-wrap:pretty">Referans fikir eski masaüstü asistanlarının konuşma balonlu etkileşimidir; karakterin kendisi tamamen Kindora'ya aittir.</p>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <div style="background:#E3F7F3;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px"><span style="font-weight:600;color:#127A6A">Yapılacaklar</span><sc-for list="{{ dos }}" as="d" hint-placeholder-count="5"><span style="font-size:10pt;color:#0F5E52">✓ {{ d }}</span></sc-for></div>
+        <div style="background:#FCEBED;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px"><span style="font-weight:600;color:#A8364A">Yapılmayacaklar</span><sc-for list="{{ donts }}" as="d" hint-placeholder-count="6"><span style="font-size:10pt;color:#7E2535">✕ {{ d }}</span></sc-for></div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">6. Durumlar</h2>
+      <p style="margin:0;color:#4A5370">Her durum tek bir olaya bağlıdır; aynı anda yalnızca bir durum görünür. Döngüsel olanlar dışında tüm hareketler sonlanır ve karakter Idle pozuna döner.</p>
+      <div style="display:flex;flex-direction:column;border:1px solid #E4E8F1;border-radius:12px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:64px 110px minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px;padding:8px 12px;background:#F7F9FC;font-size:8.5pt;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#5D6680"><span></span><span>Durum</span><span>Tetikleyici</span><span>İfade ve poz</span><span>Hareket</span></div>
+        <sc-for list="{{ states }}" as="s" hint-placeholder-count="10">
+          <div style="display:grid;grid-template-columns:64px 110px minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1fr);gap:12px;padding:8px 12px;border-top:1px solid #E4E8F1;align-items:center;break-inside:avoid;font-size:9.5pt">
+            <div style="width:56px;height:56px;border-radius:12px;background:#F1EFFD;display:flex;align-items:center;justify-content:center">{{ s.el }}</div>
+            <div style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:600;font-size:10pt">{{ s.tr }}</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:8pt;color:#5D6680">{{ s.id }}</span></div>
+            <span style="color:#4A5370">{{ s.trig }}</span>
+            <span>{{ s.pose }}</span>
+            <span style="color:#4A5370">{{ s.motion }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:12px;break-inside:avoid">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">7. Boyutlar ve sadeleştirme</h2>
+      <div style="display:flex;align-items:flex-end;gap:22px;padding:16px;background:#F7F9FC;border-radius:12px;flex-wrap:wrap">
+        <sc-for list="{{ sizes }}" as="z" hint-placeholder-count="6"><div style="display:flex;flex-direction:column;align-items:center;gap:6px">{{ z.el }}<span style="font-size:9pt;font-weight:600">{{ z.px }} px</span><span style="font-size:8.5pt;color:#5D6680">{{ z.use }}</span></div></sc-for>
+      </div>
+      <p style="margin:0;color:#4A5370;text-wrap:pretty">48 px ve altında: parlama çizgisi, yanaklar ve durum rozetinin iç ikonu kaldırılır; kontur kalınlığı en az 1,5 px kalır. 24 px'de yalnızca gövde, yüz paneli, gözler ve yapraklar.</p>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:10px;break-inside:avoid">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">8. Animasyon kuralları</h2>
+      <sc-for list="{{ motion }}" as="m" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;padding:6px 0;border-top:1px solid #F1F3F9"><span style="font-weight:600">{{ m.k }}</span><span style="color:#4A5370">{{ m.v }}</span></div></sc-for>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:10px;break-inside:avoid">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">9. Teslim edilecekler</h2>
+      <sc-for list="{{ deliver }}" as="d" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;padding:5px 0"><span style="width:20px;height:20px;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:9pt;font-weight:700;display:flex;align-items:center;justify-content:center">{{ d.n }}</span><span><b>{{ d.k }}</b> — <span style="color:#4A5370">{{ d.v }}</span></span></div></sc-for>
+      <p style="margin:0;font-size:10pt;color:#4A5370">Dosya adı: <span style="font-family:ui-monospace,Menlo,monospace">kd-mascot-{durum}-{renk}-{boyut}.{uzantı}</span> · örnek <span style="font-family:ui-monospace,Menlo,monospace">kd-mascot-break-indigo-96.svg</span></p>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:10px;break-inside:avoid">
+      <h2 style="margin:0;font-size:14pt;font-weight:600">10. Süreç ve kabul</h2>
+      <sc-for list="{{ process }}" as="p" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding:6px 0;border-top:1px solid #F1F3F9"><span style="font-weight:600">{{ p.k }}</span><span style="color:#4A5370">{{ p.v }}</span></div></sc-for>
+      <div style="background:#EEF0FC;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-weight:600;color:#2A3580">Kabul ölçütleri</span><sc-for list="{{ accept }}" as="a" hint-placeholder-count="5"><span style="font-size:10pt;color:#2A3580">• {{ a }}</span></sc-for></div>
+    </section>
+
+  </div>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ANIM = {
+  idle: 'kd-bob 3.4s ease-in-out infinite', greeting: 'kd-hop .8s ease-out 2', reminder: 'kd-nudge .5s ease-in-out 2',
+  break: 'kd-stretch 2.6s ease-in-out infinite', happy: 'kd-hop .7s ease-out 3', thinking: 'kd-tilt 2s ease-in-out infinite',
+  sleeping: 'kd-breathe 4s ease-in-out infinite', permission: 'kd-bob 2.4s ease-in-out infinite', approved: 'kd-hop .7s ease-out 2', encourage: 'kd-nudge .6s ease-in-out 2'
+};
+function mascot(state, size, o) {
+  const h = React.createElement;
+  const body = ({ indigo: '#5265D8', lavanta: '#8C80E8', teal: '#23A893', gece: '#39437A' })[o.color] || '#5265D8', ink = '#1B2150', k = [];
+  const lA = o.color === 'teal' ? '#8C80E8' : '#2BBFA7', lB = o.color === 'teal' ? '#A99FF0' : '#3ED0B8';
+  const P = (d, a) => k.push(h('path', Object.assign({ d }, a)));
+  const S = (d, w) => P(d, { stroke: w || ink, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+  if (!o.noShadow) k.push(h('ellipse', { cx: 60, cy: 112, rx: 26, ry: 4, fill: 'rgba(26,32,51,.14)' }));
+  const sleepy = state === 'sleeping';
+  if (sleepy) { S('M60 37 Q60 30 65 27', '#21A08B'); P('M65 27 C71 22 78 25 79 27 C75 33 68 32 65 27Z', { fill: lA }); }
+  else { S('M60 37 L60 26', '#21A08B'); P('M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', { fill: lA }); P('M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', { fill: lB }); }
+  const arm = (d, wave) => k.push(h('path', { d, stroke: body, strokeWidth: 8, fill: 'none', strokeLinecap: 'round', style: wave && o.motion ? { transformOrigin: '93px 70px', animation: 'kd-wave .6s ease-in-out 3' } : null }));
+  if (state === 'greeting') { arm('M27 80 Q19 86 21 93'); arm('M93 70 Q106 60 104 46', true); }
+  else if (state === 'break' || state === 'happy') { arm('M29 64 Q17 52 21 40'); arm('M91 64 Q103 52 99 40'); }
+  else if (state === 'permission') { arm('M30 86 Q38 96 48 96'); arm('M90 86 Q82 96 72 96'); }
+  else { arm('M27 80 Q19 86 21 93'); arm('M93 80 Q101 86 99 93'); }
+  P('M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', { fill: body });
+  P('M42 46 C48 41 54 40 58 40', { stroke: 'rgba(255,255,255,.35)', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  k.push(h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }));
+  const joy = ['happy', 'approved', 'greeting'].includes(state), closed = sleepy || state === 'break';
+  const eyes = (dx, dy, ry) => k.push(h('g', { style: o.motion && !closed ? { transformOrigin: '60px 72px', animation: 'kd-blink 5s infinite' } : null },
+    h('ellipse', { cx: 50 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink }), h('ellipse', { cx: 70 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink })));
+  if (joy) { S('M46 74 Q50 68 54 74'); S('M66 74 Q70 68 74 74'); }
+  else if (closed) { S('M46 72 Q50 76 54 72'); S('M66 72 Q70 76 74 72'); }
+  else if (state === 'thinking') eyes(2, -3, 4);
+  else if (state === 'encourage') { k.push(h('ellipse', { cx: 50, cy: 72, rx: 3.6, ry: 4.8, fill: ink })); S('M66 73 Q70 69 74 73'); }
+  else eyes(0, 0, 4.8);
+  if (!sleepy) { k.push(h('circle', { cx: 42, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); k.push(h('circle', { cx: 78, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); }
+  if (joy || state === 'encourage') P('M53 80 Q60 89 67 80 Z', { fill: ink });
+  else if (state === 'permission') k.push(h('ellipse', { cx: 60, cy: 83, rx: 2.6, ry: 3, fill: ink }));
+  else if (sleepy) S('M57 83 L63 83');
+  else if (state === 'thinking') S('M56 83 Q60 81 64 83');
+  else S('M55 81 Q60 85 65 81');
+  const badge = (fill, kid) => k.push(h('g', null, h('circle', { cx: 99, cy: 40, r: 11, fill, stroke: '#FFFFFF', strokeWidth: 2.5 }), kid));
+  if (state === 'reminder') badge('#E7A83E', h('path', { d: 'M99 34 L99 40 L103 43', stroke: '#FFFFFF', strokeWidth: 2.5, fill: 'none', strokeLinecap: 'round' }));
+  if (state === 'approved') badge('#2BBFA7', h('path', { d: 'M94 40 L98 44 L104 36', stroke: '#FFFFFF', strokeWidth: 2.8, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }));
+  if (state === 'permission') badge('#8C80E8', h('path', { d: 'M95.5 34 L102.5 34 L95.5 46 L102.5 46 Z', stroke: '#FFFFFF', strokeWidth: 2, fill: 'none', strokeLinejoin: 'round' }));
+  if (state === 'encourage') P('M99 28 L102 36 L110 36 L104 41 L106 49 L99 44 L92 49 L94 41 L88 36 L96 36 Z', { fill: '#E7A83E' });
+  if (state === 'thinking') [[93, 46, 2.5], [100, 38, 3.3], [108, 29, 4.2]].forEach(([cx, cy, r]) => k.push(h('circle', { cx, cy, r, fill: '#B6AEF2' })));
+  if (sleepy) { k.push(h('text', { x: 90, y: 44, fontSize: 15, fontWeight: 700, fill: '#8C80E8', fontFamily: 'Fredoka,sans-serif' }, 'z')); k.push(h('text', { x: 101, y: 32, fontSize: 11, fontWeight: 700, fill: '#B6AEF2', fontFamily: 'Fredoka,sans-serif' }, 'z')); }
+  if (state === 'happy') { P('M18 30 L20 36 L26 38 L20 40 L18 46 L16 40 L10 38 L16 36 Z', { fill: '#E7A83E' }); P('M104 22 L105.5 26 L109.5 27.5 L105.5 29 L104 33 L102.5 29 L98.5 27.5 L102.5 26 Z', { fill: lA }); }
+  return h('div', { key: state + (o.k || ''), style: { width: size, height: size, flexShrink: 0, transformOrigin: '50% 90%', animation: o.motion ? ANIM[state] : 'none' } }, h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true }, ...k));
+}
+
+const BODIES = { indigo: '#5265D8', lavanta: '#8C80E8', teal: '#23A893', gece: '#39437A' };
+class Component extends DCLogic {
+  renderVals() {
+    const m = (st, z, x) => mascot(st, z, Object.assign({ motion: false, noShadow: z < 60 }, x || {}));
+    return {
+      hero: m('greeting', 124),
+      anatomy: m('idle', 170),
+      traits: [['Arkadaş canlısı', 'İlk tepkisi her zaman sıcak.'], ['Meraklı', 'Hafif eğilen baş, büyüyen yapraklar.'], ['Yardımsever', 'Çözüm önerir, karar vermez.'], ['Hafif mizahi', 'Göz kırpma, küçük oyunbazlık; şaka yok.'], ['Yargılamayan', 'Ret ve limit anlarında da sakin.'], ['Dikkat dağıtmayan', 'Çoğu zaman hareketsiz, kısa tepkiler.']].map(([k, v]) => ({ k, v })),
+      parts: [
+        ['Gövde', 'Hafif armut biçimli çakıl taşı; alt kısım geniş, yere oturmuş. Bacak yok.'],
+        ['Filiz', 'Başın tepesinden çıkan kısa sap ve iki yaprak. Karakterin imzası; asla çıkarılmaz.'],
+        ['Yüz paneli', 'Gövdenin üst yarısında yuvarlatılmış açık panel (52×36). Gözler ve ağız yalnızca burada.'],
+        ['Gözler', 'İki küçük dikey oval. Göz bebeği, parlama veya kaş yok; duygu göz biçimiyle verilir (yay, kapalı çizgi).'],
+        ['Kollar', 'Gövdeyle aynı renkte kısa, kalın, uçları yuvarlak tüp. El / parmak yok.'],
+        ['Rozet', 'Sağ üstte 22 px daire: hatırlatma (amber saat), izin (lavanta kum saati), onay (teal tik).']
+      ].map(([k, v]) => ({ k, v })),
+      colors: [['Gövde', '#5265D8'], ['Yaprak 1', '#2BBFA7'], ['Yaprak 2', '#3ED0B8'], ['Yüz paneli', '#EEF0FC'], ['Mürekkep', '#1B2150'], ['Yanak', '#F4A6B6']].map(([k, hex]) => ({ k, hex })),
+      variants: [['indigo', 'İndigo'], ['lavanta', 'Lavanta'], ['teal', 'Deniz'], ['gece', 'Gece']].map(([id, name]) => ({ name, hex: BODIES[id], el: m('idle', 64, { color: id }) })),
+      dos: ['Kendi silüeti: çakıl gövde + filiz', 'Yuvarlak, yumuşak hatlar; köşe yok', 'Sınırlı palet, düz dolgu + hafif hacim', 'Cinsiyetsiz, yaşsız, nötr', 'Türkçe metinle ve sağdan-soldan balonla uyumlu'],
+      donts: ['Ataç, tel, büküm veya ofis gereci formu', 'Büyük kaşlar, iri parlak gözler, göz bebeği', 'Gövde üzerinde yüz (yüz yalnızca panelde)', 'Korkutucu, kızgın, hayal kırıklığı ifadesi', 'Parmaklı el, işaret etme, sallanan parmak', 'Para, kilit, zincir gibi ceza çağrışımlı nesneler'],
+      states: [
+        ['idle', 'Bekleme', 'Varsayılan; olay yok', 'Kollar aşağıda, açık gözler, hafif gülümseme', 'Yavaş süzülme 3,4 sn döngü; 5 sn\'de bir göz kırpma'],
+        ['greeting', 'Karşılama', 'Uygulama açılışı, yeniden başlatma', 'Sağ kol yukarıda sallanıyor, gülen gözler', '2 zıplama + 3 el sallama, sonra Idle'],
+        ['reminder', 'Hatırlatma', 'Molaya 5 / 1 dk kala', 'Açık gözler, amber saat rozeti', '2 kez yana dürtme'],
+        ['break', 'Mola', 'Mola başladı', 'İki kol yukarıda esneme, kapalı gözler', 'Esneme 2,6 sn döngü (mola boyunca)'],
+        ['happy', 'Mutlu', 'Hedef tamamlandı, rozet', 'Kollar yukarıda, gülen gözler, iki yıldız', '3 zıplama, sonra durur'],
+        ['thinking', 'Düşünüyor', 'Yükleme, eşitleme', 'Gözler sağ üste, düşünce noktaları', 'Hafif sağa-sola eğilme 2 sn döngü'],
+        ['sleeping', 'Sessiz mod', 'Sessiz mod, gece', 'Kapalı gözler, sarkık yaprak, “z z”', 'Yavaş nefes 4 sn döngü'],
+        ['permission', 'İzin bekliyor', 'Talep gönderildi', 'Kollar önde birleşik, küçük “o” ağız, lavanta kum saati', 'Yavaş süzülme 2,4 sn döngü'],
+        ['approved', 'Onaylandı', 'Ebeveyn onayı', 'Gülen gözler, teal tik rozeti', '2 zıplama'],
+        ['encourage', 'Cesaretlendirme', 'Ders modu, ret sonrası', 'Göz kırpma, gülümseme, amber yıldız', '2 kez dürtme']
+      ].map(([id, tr, trig, pose, motion]) => ({ id, tr, trig, pose, motion, el: m(id, 52) })),
+      sizes: [[24, 'Tepsi, sekme'], [32, 'Compact widget'], [48, 'Balon'], [96, 'Widget, mola'], [160, 'Onboarding'], [200, 'Çocuk ana ekranı']].map(([px, use]) => ({ px, use, el: m('idle', px, { noShadow: px < 60 }) })),
+      motion: [
+        ['Süre', 'Tek seferlik tepkiler en fazla 2,5 sn. Döngüler yalnızca Idle, Break, Thinking, Sleeping, Permission.'],
+        ['Yoğunluk', 'En fazla 8 px dikey yer değiştirme, ±6° dönme. Ekran sarsma, flaş, hızlı renk değişimi yok.'],
+        ['Hareketi azalt', 'Uygulama ayarı veya sistem tercihi açıksa her durumun statik son karesi gösterilir. Her durum statik karede anlaşılır olmalı.'],
+        ['Sessiz mod', 'Sleeping durumu; balon açılmaz, yalnızca kritik uyarılar (1 dk kala, süre doldu).'],
+        ['Geçiş', 'Durumlar arası 200 ms çapraz geçiş; ara kare çizimi gerekmez.'],
+        ['Ses', 'Bu sürümde ses yok.']
+      ].map(([k, v]) => ({ k, v })),
+      deliver: [
+        ['Ana karakter sayfası', 'Ön, ¾ ve yan görünüm; oran ızgarası; renk değerleri.'],
+        ['10 durum · statik', 'SVG (vektör, düz katmanlar, metin yok) + PNG @1x/@2x, 4 renk varyantı.'],
+        ['10 durum · animasyon', 'Rive (.riv, state machine tercih) veya Lottie (.json); 60 fps, en fazla 150 KB/durum.'],
+        ['Küçük boyut seti', '24, 32, 48 px için elle sadeleştirilmiş SVG.'],
+        ['Uygulama ikonu', 'Windows .ico (16–256) ve mobil (iOS/Android) için Filiz yüzlü ikon.'],
+        ['Kaynak dosyalar', 'Figma veya Illustrator kaynağı; katman adları İngilizce durum kimlikleriyle.']
+      ].map(([k, v], i) => ({ n: i + 1, k, v })),
+      process: [['1. tur', '3 yön eskizi (silüet sabit, stil farklı), siyah-beyaz.'], ['2. tur', 'Seçilen yönde renkli karakter sayfası + 3 durum (Idle, Break, Permission).'], ['3. tur', 'Tüm durumlar statik + küçük boyutlar.'], ['4. tur', 'Animasyon dosyaları ve ürün içi test.']].map(([k, v]) => ({ k, v })),
+      accept: ['8–13 yaş çocuklarla 5 kişilik testte karakter “sevimli / arkadaş” olarak tanımlanıyor, “bebeksi” değil.', '24 px\'de silüet tanınabilir.', 'Yüz paneli üzerindeki ifade AA kontrastta okunuyor (mürekkep / panel ≥ 7:1).', 'Hiçbir durum ceza veya korku çağrışımı yapmıyor.', 'Bağımsız telif ve marka araştırmasından geçmiş özgün tasarım.']
+    };
+  }
+}
+</script>
+</body>
+</html>

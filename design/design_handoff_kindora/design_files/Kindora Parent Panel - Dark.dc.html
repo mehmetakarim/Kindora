@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#111827;color:#E9ECF5;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8C9BFF}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+input,textarea,select{background:#111827;color:#E9ECF5;color-scheme:dark}
+button{font-family:inherit}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid #8C80E8;outline-offset:2px}
+@keyframes kd-spin{to{transform:rotate(360deg)}}
+@keyframes kd-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+
+<div data-screen-label="Parent App Dark" style="height:100vh;min-height:720px;display:grid;grid-template-columns:{{ sideW }} minmax(0,1fr);position:relative">
+
+  <aside style="background:#1A2233;border-right:1px solid #2E3850;padding:22px {{ sidePad }};display:flex;flex-direction:column;gap:4px;min-height:0">
+    <div style="display:flex;align-items:center;gap:10px;padding:0 10px 22px">
+      <div style="width:32px;height:32px;border-radius:10px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoSm }}</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:-.02em;display:{{ wideBlock }}">kindora</div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+        <button onClick="{{ n.go }}" aria-current="{{ n.current }}" title="{{ n.label }}" aria-label="{{ n.label }}" style="border:0;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:{{ n.weight }};color:{{ n.color }};background:{{ n.bg }}" style-hover="background:#232D42">
+          <i class="ph {{ n.icon }}" style="font-size:19px"></i><span style="flex:1;display:{{ wideDisp }}">{{ n.label }}</span>
+          <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ n.badge }}</span></sc-if>
+        </button>
+      </sc-for>
+    </nav>
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+      <div style="display:{{ wideBlock }};font-size:12px;line-height:1.4;color:#8D96AE;border:1px dashed #4A5570;border-radius:8px;padding:6px 10px">Demo · cihaz yanıtları simüle ediliyor. Senaryoyu Tweaks'ten değiştirin.</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:{{ syncBg }};font-size:12px;color:{{ syncColor }}"><i class="ph {{ syncIcon }}" style="font-size:15px"></i><span style="display:{{ wideDisp }}">{{ syncText }}</span></div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px;border-top:1px solid #2E3850">
+        <div style="width:34px;height:34px;border-radius:999px;background:#2A3349;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#A9B1C7">SY</div>
+        <div style="display:{{ wideFlex }};flex-direction:column;gap:2px;flex:1"><span style="font-size:13px;font-weight:600">Selin Yılmaz</span><span style="font-size:12px;color:#8D96AE">Ebeveyn hesabı</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="display:flex;flex-direction:column;min-width:0;min-height:0">
+    <header style="height:72px;flex-shrink:0;padding:0 28px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #2E3850;background:#1A2233;position:relative;z-index:5">
+      <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><span style="font-size:20px;font-weight:600">{{ pageTitle }}</span><span style="font-size:13px;color:#8D96AE">{{ pageSub }}</span></div>
+      <div style="position:relative">
+        <button onClick="{{ toggleChildMenu }}" aria-haspopup="listbox" style="cursor:pointer;background:#1A2233;display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border:1px solid #2E3850;border-radius:999px;color:#E9ECF5" style-hover="border-color:#5B6BC8">
+          <div style="width:28px;height:28px;border-radius:999px;background:{{ childAvatarBg }};color:{{ childAvatarColor }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">{{ childInitial }}</div>
+          <span style="font-size:14px;font-weight:600">{{ childName }}</span><i class="ph ph-caret-down" style="color:#8D96AE"></i>
+        </button>
+        <sc-if value="{{ childMenu }}" hint-placeholder-val="{{ false }}">
+          <div role="listbox" style="position:absolute;right:0;top:48px;width:240px;background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(26,32,51,.12);display:flex;flex-direction:column;gap:2px">
+            <sc-for list="{{ childOptions }}" as="c" hint-placeholder-count="2">
+              <button onClick="{{ c.pick }}" style="border:0;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:{{ c.bg }};color:#E9ECF5" style-hover="background:#232D42">
+                <div style="width:30px;height:30px;border-radius:999px;background:{{ c.avBg }};color:{{ c.avColor }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">{{ c.initial }}</div>
+                <div style="display:flex;flex-direction:column;gap:1px;flex:1"><span style="font-size:14px;font-weight:600">{{ c.name }}</span><span style="font-size:12px;color:#8D96AE">{{ c.sub }}</span></div>
+                <sc-if value="{{ c.selected }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="color:#8C9BFF"></i></sc-if>
+              </button>
+            </sc-for>
+            <div style="height:1px;background:#2E3850;margin:4px 0"></div>
+            <button onClick="{{ addChild }}" style="border:0;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:transparent;color:#8C9BFF;font-size:14px;font-weight:600" style-hover="background:rgba(82,101,216,.18)"><i class="ph ph-plus"></i>Çocuk profili ekle</button>
+          </div>
+        </sc-if>
+      </div>
+      <button aria-label="Bildirimler" style="cursor:pointer;width:40px;height:40px;border-radius:10px;border:1px solid #2E3850;background:#1A2233;display:flex;align-items:center;justify-content:center;position:relative;color:#E9ECF5" style-hover="border-color:#5B6BC8"><i class="ph ph-bell" style="font-size:19px"></i><span style="position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:999px;background:#D95B68"></span></button>
+      <button aria-label="Yardım" style="cursor:pointer;width:40px;height:40px;border-radius:10px;border:1px solid #2E3850;background:#1A2233;display:flex;align-items:center;justify-content:center;color:#E9ECF5" style-hover="border-color:#5B6BC8"><i class="ph ph-question" style="font-size:19px"></i></button>
+    </header>
+
+    <div style="flex:1;min-height:0;overflow:auto">
+    <div style="max-width:1320px;min-width:{{ contentMin }};padding:24px 28px 40px;display:flex;flex-direction:column;gap:18px">
+
+      <sc-if value="{{ bannerShow }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:12px;background:{{ bannerBg }};border:1px solid {{ bannerBorder }}">
+          <i class="ph {{ bannerIcon }}" style="font-size:20px;color:{{ bannerColor }};margin-top:1px"></i>
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:14px;font-weight:600;color:{{ bannerColor }}">{{ bannerTitle }}</span><span style="font-size:13px;line-height:1.5;color:#A9B1C7">{{ bannerBody }}</span></div>
+          <button onClick="{{ retry }}" style="cursor:pointer;flex-shrink:0;border:1px solid {{ bannerBorder }};background:#1A2233;color:#E9ECF5;font-size:13px;font-weight:600;padding:7px 12px;border-radius:8px;display:flex;align-items:center;gap:6px"><i class="ph ph-arrow-clockwise"></i>{{ bannerCta }}</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDashNoDevice }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:56px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+          <div style="width:56px;height:56px;border-radius:16px;background:rgba(82,101,216,.18);color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph ph-desktop" style="font-size:28px"></i></div>
+          <span style="font-size:18px;font-weight:600">Can için henüz bir bilgisayar eşleştirilmedi</span>
+          <span style="font-size:14px;line-height:1.55;color:#A9B1C7;max-width:440px">Can'ın bilgisayarına Kindora'yı kurun ve ekranda görünen kodu buraya girin. Eşleştirme 2 dakika sürer.</span>
+          <button onClick="{{ startPair }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600;padding:11px 18px;border-radius:10px;display:flex;align-items:center;gap:8px" style-hover="background:#3F50B8"><i class="ph ph-plus"></i>Cihaz eşleştir</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr);gap:18px">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="width:48px;height:48px;border-radius:14px;background:rgba(140,128,232,.16);color:#B6AEF2;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">E</div>
+              <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><span style="font-size:16px;font-weight:600">Ela · 10 yaş</span><span style="font-size:13px;color:#8D96AE;display:flex;align-items:center;gap:6px"><i class="ph ph-desktop"></i>ELA-PC · Windows 11</span></div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;white-space:nowrap">
+                <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:{{ stBg }};color:{{ stColor }};font-size:12px;font-weight:600"><i class="ph {{ stIcon }}" style="font-size:12px"></i>{{ stLabel }}</span>
+                <span style="font-size:12px;color:#8D96AE">{{ lastSeen }}</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#8D96AE;font-weight:500">Aktif mod</span><span style="font-size:12px;color:{{ modeNoteColor }};font-weight:500">{{ modeNote }}</span></div>
+              <div role="radiogroup" aria-label="Aktif mod" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#232D42;border-radius:10px;padding:4px">
+                <sc-for list="{{ modes }}" as="m" hint-placeholder-count="4">
+                  <button role="radio" aria-checked="{{ m.checked }}" onClick="{{ m.pick }}" disabled="{{ m.disabled }}" style="font-size:13px;font-weight:600;border:{{ m.border }};cursor:{{ m.cursor }};padding:8px 0;border-radius:7px;background:{{ m.bg }};color:{{ m.color }};box-shadow:{{ m.shadow }};display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph {{ m.icon }}"></i>{{ m.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#8D96AE;font-weight:500">Bugünkü ekran süresi</span><i class="ph ph-clock" style="color:#8D96AE;font-size:18px"></i></div>
+            <span style="font-size:32px;font-weight:700;letter-spacing:-.02em">{{ usedText }}</span>
+            <div role="progressbar" aria-valuenow="{{ usedPct }}" aria-valuemin="0" aria-valuemax="100" style="height:8px;border-radius:999px;background:#2A3349;overflow:hidden"><div style="width:{{ usedPctCss }};height:100%;border-radius:999px;background:#5265D8;transition:width .4s"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#A9B1C7"><span>Limit {{ limitText }}</span><span style="font-weight:600;color:#8C9BFF">{{ leftText }}</span></div>
+            <sc-if value="{{ staleData }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#8D96AE;display:flex;align-items:center;gap:5px"><i class="ph ph-clock-counter-clockwise"></i>{{ staleData }}</span></sc-if>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#8D96AE;font-weight:500">Sonraki mola</span><i class="ph ph-coffee" style="color:#8D96AE;font-size:18px"></i></div>
+            <span style="font-size:32px;font-weight:700;letter-spacing:-.02em">{{ breakText }}</span>
+            <div style="display:flex;gap:6px"><div style="flex:1;height:8px;border-radius:999px;background:#8C80E8"></div><div style="flex:1;height:8px;border-radius:999px;background:#8C80E8"></div><div style="flex:1;height:8px;border-radius:999px;background:#2A3349"></div></div>
+            <div style="font-size:12px;color:#A9B1C7">Her 45 dk'da 10 dk · Bugün 2 / 3 mola</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,2fr);gap:18px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Hızlı işlemler</span><span style="font-size:12px;color:#8D96AE">{{ actionsHint }}</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+                <sc-for list="{{ actions }}" as="a" hint-placeholder-count="6">
+                  <button onClick="{{ a.run }}" aria-disabled="{{ a.disabled }}" style="text-align:left;cursor:{{ a.cursor }};border:1px solid {{ a.border }};background:{{ a.bg }};border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;color:#E9ECF5;opacity:{{ a.opacity }};min-height:96px;transition:border-color .15s,background .15s" style-hover="border-color:#5B6BC8">
+                    <i class="ph {{ a.icon }}" style="font-size:20px;color:{{ a.iconColor }};animation:{{ a.anim }}"></i>
+                    <span style="font-size:13px;font-weight:600">{{ a.label }}</span>
+                    <span style="font-size:12px;line-height:1.35;color:{{ a.subColor }}">{{ a.sub }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:15px;font-weight:600">Bugün nasıl geçti</span><span style="font-size:12px;color:#8D96AE">Uygulama kategorisi</span></div>
+              <div style="display:flex;height:10px;border-radius:999px;overflow:hidden;gap:3px"><div style="width:46%;background:#2BBFA7"></div><div style="width:32%;background:#8C80E8"></div><div style="width:22%;background:#4A5570"></div></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#8D96AE;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#2BBFA7"></span>Eğitim</span><span style="font-size:15px;font-weight:600">47 dk</span></div>
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#8D96AE;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#8C80E8"></span>Oyun</span><span style="font-size:15px;font-weight:600">33 dk</span></div>
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#8D96AE;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#4A5570"></span>Diğer</span><span style="font-size:15px;font-weight:600">22 dk</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px;align-items:start">
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:15px;font-weight:600">Bekleyen izin talepleri</span><button onClick="{{ goRequests }}" style="border:0;background:transparent;cursor:pointer;font-size:13px;color:#8C9BFF;font-weight:600;padding:0">Tümü</button></div>
+              <sc-for list="{{ requests }}" as="r" hint-placeholder-count="2">
+                <div style="border:1px solid #2E3850;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;align-items:flex-start;gap:12px">
+                    <div style="width:36px;height:36px;border-radius:10px;background:{{ r.iconBg }};color:{{ r.iconColor }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ r.icon }}" style="font-size:18px"></i></div>
+                    <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><span style="font-size:14px;font-weight:600">{{ r.title }}</span><span style="font-size:13px;color:#A9B1C7;line-height:1.4">“{{ r.reason }}”</span></div>
+                    <span style="font-size:12px;color:#8D96AE;white-space:nowrap">{{ r.time }}</span>
+                  </div>
+                  <sc-if value="{{ r.open }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <button onClick="{{ r.approve }}" style="font-size:13px;font-weight:600;cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:6px" style-hover="background:#3F50B8"><i class="ph ph-check"></i>{{ r.approveLabel }}</button>
+                      <button onClick="{{ r.reject }}" style="font-size:13px;font-weight:600;cursor:pointer;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;padding:8px 12px;border-radius:8px" style-hover="background:#111827">Reddet</button>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ r.closed }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:{{ r.doneBg }};color:{{ r.doneColor }};font-size:12px;font-weight:600;line-height:1.35"><i class="ph {{ r.doneIcon }}"></i>{{ r.doneText }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px"><span style="font-size:15px;font-weight:600">Son etkinlikler</span><button onClick="{{ goActivity }}" style="border:0;background:transparent;cursor:pointer;font-size:13px;color:#8C9BFF;font-weight:600;padding:0">Geçmiş</button></div>
+              <sc-for list="{{ activity }}" as="ev" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid {{ ev.line }}">
+                  <div style="width:28px;height:28px;border-radius:8px;background:{{ ev.bg }};color:{{ ev.c }};display:flex;align-items:center;justify-content:center"><i class="ph {{ ev.icon }}" style="font-size:15px"></i></div>
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;line-height:1.4">{{ ev.text }}</span><span style="font-size:12px;color:#8D96AE;font-variant-numeric:tabular-nums">{{ ev.t }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDevices }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+          <span style="font-size:14px;color:#A9B1C7">{{ devicesSummary }}</span>
+          <button onClick="{{ startPair }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;display:flex;align-items:center;gap:8px" style-hover="background:#3F50B8"><i class="ph ph-plus"></i>Yeni cihaz ekle</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:18px;align-items:start">
+          <sc-for list="{{ devices }}" as="d" hint-placeholder-count="1">
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;display:flex;flex-direction:column">
+              <div style="padding:20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #2E3850">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(82,101,216,.18);color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph {{ d.icon }}" style="font-size:24px"></i></div>
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><span style="font-size:16px;font-weight:600">{{ d.name }}</span><span style="font-size:13px;color:#8D96AE">{{ d.owner }}</span></div>
+                <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:{{ d.stBg }};color:{{ d.stColor }};font-size:12px;font-weight:600"><i class="ph {{ d.stIcon }}" style="font-size:12px"></i>{{ d.stLabel }}</span>
+              </div>
+              <div style="padding:16px 20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 18px">
+                <sc-for list="{{ d.info }}" as="i" hint-placeholder-count="6">
+                  <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;color:#8D96AE">{{ i.k }}</span><span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;color:{{ i.color }}">{{ i.v }}</span></div>
+                </sc-for>
+              </div>
+              <div style="padding:14px 20px;border-top:1px solid #2E3850;display:flex;gap:8px;align-items:center">
+                <button onClick="{{ d.ping }}" style="cursor:pointer;font-size:13px;font-weight:600;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:6px" style-hover="border-color:#5B6BC8"><i class="ph ph-arrows-clockwise"></i>Bağlantıyı test et</button>
+                <button onClick="{{ d.rename }}" style="cursor:pointer;font-size:13px;font-weight:600;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:6px" style-hover="border-color:#5B6BC8"><i class="ph ph-pencil-simple"></i>Yeniden adlandır</button>
+                <button onClick="{{ d.remove }}" style="cursor:pointer;margin-left:auto;font-size:13px;font-weight:600;border:0;background:transparent;color:#F29AA6;padding:8px 10px;border-radius:8px;display:flex;align-items:center;gap:6px" style-hover="background:rgba(217,91,104,.14)"><i class="ph ph-link-break"></i>Eşleştirmeyi kaldır</button>
+              </div>
+            </div>
+          </sc-for>
+          <button onClick="{{ startPair }}" style="cursor:pointer;min-height:220px;border:1.5px dashed #4A5570;background:transparent;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#A9B1C7;padding:24px" style-hover="border-color:#5265D8;background:#232D42">
+            <div style="width:44px;height:44px;border-radius:12px;background:rgba(82,101,216,.18);color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph ph-plus" style="font-size:22px"></i></div>
+            <span style="font-size:14px;font-weight:600;color:#E9ECF5">Başka bir bilgisayar ekle</span>
+            <span style="font-size:13px;color:#8D96AE;max-width:260px;text-align:center;line-height:1.45">Her cihaz bir çocuk profiline bağlanır. Kurallar profille birlikte gelir.</span>
+          </button>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;color:#A9B1C7;max-width:760px"><i class="ph ph-shield-check" style="font-size:18px;color:#5FDCC6;margin-top:1px"></i><span>Kindora yalnızca süre, mod ve alan adı kurallarını uygular. Ekran görüntüsü, klavye kaydı veya mesaj içeriği toplamaz.</span></div>
+      </sc-if>
+
+      <sc-if value="{{ isTime }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:13px;color:#8D96AE;font-weight:500;display:flex;align-items:center;gap:6px"><i class="ph ph-briefcase"></i>Hafta içi günlük limit</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <button onClick="{{ wdMinus }}" aria-label="15 dk azalt" style="cursor:pointer;width:40px;height:40px;border-radius:10px;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;display:flex;align-items:center;justify-content:center" style-hover="border-color:#5B6BC8"><i class="ph ph-minus"></i></button>
+              <span style="flex:1;text-align:center;font-size:28px;font-weight:700;letter-spacing:-.02em">{{ limWd }}</span>
+              <button onClick="{{ wdPlus }}" aria-label="15 dk artır" style="cursor:pointer;width:40px;height:40px;border-radius:10px;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;display:flex;align-items:center;justify-content:center" style-hover="border-color:#5B6BC8"><i class="ph ph-plus"></i></button>
+            </div>
+            <span style="font-size:12px;color:#8D96AE">Pazartesi – Cuma · 15 dk adımlarla</span>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:13px;color:#8D96AE;font-weight:500;display:flex;align-items:center;gap:6px"><i class="ph ph-sun-horizon"></i>Hafta sonu günlük limit</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <button onClick="{{ weMinus }}" aria-label="15 dk azalt" style="cursor:pointer;width:40px;height:40px;border-radius:10px;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;display:flex;align-items:center;justify-content:center" style-hover="border-color:#5B6BC8"><i class="ph ph-minus"></i></button>
+              <span style="flex:1;text-align:center;font-size:28px;font-weight:700;letter-spacing:-.02em">{{ limWe }}</span>
+              <button onClick="{{ wePlus }}" aria-label="15 dk artır" style="cursor:pointer;width:40px;height:40px;border-radius:10px;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;display:flex;align-items:center;justify-content:center" style-hover="border-color:#5B6BC8"><i class="ph ph-plus"></i></button>
+            </div>
+            <span style="font-size:12px;color:#8D96AE">Cumartesi – Pazar</span>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:13px;color:#8D96AE;font-weight:500;display:flex;align-items:center;gap:6px"><i class="ph ph-coffee"></i>Mola</span>
+            <div style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:center"><span style="font-size:12px;color:#A9B1C7">Sıklık</span><div style="display:flex;gap:6px"><sc-for list="{{ brEveryOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="cursor:pointer;flex:1;border:1.5px solid {{ o.border }};background:{{ o.bg }};color:{{ o.color }};border-radius:8px;padding:6px 0;font-size:13px;font-weight:600">{{ o.label }}</button></sc-for></div></div>
+            <div style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:center"><span style="font-size:12px;color:#A9B1C7">Süre</span><div style="display:flex;gap:6px"><sc-for list="{{ brLenOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="cursor:pointer;flex:1;border:1.5px solid {{ o.border }};background:{{ o.bg }};color:{{ o.color }};border-radius:8px;padding:6px 0;font-size:13px;font-weight:600">{{ o.label }}</button></sc-for></div></div>
+            <span style="font-size:12px;color:#8D96AE;line-height:1.4">{{ brSummary }}</span>
+          </div>
+        </div>
+
+        <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:240px"><span style="font-size:15px;font-weight:600">Haftalık program</span><span style="font-size:13px;color:#8D96AE">Bir tür seçip saatlere tıklayın. Kapalı saatlerde bilgisayar kullanılamaz; ders saatlerinde yalnızca ders siteleri açık kalır.</span></div>
+            <div role="radiogroup" aria-label="Fırça" style="display:flex;gap:6px">
+              <sc-for list="{{ brushes }}" as="b" hint-placeholder-count="3"><button onClick="{{ b.pick }}" aria-pressed="{{ b.pressed }}" style="cursor:pointer;border:1.5px solid {{ b.border }};background:{{ b.bg }};border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#E9ECF5"><span style="width:12px;height:12px;border-radius:3px;background:{{ b.c }}"></span>{{ b.label }}</button></sc-for>
+            </div>
+            <button onClick="{{ copyWeekday }}" style="cursor:pointer;border:1px solid #2E3850;background:#1A2233;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;color:#E9ECF5;display:flex;align-items:center;gap:6px" style-hover="border-color:#5B6BC8"><i class="ph ph-copy"></i>Pazartesiyi hafta içine kopyala</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 84px;gap:10px;align-items:center">
+              <span></span>
+              <div style="display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px"><sc-for list="{{ hours }}" as="h" hint-placeholder-count="16"><span style="font-size:12px;color:#8D96AE;font-variant-numeric:tabular-nums">{{ h.h }}</span></sc-for></div>
+              <span style="font-size:12px;color:#8D96AE;text-align:right">Limit</span>
+            </div>
+            <sc-for list="{{ gridRows }}" as="r" hint-placeholder-count="7">
+              <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 84px;gap:10px;align-items:center">
+                <span style="font-size:13px;font-weight:{{ r.weight }};color:#E9ECF5">{{ r.day }}</span>
+                <div style="display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px">
+                  <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="16"><button onClick="{{ c.paint }}" title="{{ c.title }}" aria-label="{{ c.title }}" style="cursor:pointer;height:28px;border:0;border-radius:5px;background:{{ c.bg }};padding:0" style-hover="filter:brightness(.92)"></button></sc-for>
+                </div>
+                <span style="font-size:13px;font-weight:600;text-align:right">{{ r.limit }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:260px"><span style="font-size:15px;font-weight:600">Bugün için geçici ek süre</span><span style="font-size:13px;color:#8D96AE">Yalnızca bugüne eklenir, yarın plan normale döner.</span></div>
+          <div style="display:flex;gap:8px"><sc-for list="{{ extraOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.run }}" style="cursor:pointer;border:1px solid #2E3850;background:#1A2233;border-radius:8px;padding:9px 14px;font-size:14px;font-weight:600;color:#8C9BFF" style-hover="border-color:#5B6BC8;background:#232D42">{{ o.label }}</button></sc-for></div>
+          <sc-if value="{{ hasExtras }}" hint-placeholder-val="{{ false }}">
+            <div style="flex-basis:100%;display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ tExtras }}" as="x" hint-placeholder-count="1"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(43,191,167,.14);color:#5FDCC6;font-size:12px;font-weight:600"><i class="ph ph-plus-circle"></i>{{ x.text }} · {{ x.at }}</span></sc-for></div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isWeb }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:12px;background:rgba(82,101,216,.18);border:1px solid #2E3850">
+          <i class="ph ph-info" style="font-size:20px;color:#8C9BFF;margin-top:1px"></i>
+          <span style="font-size:13px;line-height:1.55;color:#C9D0FF;flex:1">Kurallar <b>alan adı düzeyinde</b> uygulanır ve tüm tarayıcılarda geçerlidir. youtube.com engellendiğinde sitenin tüm sayfaları ve videoları engellenir; tek bir sayfa, video veya kategori seçmek henüz mümkün değil.</span>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;display:flex;flex-direction:column">
+            <div style="padding:0 20px;border-bottom:1px solid #2E3850;display:flex;align-items:flex-end;gap:20px">
+              <sc-for list="{{ webTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" style="cursor:pointer;border:0;border-bottom:2px solid {{ t.border }};background:transparent;padding:16px 0 12px;display:flex;align-items:center;gap:7px;font-size:14px;font-weight:{{ t.weight }};color:{{ t.color }}"><i class="ph {{ t.icon }}"></i>{{ t.label }}<span style="font-size:12px;color:#8D96AE;font-weight:500">{{ t.count }}</span></button></sc-for>
+              <button onClick="{{ openRule }}" style="cursor:pointer;margin-left:auto;margin-bottom:10px;border:0;background:#5265D8;color:#FFFFFF;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;display:flex;align-items:center;gap:6px" style-hover="background:#3F50B8"><i class="ph ph-plus"></i>Kural ekle</button>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 84px;gap:12px;padding:10px 20px;font-size:12px;color:#8D96AE;font-weight:500;border-bottom:1px solid #2E3850"><span>Alan adı</span><span>Ne zaman</span><span>Ekleyen</span><span></span></div>
+            <sc-for list="{{ webRows }}" as="w" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 84px;gap:12px;padding:12px 20px;align-items:center;border-bottom:1px solid #232D42" style-hover="background:#1F2839">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="width:30px;height:30px;border-radius:8px;background:{{ w.kBg }};color:{{ w.kColor }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">{{ w.letter }}</span><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis">{{ w.domain }}</span><span style="font-size:12px;color:{{ w.kColor }};display:flex;align-items:center;gap:4px"><i class="ph {{ w.kIcon }}"></i>{{ w.kindLabel }}</span></div></div>
+                <span style="font-size:13px;color:#E9ECF5">{{ w.when }}</span>
+                <span style="font-size:13px;color:#A9B1C7">{{ w.by }}</span>
+                <div style="display:flex;gap:4px;justify-content:flex-end">
+                  <button onClick="{{ w.edit }}" aria-label="Düzenle" style="cursor:pointer;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#A9B1C7;display:flex;align-items:center;justify-content:center" style-hover="background:#232D42"><i class="ph ph-pencil-simple" style="font-size:16px"></i></button>
+                  <button onClick="{{ w.remove }}" aria-label="Kaldır" style="cursor:pointer;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#F29AA6;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(217,91,104,.14)"><i class="ph ph-trash" style="font-size:16px"></i></button>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ webEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><i class="ph ph-globe-simple" style="font-size:28px;color:#9AA2B8"></i><span style="font-size:14px;font-weight:600">Bu listede site yok</span><span style="font-size:13px;color:#8D96AE">"Kural ekle" ile bir alan adı ekleyebilirsiniz.</span></div></sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:14px;font-weight:600">Listede olmayan siteler</span>
+              <sc-for list="{{ webDefaults }}" as="d" hint-placeholder-count="2"><button onClick="{{ d.pick }}" style="cursor:pointer;text-align:left;border:1.5px solid {{ d.border }};background:{{ d.bg }};border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;color:#E9ECF5"><span style="font-size:13px;font-weight:600;color:{{ d.color }}">{{ d.label }}</span><span style="font-size:12px;color:#8D96AE">{{ d.sub }}</span></button></sc-for>
+            </div>
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:14px;font-weight:600">Gelecek özellikler</span>
+              <sc-for list="{{ future }}" as="f" hint-placeholder-count="4"><div style="display:flex;align-items:flex-start;gap:10px;opacity:.85"><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:13px;font-weight:600;color:#A9B1C7">{{ f.t }}</span><span style="font-size:12px;color:#8D96AE">{{ f.d }}</span></div><span style="font-size:12px;font-weight:600;color:#B6AEF2;background:rgba(140,128,232,.16);padding:3px 8px;border-radius:999px;white-space:nowrap">Planlanıyor</span></div></sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReq }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:20px;border-bottom:1px solid #2E3850">
+          <sc-for list="{{ reqTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.pick }}" style="cursor:pointer;border:0;border-bottom:2px solid {{ t.border }};background:transparent;padding:6px 0 12px;font-size:14px;font-weight:{{ t.weight }};color:{{ t.color }};display:flex;align-items:center;gap:7px">{{ t.label }}<span style="font-size:12px;color:#8D96AE;font-weight:500">{{ t.n }}</span></button></sc-for>
+        </div>
+        <sc-if value="{{ reqPendingTab }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:18px;align-items:start">
+            <sc-for list="{{ pend }}" as="q" hint-placeholder-count="2">
+              <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px">
+                <div style="display:flex;align-items:flex-start;gap:12px">
+                  <div style="width:40px;height:40px;border-radius:10px;background:{{ q.iconBg }};color:{{ q.iconColor }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ q.icon }}" style="font-size:20px"></i></div>
+                  <div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:16px;font-weight:600">{{ q.title }}</span><span style="font-size:12px;color:#8D96AE">Ela · {{ q.time }}</span></div>
+                  <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:rgba(231,168,62,.14);color:#F3C77A;font-size:12px;font-weight:600;white-space:nowrap"><i class="ph ph-hourglass-medium"></i>Yanıt bekliyor</span>
+                </div>
+                <div style="background:#111827;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:#8D96AE">Ela'nın nedeni</span><span style="font-size:14px;line-height:1.5">“{{ q.reason }}”</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600">İzin süresi</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="cursor:pointer;border:1.5px solid {{ o.border }};background:{{ o.bg }};color:{{ o.color }};border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600">{{ o.label }}</button></sc-for></div><span style="font-size:12px;color:#8D96AE">{{ q.detail }}</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font-size:13px;font-weight:600">Ela'ya not <span style="font-weight:400;color:#8D96AE">· isteğe bağlı</span></span>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ q.notes }}" as="n" hint-placeholder-count="3"><button onClick="{{ n.pick }}" style="cursor:pointer;border:1px solid #2E3850;background:#1A2233;border-radius:999px;padding:5px 10px;font-size:12px;color:#A9B1C7" style-hover="border-color:#5B6BC8">{{ n.n }}</button></sc-for></div>
+                  <input value="{{ q.note }}" onChange="{{ q.setNote }}" placeholder="Kısa ve nazik bir not yazın" style="font:inherit;font-size:14px;padding:9px 12px;border:1px solid #3A4560;border-radius:8px;color:#E9ECF5">
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;padding-top:4px;border-top:1px solid #2E3850">
+                  <button onClick="{{ q.approve }}" style="cursor:pointer;margin-top:12px;border:0;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600;padding:10px 16px;border-radius:8px;display:flex;align-items:center;gap:6px" style-hover="background:#3F50B8"><i class="ph ph-check"></i>{{ q.approveLabel }}</button>
+                  <button onClick="{{ q.reject }}" style="cursor:pointer;margin-top:12px;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;font-size:14px;font-weight:600;padding:10px 16px;border-radius:8px" style-hover="background:#111827">Reddet</button>
+                  <span style="margin-top:12px;margin-left:auto;font-size:12px;color:#8D96AE">Ela kararı ve notunu görür</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ pendEmpty }}" hint-placeholder-val="{{ false }}"><div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center"><div style="width:52px;height:52px;border-radius:14px;background:rgba(43,191,167,.14);color:#5FDCC6;display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:26px"></i></div><span style="font-size:16px;font-weight:600">Bekleyen talep yok</span><span style="font-size:13px;color:#8D96AE">Yeni bir istek geldiğinde bildirim alırsınız.</span></div></sc-if>
+        </sc-if>
+        <sc-if value="{{ reqHistoryTab }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:6px 20px">
+            <sc-for list="{{ hist }}" as="h" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:96px 80px minmax(0,1fr) auto;gap:16px;align-items:flex-start;padding:14px 0;border-top:1px solid {{ h.line }}">
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;font-weight:600">{{ h.d }}</span><span style="font-size:12px;color:#8D96AE">{{ h.t }}</span></div>
+                <span style="font-size:13px;color:#A9B1C7">{{ h.type }}</span>
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><span style="font-size:14px;font-weight:600">{{ h.detail }}</span><span style="font-size:13px;color:#A9B1C7">“{{ h.reason }}”</span><sc-if value="{{ h.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#8D96AE">{{ h.note }}</span></sc-if></div>
+                <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:{{ h.resBg }};color:{{ h.resColor }};font-size:12px;font-weight:600;white-space:nowrap"><i class="ph {{ h.resIcon }}"></i>{{ h.res }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isReports }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onClick="{{ weekPrev }}" aria-label="Önceki hafta" style="cursor:pointer;width:34px;height:34px;border:1px solid #2E3850;border-radius:8px;background:#1A2233;color:#E9ECF5;display:flex;align-items:center;justify-content:center;opacity:{{ weekPrevDis }}"><i class="ph ph-caret-left"></i></button>
+          <span style="font-size:15px;font-weight:600;min-width:120px;text-align:center">{{ weekLabel }}</span>
+          <button onClick="{{ weekNext }}" aria-label="Sonraki hafta" style="cursor:pointer;width:34px;height:34px;border:1px solid #2E3850;border-radius:8px;background:#1A2233;color:#E9ECF5;display:flex;align-items:center;justify-content:center;opacity:{{ weekNextDis }}"><i class="ph ph-caret-right"></i></button>
+          <span style="margin-left:auto;font-size:12px;color:#8D96AE;display:flex;align-items:center;gap:6px"><i class="ph ph-shield-check" style="color:#5FDCC6"></i>Yalnızca süre ve kategori · Ela da kendi özetini görür</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;color:#8D96AE;font-weight:500">{{ k.k }}</span><span style="font-size:26px;font-weight:700;letter-spacing:-.02em">{{ k.v }}</span><span style="font-size:12px;color:{{ k.dc }}">{{ k.d }}</span></div></sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;align-items:start">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:15px;font-weight:600;flex:1">Günlük kullanım</span>
+              <span style="font-size:12px;color:#A9B1C7;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#2BBFA7"></span>Eğitim</span><span style="font-size:12px;color:#A9B1C7;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#8C80E8"></span>Oyun</span><span style="font-size:12px;color:#A9B1C7;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#4A5570"></span>Diğer</span><span style="font-size:12px;color:#A9B1C7;display:flex;align-items:center;gap:6px"><span style="width:14px;border-top:2px dashed #8D96AE"></span>Limit</span>
+            </div>
+            <div role="img" aria-label="Günlük kullanım grafiği. Değerler grafiğin altındaki tabloda." style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:14px;align-items:end;height:220px">
+              <sc-for list="{{ bars }}" as="b" hint-placeholder-count="7">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                  <span style="font-size:12px;color:#A9B1C7;font-weight:600;white-space:nowrap">{{ b.total }}</span>
+                  <div style="position:relative;width:100%;max-width:44px;height:180px;display:flex;flex-direction:column-reverse;gap:2px">
+                    <div style="height:{{ b.e }};background:#2BBFA7;border-radius:0 0 6px 6px"></div><div style="height:{{ b.g }};background:#8C80E8"></div><div style="height:{{ b.o }};background:#4A5570;border-radius:6px 6px 0 0"></div>
+                    <div style="position:absolute;left:-6px;right:-6px;bottom:{{ b.limBottom }};border-top:2px dashed #8D96AE"></div>
+                  </div>
+                  <span style="font-size:12px;color:#8D96AE">{{ b.day }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <details style="font-size:13px;color:#A9B1C7"><summary style="cursor:pointer;font-weight:600;color:#8C9BFF">Tablo olarak göster</summary>
+              <div role="table" aria-label="Günlük kullanım tablosu" style="display:flex;flex-direction:column;margin-top:8px;font-variant-numeric:tabular-nums">
+                <div role="row" style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:7px 0;font-weight:600"><span role="columnheader">Gün</span><span role="columnheader">Toplam</span><span role="columnheader">Eğitim</span><span role="columnheader">Oyun</span><span role="columnheader">Diğer</span><span role="columnheader">Limit</span></div>
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="7"><div role="row" style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:7px 0;border-top:1px solid #2E3850"><span role="cell">{{ b.day }}</span><span role="cell">{{ b.total }}</span><span role="cell">{{ b.eT }}</span><span role="cell">{{ b.gT }}</span><span role="cell">{{ b.oT }}</span><span role="cell">{{ b.limT }}</span></div></sc-for>
+              </div>
+            </details>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px">
+            <span style="font-size:15px;font-weight:600">Kategoriler</span>
+            <sc-for list="{{ cats }}" as="c" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="display:flex;align-items:center;gap:8px;font-weight:600"><span style="width:10px;height:10px;border-radius:3px;background:{{ c.c }}"></span>{{ c.k }}</span><span><b>{{ c.v }}</b> <span style="color:#8D96AE">· {{ c.pct }}</span></span></div>
+                <div style="height:8px;border-radius:999px;background:#2A3349;overflow:hidden"><div style="height:100%;width:{{ c.pct }};background:{{ c.c }};border-radius:999px"></div></div>
+                <span style="font-size:12px;color:#8D96AE">{{ c.apps }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:4px">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 110px;gap:12px;padding-bottom:8px;font-size:12px;color:#8D96AE"><span style="font-size:15px;font-weight:600;color:#E9ECF5">Önceki haftayla</span><span style="text-align:right">Bu hafta</span><span style="text-align:right">Önceki</span></div>
+            <sc-for list="{{ compare }}" as="c" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 110px;gap:12px;padding:10px 0;border-top:1px solid #2E3850;font-size:14px"><span style="color:#A9B1C7">{{ c.k }}</span><span style="text-align:right;font-weight:600">{{ c.a }}</span><span style="text-align:right;color:#8D96AE">{{ c.b }}</span></div></sc-for>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:15px;font-weight:600;padding-bottom:8px">Kural değişiklikleri</span>
+            <sc-for list="{{ ruleHist }}" as="r" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid #2E3850;font-size:14px"><span style="color:#8D96AE;font-size:13px">{{ r.d }}</span><span>{{ r.t }}</span></div></sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isActivity }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ actFilters }}" as="f" hint-placeholder-count="6"><button onClick="{{ f.pick }}" style="cursor:pointer;border:1.5px solid {{ f.border }};background:{{ f.bg }};color:{{ f.color }};border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600">{{ f.label }}</button></sc-for></div>
+        <sc-for list="{{ actDays }}" as="g" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:13px;font-weight:600;color:#A9B1C7">{{ g.day }}</span>
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:6px 20px">
+              <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:52px 32px minmax(0,1fr);gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #232D42">
+                  <span style="font-size:13px;color:#8D96AE;font-variant-numeric:tabular-nums;padding-top:6px">{{ it.t }}</span>
+                  <div style="width:32px;height:32px;border-radius:9px;background:{{ it.bg }};color:{{ it.c }};display:flex;align-items:center;justify-content:center"><i class="ph {{ it.icon }}" style="font-size:16px"></i></div>
+                  <div style="display:flex;flex-direction:column;gap:2px;padding-top:2px"><span style="font-size:14px;font-weight:500">{{ it.text }}</span><sc-if value="{{ it.hasSub }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#8D96AE;line-height:1.45">{{ it.sub }}</span></sc-if></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ actEmpty }}" hint-placeholder-val="{{ false }}"><div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:40px;text-align:center;font-size:14px;color:#8D96AE">Bu filtrede etkinlik yok.</div></sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px">
+            <sc-for list="{{ setNav }}" as="n" hint-placeholder-count="6"><button onClick="{{ n.pick }}" style="cursor:pointer;border:0;text-align:left;background:{{ n.bg }};color:{{ n.color }};font-weight:{{ n.weight }};font-size:14px;padding:10px 12px;border-radius:8px;display:flex;align-items:center;gap:10px" style-hover="background:#232D42"><i class="ph {{ n.icon }}" style="font-size:18px"></i>{{ n.label }}</button></sc-for>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:8px 24px 12px;display:flex;flex-direction:column">
+            <span style="font-size:17px;font-weight:600;padding:16px 0 8px">{{ setTitle }}</span>
+            <sc-for list="{{ setRows }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:20px;padding:16px 0;border-top:1px solid {{ r.line }}">
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><span style="font-size:14px;font-weight:600">{{ r.label }}</span><span style="font-size:13px;color:#8D96AE;line-height:1.45">{{ r.sub }}</span></div>
+                <sc-if value="{{ r.isToggle }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.run }}" role="switch" aria-checked="{{ r.aria }}" aria-label="{{ r.label }}" style="cursor:{{ r.cursor }};border:0;width:44px;height:26px;border-radius:999px;background:{{ r.swBg }};padding:3px;display:flex;justify-content:{{ r.swJ }};flex-shrink:0"><span style="width:20px;height:20px;border-radius:999px;background:#FFFFFF;box-shadow:0 1px 2px rgba(0,0,0,.2)"></span></button></sc-if>
+                <sc-if value="{{ r.isValue }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:12px;flex-shrink:0"><span style="font-size:14px;color:#A9B1C7">{{ r.v }}</span><sc-if value="{{ r.hasBtn }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.run }}" style="cursor:pointer;border:1px solid {{ r.btnBorder }};background:#1A2233;color:{{ r.btnColor }};font-size:13px;font-weight:600;padding:7px 12px;border-radius:8px;white-space:nowrap">{{ r.btn }}</button></sc-if></div></sc-if>
+                <sc-if value="{{ r.isSeg }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:4px;background:#232D42;border-radius:10px;padding:4px;flex-shrink:0"><sc-for list="{{ r.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="cursor:pointer;border:0;border-radius:7px;padding:7px 14px;font-size:13px;font-weight:600;background:{{ o.bg }};color:{{ o.color }};box-shadow:{{ o.shadow }}">{{ o.label }}</button></sc-for></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ pBack }}" style="cursor:pointer;align-self:flex-start;border:0;background:transparent;color:#8C9BFF;font-size:13px;font-weight:600;padding:0;display:flex;align-items:center;gap:6px"><i class="ph ph-arrow-left"></i>Çocuk profilleri</button>
+        <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <div style="width:72px;height:72px;border-radius:20px;background:{{ pAvBg }};color:{{ pAvColor }};display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700">{{ pInitial }}</div>
+          <label style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:220px"><span style="font-size:12px;color:#8D96AE;font-weight:500">Ad</span><input value="{{ pName }}" onChange="{{ pSetName }}" style="font:inherit;font-size:18px;font-weight:600;padding:8px 12px;border:1px solid #3A4560;border-radius:8px;color:#E9ECF5;max-width:320px"><span style="font-size:13px;color:#8D96AE">{{ pAge }}</span></label>
+          <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;color:#8D96AE;font-weight:500">Profil rengi</span><div style="display:flex;gap:10px"><sc-for list="{{ pColors }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" aria-label="Renk" style="cursor:pointer;width:32px;height:32px;border-radius:10px;border:0;background:{{ c.bg }};box-shadow:{{ c.ring }};display:flex;align-items:center;justify-content:center"><span style="width:12px;height:12px;border-radius:999px;background:{{ c.c }}"></span></button></sc-for></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start">
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px"><span style="font-size:15px;font-weight:600">Kullanım planı</span><button onClick="{{ pGoTime }}" style="cursor:pointer;border:0;background:transparent;color:#8C9BFF;font-size:13px;font-weight:600;padding:0">Düzenle</button></div>
+            <sc-for list="{{ pPlan }}" as="p" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid #232D42;font-size:14px"><span style="color:#A9B1C7">{{ p.k }}</span><span style="font-weight:600">{{ p.v }}</span></div></sc-for>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:15px;font-weight:600">Cihazlar</span><button onClick="{{ pGoDevices }}" style="cursor:pointer;border:0;background:transparent;color:#8C9BFF;font-size:13px;font-weight:600;padding:0">Yönet</button></div>
+            <sc-if value="{{ pHasDevice }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:12px;border:1px solid #2E3850;border-radius:10px;padding:12px"><div style="width:36px;height:36px;border-radius:10px;background:rgba(82,101,216,.18);color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph ph-desktop" style="font-size:18px"></i></div><div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">ELA-PC</span><span style="font-size:12px;color:{{ pDevColor }}">{{ pDevSeen }}</span></div></div></sc-if>
+            <sc-if value="{{ pNoDevice }}" hint-placeholder-val="{{ false }}"><div style="border:1.5px dashed #4A5570;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center"><span style="font-size:14px;font-weight:600">Henüz cihaz yok</span><span style="font-size:12px;color:#8D96AE">Kurallar cihaz eşleştirilince uygulanır.</span></div></sc-if>
+            <div style="display:flex;flex-direction:column;gap:6px;padding-top:4px"><span style="font-size:13px;font-weight:600">Web kuralları</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ pWeb }}" as="w" hint-placeholder-count="4"><button onClick="{{ pGoWeb }}" style="cursor:pointer;border:1px solid #2E3850;background:#1A2233;border-radius:999px;padding:4px 10px;font-size:12px;color:#A9B1C7;display:flex;gap:5px;align-items:center"><b style="color:{{ w.c }}">{{ w.n }}</b>{{ w.k }}</button></sc-for></div></div>
+          </div>
+          <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:8px"><span style="font-size:15px;font-weight:600">{{ pGen }} tercihleri</span><span style="font-size:12px;color:#8D96AE;line-height:1.45">Çocuk kendi uygulamasında değiştirir. Güvenlik kurallarını etkilemez.</span></div>
+            <sc-for list="{{ pPrefs }}" as="p" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid #232D42;font-size:14px"><span style="color:#A9B1C7">{{ p.k }}</span><span style="font-weight:600">{{ p.v }}</span></div></sc-for>
+            <div style="display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid #232D42;font-size:14px"><span style="color:#A9B1C7">Rozetler</span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><b>{{ pBadges }}</b><span style="font-size:12px;color:#8D96AE">{{ pBadgeNote }}</span></span></div>
+          </div>
+        </div>
+        <div style="background:#1A2233;border:1px solid rgba(217,91,104,.4);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:16px">
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:14px;font-weight:600">Profili sil</span><span style="font-size:13px;color:#8D96AE">Kurallar, geçmiş ve eşleştirmeler kalıcı olarak silinir.</span></div>
+          <button onClick="{{ pDelete }}" style="cursor:pointer;border:1px solid rgba(217,91,104,.4);background:#1A2233;color:#F29AA6;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px" style-hover="background:rgba(217,91,104,.14)">Profili sil</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tDirty }}" hint-placeholder-val="{{ false }}">
+        <div style="position:sticky;bottom:16px;z-index:6;background:#2E3850;color:#FFFFFF;border-radius:12px;padding:12px 14px 12px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 32px rgba(17,24,39,.25)">
+          <i class="ph ph-pencil-simple" style="font-size:18px;color:#8C9BFF"></i><span style="flex:1;font-size:14px">Kaydedilmemiş değişiklikler var. Kaydedince ELA-PC'ye gönderilir.</span>
+          <button onClick="{{ tDiscard }}" style="cursor:pointer;border:1px solid #3A4466;background:transparent;color:#FFFFFF;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px">Vazgeç</button>
+          <button onClick="{{ tSave }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px">Kaydet ve gönder</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isOther }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#1A2233;border:1px solid #2E3850;border-radius:12px;padding:56px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+          <div style="width:56px;height:56px;border-radius:16px;background:#232D42;color:#8D96AE;display:flex;align-items:center;justify-content:center"><i class="ph {{ otherIcon }}" style="font-size:28px"></i></div>
+          <span style="font-size:18px;font-weight:600">{{ pageTitle }}</span>
+          <span style="font-size:14px;color:#A9B1C7">Bu ekran Design Phase 5'te tasarlanacak.</span>
+        </div>
+      </sc-if>
+    </div>
+    </div>
+  </main>
+
+  <sc-if value="{{ confirm }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(17,24,39,.38);display:flex;align-items:center;justify-content:center;z-index:20">
+      <div role="dialog" aria-modal="true" style="width:440px;max-width:calc(100% - 32px);background:#1A2233;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 64px rgba(17,24,39,.25)">
+        <div style="width:44px;height:44px;border-radius:12px;background:{{ cfIconBg }};color:{{ cfIconColor }};display:flex;align-items:center;justify-content:center"><i class="ph {{ cfIcon }}" style="font-size:22px"></i></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:18px;font-weight:600">{{ cfTitle }}</span><span style="font-size:14px;line-height:1.55;color:#A9B1C7">{{ cfBody }}</span></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button onClick="{{ closeConfirm }}" style="font-size:14px;font-weight:600;cursor:pointer;border:1px solid #2E3850;background:#1A2233;padding:10px 16px;border-radius:8px;color:#E9ECF5">Vazgeç</button>
+          <button onClick="{{ cfRun }}" style="font-size:14px;font-weight:600;cursor:pointer;border:0;background:{{ cfCtaBg }};color:#FFFFFF;padding:10px 16px;border-radius:8px">{{ cfCta }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ pairOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(17,24,39,.38);display:flex;align-items:center;justify-content:center;z-index:20">
+      <div role="dialog" aria-modal="true" style="width:520px;max-width:calc(100% - 32px);background:#1A2233;border-radius:16px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(17,24,39,.25)">
+        <div style="padding:20px 24px;border-bottom:1px solid #2E3850;display:flex;align-items:center;gap:12px">
+          <span style="font-size:17px;font-weight:600;flex:1">Yeni cihaz eşleştir</span>
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ pairDots }}" as="p" hint-placeholder-count="3"><span style="width:28px;height:4px;border-radius:999px;background:{{ p }}"></span></sc-for>
+          </div>
+          <button onClick="{{ closePair }}" aria-label="Kapat" style="cursor:pointer;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#A9B1C7;display:flex;align-items:center;justify-content:center" style-hover="background:#232D42"><i class="ph ph-x" style="font-size:18px"></i></button>
+        </div>
+
+        <sc-if value="{{ pair1 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
+            <span style="font-size:14px;line-height:1.55;color:#A9B1C7">Önce cihazın hangi çocuğa ait olduğunu seçin, sonra o bilgisayara Kindora'yı kurun.</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <sc-for list="{{ pairChildren }}" as="c" hint-placeholder-count="2">
+                <button onClick="{{ c.pick }}" style="cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1.5px solid {{ c.border }};background:{{ c.bg }};color:#E9ECF5">
+                  <div style="width:32px;height:32px;border-radius:999px;background:{{ c.avBg }};color:{{ c.avColor }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">{{ c.initial }}</div>
+                  <div style="display:flex;flex-direction:column;gap:1px"><span style="font-size:14px;font-weight:600">{{ c.name }}</span><span style="font-size:12px;color:#8D96AE">{{ c.sub }}</span></div>
+                </button>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;background:#111827;border-radius:12px;padding:16px">
+              <div style="display:flex;gap:12px;font-size:14px;line-height:1.5"><span style="width:24px;height:24px;flex-shrink:0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span><span>Çocuğun bilgisayarında <b>kindora.app/indir</b> adresini açıp Kindora'yı kurun.</span></div>
+              <div style="display:flex;gap:12px;font-size:14px;line-height:1.5"><span style="width:24px;height:24px;flex-shrink:0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span><span>Kurulumda "Ebeveyn hesabına bağlan" seçeneğini seçin.</span></div>
+              <div style="display:flex;gap:12px;font-size:14px;line-height:1.5"><span style="width:24px;height:24px;flex-shrink:0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span><span>Bir sonraki adımda göreceğiniz kodu o bilgisayara girin.</span></div>
+            </div>
+            <div style="display:flex;justify-content:flex-end"><button onClick="{{ pairNext }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600;padding:10px 18px;border-radius:10px" style-hover="background:#3F50B8">Kodu göster</button></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ pair2 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
+            <span style="font-size:14px;color:#A9B1C7">Bu kodu {{ pairChildGen }} bilgisayarındaki Kindora kurulumuna girin.</span>
+            <div style="display:flex;gap:8px" aria-label="Eşleştirme kodu 482 913">
+              <sc-for list="{{ codeDigits }}" as="g" hint-placeholder-count="7"><span style="width:{{ g.w }};height:60px;border-radius:10px;background:{{ g.bg }};display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:#E9ECF5">{{ g.v }}</span></sc-for>
+            </div>
+            <span style="font-size:13px;color:#8D96AE;display:flex;align-items:center;gap:6px"><i class="ph ph-timer"></i>Kod 9:42 dakika geçerli · tek kullanımlık</span>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;background:rgba(231,168,62,.14);color:#F3C77A;font-size:13px;font-weight:600"><i class="ph ph-circle-notch" style="animation:kd-spin 1s linear infinite;font-size:16px"></i>Cihazın bağlanması bekleniyor…</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ pair3 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
+            <span style="font-size:14px;line-height:1.55;color:#A9B1C7">Bir bilgisayar kodu girdi. Sizin cihazınız olduğunu doğrulayın.</span>
+            <div style="border:1px solid #2E3850;border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px">
+              <div style="width:44px;height:44px;border-radius:12px;background:rgba(82,101,216,.18);color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph ph-laptop" style="font-size:22px"></i></div>
+              <div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:15px;font-weight:600">DESKTOP-7K2QF</span><span style="font-size:13px;color:#8D96AE">Windows 11 Home · Kindora 0.9.2</span></div>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600">Cihaz adı
+              <input value="{{ pairName }}" onChange="{{ setPairName }}" style="font:inherit;font-size:14px;font-weight:400;padding:10px 12px;border:1px solid #3A4560;border-radius:8px;color:#E9ECF5">
+            </label>
+            <div style="display:flex;justify-content:flex-end;gap:10px">
+              <button onClick="{{ closePair }}" style="cursor:pointer;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px">Bu benim cihazım değil</button>
+              <button onClick="{{ pairConfirm }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600;padding:10px 18px;border-radius:10px" style-hover="background:#3F50B8">Eşleştir</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ pair4 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:32px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+            <div style="width:56px;height:56px;border-radius:999px;background:rgba(43,191,167,.14);color:#5FDCC6;display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:28px"></i></div>
+            <span style="font-size:18px;font-weight:600">{{ pairName }} eşleştirildi</span>
+            <span style="font-size:14px;line-height:1.55;color:#A9B1C7;max-width:380px">{{ pairChildGen }} kuralları cihaza gönderildi ve cihaz onayladı. Widget bir sonraki oturum açışta görünecek.</span>
+            <button onClick="{{ closePair }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600;padding:10px 18px;border-radius:10px" style-hover="background:#3F50B8">Tamam</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ruleOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;background:rgba(17,24,39,.38);display:flex;align-items:center;justify-content:center;z-index:20">
+      <div role="dialog" aria-modal="true" style="width:540px;max-width:calc(100% - 32px);max-height:calc(100% - 32px);overflow:auto;background:#1A2233;border-radius:16px;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(17,24,39,.25)">
+        <div style="padding:20px 24px;border-bottom:1px solid #2E3850;display:flex;align-items:center"><span style="font-size:17px;font-weight:600;flex:1">{{ ruleTitle }}</span><button onClick="{{ rClose }}" aria-label="Kapat" style="cursor:pointer;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#A9B1C7;display:flex;align-items:center;justify-content:center" style-hover="background:#232D42"><i class="ph ph-x" style="font-size:18px"></i></button></div>
+        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600">Alan adı</span>
+            <input value="{{ rDomain }}" onChange="{{ rSetDomain }}" placeholder="ornek.com" style="font:inherit;font-size:15px;padding:10px 12px;border:1px solid #3A4560;border-radius:8px;color:#E9ECF5">
+            <sc-if value="{{ rNormWarn }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#F3C77A;display:flex;gap:6px;line-height:1.45"><i class="ph ph-info" style="margin-top:2px"></i>{{ rNormWarn }}</span></sc-if>
+            <sc-if value="{{ rErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#F29AA6;display:flex;gap:6px"><i class="ph ph-warning-circle" style="margin-top:2px"></i>{{ rErr }}</span></sc-if>
+          </label>
+          <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600">Kural</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><sc-for list="{{ rKinds }}" as="k" hint-placeholder-count="4"><button onClick="{{ k.pick }}" style="cursor:pointer;text-align:left;border:1.5px solid {{ k.border }};background:{{ k.bg }};color:{{ k.color }};border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px"><i class="ph {{ k.icon }}" style="font-size:17px"></i>{{ k.label }}</button></sc-for></div>
+          </div>
+          <sc-if value="{{ rNotTemp }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600">Ne zaman</span>
+              <div style="display:flex;gap:8px"><sc-for list="{{ rTimeModes }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.pick }}" style="cursor:pointer;border:1.5px solid {{ t.border }};background:{{ t.bg }};color:{{ t.color }};border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600">{{ t.label }}</button></sc-for></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ rIsHours }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px;background:#111827;border-radius:10px;padding:14px">
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ rDays }}" as="d" hint-placeholder-count="7"><button onClick="{{ d.pick }}" style="cursor:pointer;width:44px;border:1.5px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};border-radius:8px;padding:6px 0;font-size:12px;font-weight:600">{{ d.label }}</button></sc-for></div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px"><input type="time" value="{{ rFrom }}" onChange="{{ rSetFrom }}" style="font:inherit;font-size:14px;padding:7px 10px;border:1px solid #3A4560;border-radius:8px"><span style="color:#8D96AE">–</span><input type="time" value="{{ rTo }}" onChange="{{ rSetTo }}" style="font:inherit;font-size:14px;padding:7px 10px;border:1px solid #3A4560;border-radius:8px"></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ rIsTemp }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600">Süre</span>
+              <div style="display:flex;gap:8px"><sc-for list="{{ rTemps }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" style="cursor:pointer;border:1.5px solid {{ t.border }};background:{{ t.bg }};color:{{ t.color }};border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600">{{ t.label }}</button></sc-for></div>
+              <span style="font-size:12px;color:#8D96AE">Süre bitince site otomatik olarak önceki kuralına döner.</span>
+            </div>
+          </sc-if>
+          <div style="display:flex;gap:10px;align-items:flex-start;background:rgba(82,101,216,.18);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;color:#C9D0FF"><i class="ph ph-eye" style="margin-top:2px"></i><span>{{ rPreview }}</span></div>
+        </div>
+        <div style="padding:16px 24px;border-top:1px solid #2E3850;display:flex;justify-content:flex-end;gap:10px">
+          <button onClick="{{ rClose }}" style="cursor:pointer;border:1px solid #2E3850;background:#1A2233;color:#E9ECF5;font-size:14px;font-weight:600;padding:10px 16px;border-radius:8px">Vazgeç</button>
+          <button onClick="{{ rSave }}" aria-disabled="{{ rSaveDisabled }}" style="cursor:{{ rSaveCursor }};border:0;background:{{ rSaveBg }};color:#FFFFFF;font-size:14px;font-weight:600;padding:10px 18px;border-radius:8px">Kaydet ve gönder</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:absolute;right:24px;bottom:24px;z-index:30;background:#2E3850;color:#FFFFFF;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:14px;max-width:420px;box-shadow:0 12px 32px rgba(17,24,39,.25)"><i class="ph {{ toastIcon }}" style="font-size:18px;color:{{ toastIconColor }}"></i><span style="flex:1">{{ toast }}</span><sc-if value="{{ toastIsErr }}" hint-placeholder-val="{{ false }}"><button onClick="{{ closeToast }}" aria-label="Kapat" style="cursor:pointer;border:0;background:transparent;color:#FFFFFF;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button></sc-if></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scenario&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Normal&quot;,&quot;Çocuk cihazı çevrimdışı&quot;,&quot;Ebeveyn bağlantısı yok&quot;],&quot;default&quot;:&quot;Normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo senaryosu&quot;},&quot;lockResult&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Uygulandı&quot;,&quot;Başarısız&quot;,&quot;Doğrulanamadı&quot;],&quot;default&quot;:&quot;Uygulandı&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo senaryosu&quot;}}">
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#1A2233' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+const C = { ink: '#E9ECF5', ink2: '#A9B1C7', ink3: '#8D96AE', line: '#2E3850', p: '#5265D8', p7: '#8C9BFF', p0: 'rgba(82,101,216,.18)', teal: '#5FDCC6', teal0: 'rgba(43,191,167,.14)', amb: '#F3C77A', amb0: 'rgba(231,168,62,.14)', ambL: 'rgba(231,168,62,.4)', red: '#F29AA6', red0: 'rgba(217,91,104,.14)', redL: 'rgba(217,91,104,.4)', n0: '#2A3349' };
+const PAGES = { dash: ['Genel Bakış', 'ph-squares-four'], devices: ['Cihazlar', 'ph-desktop'], time: ['Ekran Süresi', 'ph-hourglass-medium'], web: ['Web Kuralları', 'ph-globe-simple'], req: ['İzin Talepleri', 'ph-hand-waving'], reports: ['Raporlar', 'ph-chart-bar'], activity: ['Etkinlik Geçmişi', 'ph-clock-counter-clockwise'], settings: ['Ayarlar', 'ph-gear-six'] };
+
+function defaultGrid() {
+  const wd = 'xxxxxxxfdfffffxx', we = 'xxffffffffffffxx';
+  return [wd, wd, wd, wd, wd, we, we];
+}
+const SITES = [
+  { domain: 'tiktok.com', kind: 'block', when: 'Her zaman', by: 'Siz · 3 Ekim' },
+  { domain: 'twitch.tv', kind: 'block', when: 'Her zaman', by: 'Siz · 3 Ekim' },
+  { domain: 'youtube.com', kind: 'block', when: 'Hafta içi 08:00–17:00', timeMode: 'hours', days: [0, 1, 2, 3, 4], from: '08:00', to: '17:00', by: 'Siz · 5 Ekim' },
+  { domain: 'roblox.com', kind: 'block', when: 'Pzt, Sal, Çar, Per', timeMode: 'hours', days: [0, 1, 2, 3], from: '00:00', to: '23:59', by: 'Siz · 12 Ekim' },
+  { domain: 'khanacademy.org', kind: 'allow', when: 'Her zaman', by: 'Siz · 3 Ekim' },
+  { domain: 'wikipedia.org', kind: 'allow', when: 'Her zaman', by: 'Siz · 3 Ekim' },
+  { domain: 'eba.gov.tr', kind: 'study', when: 'Ders modunda', by: 'Siz · 3 Ekim' },
+  { domain: 'khanacademy.org', kind: 'study', when: 'Ders modunda', by: 'Siz · 3 Ekim' },
+  { domain: 'sozluk.gov.tr', kind: 'study', when: 'Ders modunda', by: 'Ela\'nın isteği · 15 Ekim' },
+  { domain: 'minecraft.net', kind: 'temp', when: 'Bugün 18:00\'e kadar', by: 'Ela\'nın isteği · bugün', temp: 'Bugün' }
+];
+const HIST = [
+  { d: 'Dün', t: '19:40', type: 'Ek süre', detail: '15 dakika ek süre → 15 dk', reason: 'Bölümün sonuna geldim.', ok: true, note: '' },
+  { d: 'Dün', t: '17:05', type: 'Site', detail: 'youtube.com · 30 dk', reason: 'Fen ödevi için deney videosu izleyeceğim.', ok: true, note: 'Ödev bitince kapatalım.' },
+  { d: '18 Ekim', t: '21:10', type: 'Ek süre', detail: '30 dakika ek süre', reason: 'Arkadaşlarımla oyundayız.', ok: false, note: 'Uyku saati geldi, yarın devam edersin.' },
+  { d: '15 Ekim', t: '15:20', type: 'Site', detail: 'sozluk.gov.tr · Her zaman', reason: 'Türkçe ödevi için kelime bakıyorum.', ok: true, note: '' }
+];
+
+function gen(n) {
+  n = n || '';
+  const vs = n.toLowerCase().match(/[aeıioöuü]/g) || ['a'];
+  const lv = vs[vs.length - 1];
+  const suf = { a: 'ın', ı: 'ın', e: 'in', i: 'in', o: 'un', u: 'un', ö: 'ün', ü: 'ün' }[lv];
+  return n + "'" + (/[aeıioöuü]$/i.test(n) ? 'n' : '') + suf;
+}
+class Component extends DCLogic {
+  state = { lim: { wd: 150, we: 180 }, brEvery: 45, brLen: 10, brush: 'f', grid: defaultGrid(), tDirty: false, tExtras: [{ v: 15, by: 'Ela\'nın isteği', at: '10:20' }],
+    webTab: 'block', webDefault: 'allow', sites: SITES.slice(), rule: null,
+    reqTab: 'pending', reqDur: { a: 20, b: '1 saat' }, reqNote: { a: '', b: '' }, hist: HIST.slice(),
+    profKid: 'ela', profName: { ela: 'Ela', can: 'Can' }, profColor: { ela: 'lav', can: 'teal' },
+    actFilter: 'all', setSec: 'general', setOn: { noSkip: true, warn1: true, reason: true, sleep: true, nReq: true, nSite: true, nLock: true, nOff: true, nWeekly: true, twofa: false, pinOn: true }, theme: 'Dark', lang: 'Türkçe', week: 0,
+    page: 'dash', child: 'ela', childMenu: false, mode: 'Serbest', pendingMode: null, lock: 'idle', lockId: null, vw: (typeof window !== 'undefined' ? window.innerWidth : 1440), confirm: null, toast: null, req: { a: 'open', b: 'open' }, extra: 0, pair: 0, pairChild: 'can', pairName: 'CAN-LAPTOP', canPaired: false, elaPaired: true };
+  timers = [];
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  componentDidMount() { this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs); }
+  componentWillUnmount() { this.timers.forEach(clearTimeout); window.removeEventListener('resize', this._rs); }
+  toast(text, kind) { clearTimeout(this._tt); this.setState({ toast: { text, kind: kind || 'info' } }); if (!['err', 'warn'].includes(kind || 'info')) this._tt = setTimeout(() => this.setState({ toast: null }), 3600); }
+
+  renderVals() {
+    const s = this.state;
+    const scen = this.props.scenario ?? 'Normal';
+    const lockRes = this.props.lockResult ?? 'Uygulandı';
+    const offline = scen === 'Çocuk cihazı çevrimdışı';
+    const noConn = scen === 'Ebeveyn bağlantısı yok';
+    const ela = s.child === 'ela';
+    const hasDevice = ela ? s.elaPaired : s.canPaired;
+    const canSend = !noConn;
+
+    const st = noConn ? { l: 'Bilinmiyor', bg: C.n0, c: C.ink2, i: 'ph-question', seen: 'Son bilgi: 10:42' }
+      : offline ? { l: 'Çevrimdışı', bg: C.n0, c: C.ink2, i: 'ph-wifi-slash', seen: 'Son bağlantı: 2 sa 14 dk önce' }
+      : { l: 'Çevrimiçi', bg: C.teal0, c: C.teal, i: 'ph-circle', seen: 'Son bağlantı: şimdi' };
+
+    let banner = null;
+    if (noConn) banner = { bg: C.red0, border: C.redL, c: C.red, i: 'ph-cloud-slash', t: 'Kindora sunucusuna bağlanılamıyor', b: 'Gösterilen bilgiler 10:42 itibarıyla. Bağlantı gelene kadar komut gönderemezsiniz. Ela\'nın bilgisayarındaki kurallar çalışmaya devam ediyor.', cta: 'Yeniden dene' };
+    else if (offline && hasDevice) banner = { bg: '#232D42', border: '#3A4560', c: C.ink, i: 'ph-wifi-slash', t: 'ELA-PC şu anda çevrimdışı', b: 'Bilgisayar kapalı veya internete bağlı değil. Kurallar cihazda çalışmaya devam ediyor; göndereceğiniz komutlar cihaz bağlandığında iletilir.', cta: 'Kontrol et' };
+
+    const used = 102, limit = 150 + s.extra;
+    const fmt = m => (m >= 60 ? `${Math.floor(m / 60)} sa ${m % 60} dk` : `${m} dk`);
+    const pct = Math.round((used / limit) * 100);
+
+    const sendCmd = (label, okText, apply) => {
+      if (!canSend) return this.toast('Bağlantı yok · komut gönderilemedi', 'err');
+      if (offline) { this.toast(`${label} sıraya alındı · ELA-PC bağlandığında iletilecek`, 'wait'); return; }
+      this.toast(`${label} gönderildi · cihaz yanıtı bekleniyor`, 'wait');
+      this.later(() => { apply && apply(); this.toast(okText, 'ok'); }, 1800);
+    };
+
+    const lockMap = {
+      idle: { icon: 'ph-lock-simple', label: 'Bilgisayarı kilitle', sub: offline ? 'Cihaz bağlanınca uygulanır' : 'Windows oturumu · onay ister', ic: C.p, sc: C.ink3, bg: '#1A2233', bd: C.line },
+      sending: { icon: 'ph-paper-plane-tilt', label: 'Kilit gönderiliyor', sub: 'Komut sunucuya iletiliyor…', ic: C.amb, sc: C.amb, bg: C.amb0, bd: C.ambL, anim: 'kd-pulse 1.4s ease-in-out infinite' },
+      queued: { icon: 'ph-clock-countdown', label: 'Kilit sırada', sub: 'ELA-PC bağlanınca iletilecek', ic: C.amb, sc: C.amb, bg: C.amb0, bd: C.ambL },
+      pending: { icon: 'ph-hourglass-medium', label: 'Cihaz yanıtı bekleniyor', sub: s.lockChecking ? 'Durum soruluyor · yeni komut yok' : 'Ela\'ya 1 dk kaydetme süresi', ic: C.amb, sc: C.amb, bg: C.amb0, bd: C.ambL, anim: 'kd-pulse 1.4s ease-in-out infinite' },
+      done: { icon: 'ph-lock-key', label: 'Kilit uygulandı', sub: 'Oturum kilitli · kısıtlamayı kaldır', ic: C.teal, sc: C.teal, bg: C.teal0, bd: 'rgba(43,191,167,.4)' },
+      releasing: { icon: 'ph-hourglass-medium', label: 'Kısıtlama kaldırılıyor', sub: 'Cihaz yanıtı bekleniyor…', ic: C.amb, sc: C.amb, bg: C.amb0, bd: C.ambL, anim: 'kd-pulse 1.4s ease-in-out infinite' },
+      failed: { icon: 'ph-warning-circle', label: 'Kilit başarısız', sub: 'ELA-PC hata bildirdi · tekrar dene', ic: C.red, sc: C.red, bg: C.red0, bd: C.redL },
+      unverified: { icon: 'ph-question', label: 'Kilit doğrulanamadı', sub: '30 sn yanıt yok · durumu kontrol et', ic: C.amb, sc: C.amb, bg: C.amb0, bd: C.ambL }
+    }[s.lock];
+
+    const lockBusy = ['sending', 'queued', 'pending', 'releasing'].includes(s.lock);
+    const openLock = () => {
+      if (!canSend) return this.toast('Bağlantı yok · komut gönderilemedi', 'err');
+      if (lockBusy) return this.toast(`${s.lockId} işleniyor · yeni komut gönderilmedi`, 'info');
+      if (s.lock === 'done') return this.setState({ confirm: 'unlock' });
+      if (s.lock === 'unverified') return checkLock();
+      this.setState({ confirm: s.lock === 'failed' ? 'relock' : 'lock' });
+    };
+    const checkLock = () => {
+      this.setState({ lock: 'pending', lockChecking: true });
+      this.toast(`${s.lockId} durumu soruluyor · yeni komut gönderilmedi`, 'wait');
+      this.later(() => { this.setState({ lock: 'done', lockChecking: false }); this.toast('Demo: ELA-PC kilidi uygulamış · durum doğrulandı', 'ok'); }, 1800);
+    };
+    const runLock = () => {
+      const id = s.lock === 'failed' && s.lockId ? s.lockId : 'K-' + (1040 + Math.floor(Math.random() * 50));
+      this.setState({ confirm: null, lockId: id });
+      if (offline) { this.setState({ lock: 'queued' }); return this.toast(`Kilit sıraya alındı · ${id}`, 'wait'); }
+      this.setState({ lock: 'sending' });
+      this.later(() => this.setState({ lock: 'pending' }), 700);
+      this.later(() => {
+        if (lockRes === 'Başarısız') { this.setState({ lock: 'failed' }); this.toast(`ELA-PC kilidi uygulayamadığını bildirdi · ${id}`, 'err'); }
+        else if (lockRes === 'Doğrulanamadı') { this.setState({ lock: 'unverified' }); this.toast('ELA-PC 30 sn içinde yanıt vermedi · kilidin uygulanıp uygulanmadığı bilinmiyor', 'warn'); }
+        else { this.setState({ lock: 'done' }); this.toast('Kilit uygulandı · Windows oturumu kilitlendi', 'ok'); }
+      }, 2600);
+    };
+
+    const disabledAll = !canSend;
+    const actions = [
+      { icon: lockMap.icon, label: lockMap.label, sub: lockMap.sub, iconColor: lockMap.ic, subColor: lockMap.sc, bg: lockMap.bg, border: lockMap.bd, anim: lockMap.anim || 'none', run: openLock },
+      { icon: 'ph-coffee', label: 'Mola başlat', sub: offline ? 'Sıraya alınır' : '10 dk, hemen', run: () => sendCmd('Mola', 'Mola başladı · Ela bilgilendirildi') },
+      { icon: 'ph-plus-circle', label: '15 dk ek süre', sub: 'Yalnızca bugün', run: () => sendCmd('15 dk ek süre', '15 dk eklendi · yeni limit ' + fmt(limit + 15), () => this.setState(p => ({ extra: p.extra + 15 }))) },
+      { icon: 'ph-book-open', label: 'Ders modu', sub: '45 dk odak', run: () => pickMode('Ders') },
+      { icon: 'ph-globe-simple', label: 'Web kuralları', sub: '12 kural · 3 ders sitesi', local: true, run: () => this.setState({ page: 'web' }) },
+      { icon: 'ph-chart-bar', label: 'Raporlar', sub: 'Bu hafta 9 sa 20 dk', local: true, run: () => this.setState({ page: 'reports' }) }
+    ].map(a => {
+      const dis = disabledAll && !a.local;
+      const base = Object.assign({ iconColor: C.p, subColor: C.ink3, bg: '#1A2233', border: C.line, anim: 'none' }, a, { disabled: dis, opacity: 1, cursor: dis ? 'not-allowed' : 'pointer' });
+      if (dis) Object.assign(base, { bg: '#232D42', iconColor: '#8D96AE', subColor: '#8D96AE', anim: 'none', sub: 'Bağlantı gelince kullanılabilir' });
+      return base;
+    });
+
+    const pickMode = label => {
+      if (label === s.mode || s.pendingMode) return;
+      if (!canSend) return this.toast('Bağlantı yok · mod değiştirilemedi', 'err');
+      if (offline) { this.setState({ pendingMode: label }); return this.toast(`${label} modu sıraya alındı`, 'wait'); }
+      this.setState({ pendingMode: label });
+      this.later(() => { this.setState({ mode: label, pendingMode: null }); this.toast(`${label} modu aktif · ELA-PC onayladı`, 'ok'); }, 1800);
+    };
+    const modes = [['Serbest', 'ph-sun'], ['Ders', 'ph-book-open'], ['Mola', 'ph-coffee'], ['Kısıtlı', 'ph-shield']].map(([label, icon]) => {
+      const on = s.mode === label, pend = s.pendingMode === label;
+      return { label, icon: pend ? 'ph-hourglass-medium' : icon, checked: on ? 'true' : 'false', disabled: disabledAll, cursor: disabledAll ? 'not-allowed' : 'pointer',
+        bg: on ? '#1A2233' : pend ? C.amb0 : 'transparent', color: on ? C.ink : pend ? C.amb : C.ink3, border: pend ? `1px dashed ${C.ambL}` : '0',
+        shadow: on ? '0 1px 3px rgba(26,32,51,.12)' : 'none', pick: () => pickMode(label) };
+    });
+    const modeNote = s.pendingMode ? (offline ? `${s.pendingMode} · cihaz bağlanınca` : `${s.pendingMode} · onay bekleniyor`) : 'Hafta içi planı';
+
+    const reqDefs = [
+      { key: 'a', icon: 'ph-hourglass-medium', iconBg: 'rgba(140,128,232,.16)', iconColor: '#B6AEF2', title: '20 dakika ek süre', reason: 'Minecraft\'ta yaptığım evi bitirmek istiyorum.', time: '4 dk önce', approveLabel: '20 dk onayla', ok: '20 dk eklendi' },
+      { key: 'b', icon: 'ph-globe-simple', iconBg: C.p0, iconColor: C.p7, title: 'scratch.mit.edu', reason: 'Okul ödevi için oyun yapacağız.', time: '12 dk önce', approveLabel: '1 saat izin ver', ok: '1 saatlik geçici izin' }
+    ];
+    const requests = (ela ? reqDefs : []).map(r => {
+      const v = s.req[r.key];
+      const set = val => () => { if (!canSend) return this.toast('Bağlantı yok · yanıt gönderilemedi', 'err'); this.setState(p => ({ req: Object.assign({}, p.req, { [r.key]: val }) })); };
+      const okText = offline ? `Onaylandı · ${r.ok}, cihaz bağlanınca` : `Onaylandı · ${r.ok}`;
+      return Object.assign({}, r, { open: v === 'open', closed: v !== 'open', approve: set('ok'), reject: set('no'),
+        doneBg: v === 'ok' ? C.teal0 : C.n0, doneColor: v === 'ok' ? C.teal : C.ink2, doneIcon: v === 'ok' ? 'ph-check-circle' : 'ph-minus-circle',
+        doneText: v === 'ok' ? okText : 'Reddedildi · Ela\'ya nazik bir mesajla iletildi' });
+    });
+
+    const actRaw = [
+      ['10:42', 'ph-arrows-clockwise', C.ink2, C.n0, 'Kurallar ELA-PC ile eşitlendi'],
+      ['10:31', 'ph-coffee', '#B6AEF2', 'rgba(140,128,232,.16)', 'Mola tamamlandı · 10 dk'],
+      ['10:05', 'ph-globe-simple', C.amb, C.amb0, 'youtube.com kullanım planında değildi · erişim istenmedi'],
+      ['09:40', 'ph-book-open', C.p7, C.p0, 'Ders modu bitti · 45 dk'],
+      ['08:55', 'ph-power', C.teal, C.teal0, 'ELA-PC açıldı']
+    ];
+    if (s.lock === 'failed') actRaw.unshift(['şimdi', 'ph-warning-circle', C.red, C.red0, `Kilit komutu başarısız · ${s.lockId}`]);
+    if (s.lock === 'unverified') actRaw.unshift(['şimdi', 'ph-question', C.amb, C.amb0, `Kilit komutu doğrulanamadı · ${s.lockId}`]);
+    if (s.lock === 'done') actRaw.unshift(['şimdi', 'ph-lock-key', C.teal, C.teal0, 'Kilit uygulandı · Windows oturumu kilitlendi']);
+    const activity = actRaw.slice(0, 5).map(([t, icon, c, bg, text], i) => ({ t, icon, c, bg, text, line: i ? C.line : 'transparent' }));
+
+    const cf = {
+      lock: { icon: 'ph-lock-simple', ibg: C.red0, ic: C.red, title: 'ELA-PC kilitlensin mi?', body: offline ? 'Bilgisayar şu anda çevrimdışı. Komut sıraya alınır; cihaz bağlandığında Ela\'ya 1 dakika kaydetme süresi tanınarak Windows oturumu kilitlenir.' : 'Ela\'ya çalışmasını kaydetmesi için 1 dakika tanınır. Ardından Windows oturumu kilitlenir ve Kindora kısıtlaması başlar.', cta: offline ? 'Sıraya al' : '1 dk sonra kilitle', ctaBg: '#C9475A', run: runLock },
+      relock: { icon: 'ph-arrow-clockwise', ibg: C.red0, ic: C.red, title: 'Kilit yeniden gönderilsin mi?', body: `Önceki komut (${s.lockId}) uygulanmadı. Aynı komut kimliğiyle yeniden gönderilir; cihaz komutu iki kez uygulamaz.`, cta: 'Yeniden gönder', ctaBg: '#C9475A', run: runLock },
+      unlock: { icon: 'ph-lock-open', ibg: C.p0, ic: C.p7, title: 'Kindora kısıtlaması kaldırılsın mı?', body: 'ELA-PC normal kullanım planına döner. Windows oturumu otomatik açılmaz; Ela kendi Windows şifresi veya PIN\'iyle giriş yapar. Kalan süre: ' + fmt(Math.max(0, limit - used)) + '.', cta: 'Kısıtlamayı kaldır', ctaBg: C.p, run: () => { this.setState({ confirm: null, lock: 'releasing' }); this.toast('Kaldırma komutu gönderildi · cihaz yanıtı bekleniyor', 'wait'); this.later(() => { this.setState({ lock: 'idle', lockId: null }); this.toast('Kısıtlama kaldırıldı · Windows girişi Ela\'da', 'ok'); }, 1800); } },
+      delProfile: { icon: 'ph-trash', ibg: C.red0, ic: C.red, title: `${s.profName[s.profKid || 'ela']} profili silinsin mi?`, body: 'Profile bağlı kurallar ve geçmiş silinir, eşleştirilmiş bilgisayarlarda Kindora durur. Bu işlem geri alınamaz.', cta: 'Profili sil', ctaBg: '#C9475A', run: () => { this.setState({ confirm: null, page: 'settings', setSec: 'kids' }); this.toast('Demo: profil silme simüle edildi'); } },
+      remove: { icon: 'ph-link-break', ibg: C.red0, ic: C.red, title: 'ELA-PC eşleştirmesi kaldırılsın mı?', body: 'Bu bilgisayarda Kindora kuralları durur ve widget kapanır. Kullanım geçmişi hesabınızda kalır. Tekrar eşleştirmek için yeni bir kod gerekir.', cta: 'Eşleştirmeyi kaldır', ctaBg: '#C9475A', run: () => { this.setState({ confirm: null, elaPaired: false }); this.toast('ELA-PC eşleştirmesi kaldırıldı', 'info'); } }
+    }[s.confirm] || {};
+
+    const ti = { info: ['ph-info', '#8C9BFF'], ok: ['ph-check-circle', '#5FDCC6'], wait: ['ph-hourglass-medium', '#F3C77A'], err: ['ph-warning-circle', '#F29AA6'], warn: ['ph-question', '#F3C77A'] }[s.toast ? s.toast.kind : 'info'];
+
+    const devInfo = d => d === 'ela' ? [
+      { k: 'Sistem', v: 'Windows 11 Home · 23H2' }, { k: 'Kindora sürümü', v: '0.9.2' },
+      { k: 'Son bağlantı', v: noConn ? 'Bilinmiyor (10:42)' : offline ? '2 sa 14 dk önce' : 'Şimdi', color: offline ? C.ink2 : C.ink },
+      { k: 'Kural eşitleme', v: noConn ? 'Doğrulanamadı' : offline ? '08:28 · bekleyen 0' : '10:42 · güncel', color: noConn ? C.amb : C.ink },
+      { k: 'Widget', v: 'Görünür · sağ alt köşe' }, { k: 'Eşleştirme', v: '3 Ekim 2026' }
+    ] : [
+      { k: 'Sistem', v: 'Windows 11 Home' }, { k: 'Kindora sürümü', v: '0.9.2' }, { k: 'Son bağlantı', v: 'Şimdi' }, { k: 'Kural eşitleme', v: 'Güncel' }, { k: 'Widget', v: 'Görünür · sağ alt köşe' }, { k: 'Eşleştirme', v: 'Bugün' }
+    ];
+    const devices = [];
+    if (s.elaPaired && ela) devices.push({ name: 'ELA-PC', owner: 'Ela · masaüstü', icon: 'ph-desktop', stLabel: st.l, stBg: st.bg, stColor: st.c, stIcon: st.i, info: devInfo('ela'),
+      ping: () => { if (!canSend) return this.toast('Bağlantı yok · test yapılamadı', 'err'); this.toast('ELA-PC test ediliyor…', 'wait'); this.later(() => this.toast(offline ? 'ELA-PC yanıt vermedi · çevrimdışı' : 'ELA-PC yanıt verdi · 84 ms', offline ? 'err' : 'ok'), 1500); },
+      rename: () => this.toast('Yeniden adlandırma · demo'), remove: () => this.setState({ confirm: 'remove' }) });
+    if (s.canPaired && !ela) devices.push({ name: s.pairName, owner: 'Can · dizüstü', icon: 'ph-laptop', stLabel: 'Çevrimiçi', stBg: C.teal0, stColor: C.teal, stIcon: 'ph-circle', info: devInfo('can'),
+      ping: () => this.toast(s.pairName + ' yanıt verdi · 61 ms', 'ok'), rename: () => this.toast('Yeniden adlandırma · demo'), remove: () => this.toast('Demo: yalnızca ELA-PC kaldırılabilir') });
+
+    const kids = [{ id: 'ela', name: 'Ela', initial: 'E', sub: s.elaPaired ? '10 yaş · ELA-PC' : '10 yaş · cihaz yok', avBg: 'rgba(140,128,232,.16)', avColor: '#B6AEF2' }, { id: 'can', name: 'Can', initial: 'C', sub: s.canPaired ? '8 yaş · ' + s.pairName : '8 yaş · cihaz yok', avBg: C.teal0, avColor: C.teal }];
+    const cur = kids.find(k => k.id === s.child);
+    const page = s.page;
+    const sub = { dash: 'Salı, 20 Ekim · Hafta içi planı', devices: 'Eşleştirilmiş bilgisayarlar ve bağlantı durumu', time: 'Ela · günlük limitler, haftalık program ve molalar', web: 'Ela · alan adı düzeyinde site kuralları', req: 'Ela\'nın ek süre ve site istekleri', reports: 'Ela · haftalık kullanım özeti', activity: 'Komutlar, talepler ve bağlantı olayları', settings: 'Hesap, bildirimler ve güvenlik', profile: 'Profil, cihazlar ve çocuğun kendi tercihleri' }[page] || '';
+    const pairKid = kids.find(k => k.id === s.pairChild);
+    const code = '482913'.split('');
+
+    return {
+      logoSm: logo(24), sideW: s.vw < 1240 ? '72px' : '240px', sidePad: s.vw < 1240 ? '10px' : '14px', wideDisp: s.vw < 1240 ? 'none' : 'inline', wideBlock: s.vw < 1240 ? 'none' : 'block', wideFlex: s.vw < 1240 ? 'none' : 'flex', contentMin: s.vw < 1240 ? '900px' : '1040px',
+      nav: Object.entries(PAGES).map(([id, [label, icon]]) => ({ label, icon, badge: id === 'req' && ela ? (Object.values(s.req).filter(v => v === 'open').length || null) : null, current: page === id ? 'page' : 'false', weight: page === id ? 600 : 500, color: page === id ? C.p7 : C.ink2, bg: page === id ? C.p0 : 'transparent', go: () => this.setState({ page: id, childMenu: false }) })),
+      syncText: noConn ? 'Bağlantı yok · 10:42' : 'Eşitlendi · şimdi', syncIcon: noConn ? 'ph-cloud-slash' : 'ph-cloud-check', syncBg: noConn ? C.red0 : '#232D42', syncColor: noConn ? C.red : C.ink2,
+      pageTitle: page === 'dash' ? (ela ? 'Günaydın, Selin' : 'Can') : (PAGES[page] || ['Çocuk profili'])[0], pageSub: page === 'dash' && !ela ? 'Profil hazır · cihaz bekleniyor' : sub,
+      toggleChildMenu: () => this.setState(p => ({ childMenu: !p.childMenu })), childMenu: s.childMenu,
+      childOptions: kids.map(k => Object.assign({}, k, { selected: k.id === s.child, bg: k.id === s.child ? '#111827' : 'transparent', pick: () => this.setState({ child: k.id, childMenu: false }) })),
+      addChild: () => { this.setState({ childMenu: false }); this.toast('Çocuk profili ekleme · Faz 5'); },
+      childName: cur.name, childInitial: cur.initial, childAvatarBg: cur.avBg, childAvatarColor: cur.avColor,
+      bannerShow: !!banner && page !== 'other' && (ela || noConn), bannerBg: banner && banner.bg, bannerBorder: banner && banner.border, bannerColor: banner && banner.c, bannerIcon: banner && banner.i, bannerTitle: banner && banner.t, bannerBody: banner && banner.b, bannerCta: banner && banner.cta,
+      retry: () => { this.toast('Bağlantı deneniyor…', 'wait'); this.later(() => this.toast(noConn ? 'Hâlâ bağlanılamıyor · 30 sn sonra otomatik denenecek' : 'ELA-PC hâlâ çevrimdışı', 'err'), 1500); },
+      isDash: page === 'dash' && hasDevice, isDashNoDevice: page === 'dash' && !hasDevice, isDevices: page === 'devices', isOther: false, otherIcon: (PAGES[page] || ['', 'ph-user'])[1],
+      stLabel: st.l, stBg: st.bg, stColor: st.c, stIcon: st.i, lastSeen: st.seen,
+      modes, modeNote, modeNoteColor: s.pendingMode ? C.amb : C.ink3,
+      usedText: fmt(used), limitText: fmt(limit), leftText: fmt(Math.max(0, limit - used)) + ' kaldı', usedPct: pct, usedPctCss: pct + '%',
+      staleData: noConn ? '10:42 itibarıyla' : offline ? 'Cihaz son bağlandığında: 08:28' : null,
+      breakText: offline || noConn ? '—' : '18 dk',
+      actions, actionsHint: noConn ? 'Bağlantı gelince kullanılabilir' : offline ? 'Komutlar sıraya alınır' : 'Kritik işlemler onay ister',
+      requests, activity, goRequests: () => this.setState({ page: 'req' }), goActivity: () => this.setState({ page: 'activity' }),
+      confirm: !!s.confirm, cfIcon: cf.icon, cfIconBg: cf.ibg, cfIconColor: cf.ic, cfTitle: cf.title, cfBody: cf.body, cfCta: cf.cta, cfCtaBg: cf.ctaBg, cfRun: cf.run, closeConfirm: () => this.setState({ confirm: null }),
+      toast: s.toast ? s.toast.text : null, toastIsErr: !!(s.toast && ['err', 'warn'].includes(s.toast.kind)), closeToast: () => { clearTimeout(this._tt); this.setState({ toast: null }); }, toastIcon: ti[0], toastIconColor: ti[1],
+      devices, devicesSummary: devices.length ? `${cur.name} · ${devices.length} cihaz` : `${cur.name} için eşleştirilmiş cihaz yok`,
+      startPair: () => { if (!canSend) return this.toast('Bağlantı yok · eşleştirme başlatılamadı', 'err'); this.setState({ pair: 1, pairChild: ela && s.elaPaired ? 'can' : s.child, pairName: (ela && s.elaPaired ? 'CAN' : cur.name.toUpperCase()) + '-LAPTOP' }); },
+      pairOpen: s.pair > 0, pair1: s.pair === 1, pair2: s.pair === 2, pair3: s.pair === 3, pair4: s.pair === 4,
+      pairDots: [1, 2, 3].map(i => (s.pair >= i + (s.pair === 4 ? 0 : 0) ? C.p : C.line)),
+      pairChildren: kids.map(k => Object.assign({}, k, { border: k.id === s.pairChild ? C.p : C.line, bg: k.id === s.pairChild ? C.p0 : '#1A2233', pick: () => this.setState({ pairChild: k.id, pairName: k.name.toUpperCase() + '-LAPTOP' }) })),
+      pairChildName: pairKid.name, pairChildGen: gen(pairKid.name),
+      pairNext: () => { this.setState({ pair: 2 }); this.later(() => this.setState(p => (p.pair === 2 ? { pair: 3 } : null)), 3200); },
+      codeDigits: [...code.slice(0, 3).map(v => ({ v, w: '48px', bg: '#232D42' })), { v: '', w: '10px', bg: 'transparent' }, ...code.slice(3).map(v => ({ v, w: '48px', bg: '#232D42' }))],
+      pairName: s.pairName, setPairName: e => this.setState({ pairName: e.target.value }),
+      pairConfirm: () => { this.setState({ pair: 4, [s.pairChild + 'Paired']: true }); },
+      closePair: () => this.setState(p => ({ pair: 0, child: p.pair === 4 ? p.pairChild : p.child })),
+      ...this.p5({ canSend, offline, ela, fmt, sendCmd, page })
+    };
+  }
+
+  p5({ canSend, offline, ela, fmt, sendCmd, page }) {
+    const s = this.state;
+    const up = (k, fn) => this.setState(p => ({ [k]: fn(p[k]) }));
+    // ---- Ekran süresi
+    const TYPES = { f: ['Serbest', '#2BBFA7', 'rgba(43,191,167,.14)'], d: ['Ders', '#5265D8', 'rgba(82,101,216,.18)'], x: ['Kapalı', '#4A5570', '#232D42'] };
+    const DAYS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    const gridRows = s.grid.map((row, di) => ({
+      day: DAYS[di], limit: fmt(di < 5 ? s.lim.wd : s.lim.we), today: di === 1, weight: di === 1 ? 700 : 500,
+      cells: row.split('').map((c, hi) => ({ bg: TYPES[c][1], title: `${DAYS[di]} ${String(7 + hi).padStart(2, '0')}:00 · ${TYPES[c][0]}`,
+        paint: () => this.setState(p => { const g = p.grid.slice(); const r = g[di].split(''); r[hi] = p.brush; g[di] = r.join(''); return { grid: g, tDirty: true }; }) }))
+    }));
+    const stepLim = (k, d) => () => this.setState(p => ({ lim: Object.assign({}, p.lim, { [k]: Math.min(360, Math.max(30, p.lim[k] + d)) }), tDirty: true }));
+    const chip = (on) => ({ border: on ? '#5265D8' : '#2E3850', bg: on ? 'rgba(82,101,216,.18)' : '#1A2233', color: on ? '#8C9BFF' : '#E9ECF5' });
+    // ---- Web
+    const tabsDef = [['block', 'Engellenenler', 'ph-prohibit'], ['allow', 'İzinliler', 'ph-check-circle'], ['study', 'Ders modu', 'ph-book-open'], ['temp', 'Geçici izinler', 'ph-timer']];
+    const KIND = { block: ['Engelli', 'rgba(217,91,104,.14)', '#F29AA6', 'ph-prohibit'], allow: ['İzinli', 'rgba(43,191,167,.14)', '#5FDCC6', 'ph-check-circle'], study: ['Ders modunda izinli', 'rgba(82,101,216,.18)', '#8C9BFF', 'ph-book-open'], temp: ['Geçici izin', 'rgba(231,168,62,.14)', '#F3C77A', 'ph-timer'] };
+    const rows = s.sites.map((x, i) => Object.assign({}, x, { i })).filter(x => x.kind === s.webTab).map(x => ({
+      domain: x.domain, letter: x.domain[0].toUpperCase(), when: x.when, by: x.by, kindLabel: KIND[x.kind][0], kBg: KIND[x.kind][1], kColor: KIND[x.kind][2], kIcon: KIND[x.kind][3],
+      edit: () => this.setState({ rule: { domain: x.domain, kind: x.kind, timeMode: x.timeMode || 'always', days: x.days || [0, 1, 2, 3, 4], from: x.from || '15:00', to: x.to || '17:00', temp: x.temp || '1 saat', editIdx: x.i } }),
+      remove: () => { this.setState(p => ({ sites: p.sites.filter((_, j) => j !== x.i) })); sendCmd(x.domain + ' kuralı kaldırma', x.domain + ' kuralı kaldırıldı · ELA-PC onayladı'); }
+    }));
+    const r = s.rule;
+    let norm = '', normWarn = '', valid = false, dup = false;
+    if (r) {
+      const raw = r.domain.trim().toLowerCase();
+      norm = raw.replace(/^[a-z]+:\/\//, '').replace(/^www\./, '').split(/[\/?#]/)[0];
+      normWarn = raw && norm && raw.replace(/^www\./, '') !== norm ? `Yalnızca alan adı kaydedilir. Kural tüm ${norm} için geçerli olur; tek bir sayfa veya video seçilemez.` : '';
+      valid = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(norm);
+      dup = valid && s.sites.some((x, j) => x.domain === norm && j !== r.editIdx);
+    }
+    const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    const whenText = rr => rr.kind === 'temp' ? `${rr.temp} · bugün` : rr.timeMode === 'always' ? 'Her zaman' : `${rr.days.length === 5 && rr.days.every(d => d < 5) ? 'Hafta içi' : rr.days.length === 7 ? 'Her gün' : rr.days.map(d => dayNames[d]).join(', ')} ${rr.from}–${rr.to}`;
+    const verb = { block: 'engellenecek', allow: 'izinli olacak', study: 'ders modunda açık olacak', temp: 'geçici olarak açık olacak' };
+    const setR = patch => this.setState(p => ({ rule: Object.assign({}, p.rule, patch) }));
+    const canSave = valid && !dup && (!r || r.timeMode === 'always' || r.kind === 'temp' || r.days.length > 0);
+    // ---- Talepler
+    const RQ = [
+      { key: 'a', type: 'time', icon: 'ph-hourglass-medium', iconBg: 'rgba(140,128,232,.16)', iconColor: '#B6AEF2', title: '20 dakika ek süre', reason: 'Minecraft\'ta yaptığım evi bitirmek istiyorum.', time: 'Bugün 10:38', opts: [10, 20, 30].map(v => [v, v + ' dk']), detail: 'Bugünkü limit: 2 sa 30 dk · Kalan: 48 dk' },
+      { key: 'b', type: 'site', icon: 'ph-globe-simple', iconBg: 'rgba(82,101,216,.18)', iconColor: '#8C9BFF', title: 'scratch.mit.edu', reason: 'Okul ödevi için oyun yapacağız.', time: 'Bugün 10:30', opts: ['30 dk', '1 saat', 'Bugün', 'Her zaman'].map(v => [v, v]), detail: 'Alan adı düzeyinde · "Her zaman" seçilirse İzinliler listesine eklenir' }
+    ];
+    const NOTES = ['Akşam yemeğinden sonra devam edersin.', 'Ödevin bitince birlikte bakalım.', 'Bugün olmaz, yarın tekrar sorabilirsin.'];
+    const decide = (q, ok) => () => {
+      if (!canSend) return this.toast('Bağlantı yok · yanıt gönderilemedi', 'err');
+      const dur = s.reqDur[q.key], note = s.reqNote[q.key].trim();
+      this.setState(p => ({ req: Object.assign({}, p.req, { [q.key]: ok ? 'ok' : 'no' }),
+        hist: [{ d: 'Bugün', t: '10:4' + (q.key === 'a' ? '4' : '5'), type: q.type === 'time' ? 'Ek süre' : 'Site', detail: q.type === 'time' ? `${q.title} → ${dur} dk` : `${q.title} · ${dur}`, reason: q.reason, ok, note }].concat(p.hist),
+        sites: ok && q.type === 'site' ? p.sites.concat([{ domain: 'scratch.mit.edu', kind: dur === 'Her zaman' ? 'allow' : 'temp', when: dur === 'Her zaman' ? 'Her zaman' : `${dur} · bugün`, by: 'Ela\'nın isteği · bugün', temp: dur }]) : p.sites }));
+      this.toast(ok ? (offline ? 'Onaylandı · ELA-PC bağlanınca uygulanacak' : 'Onaylandı · Ela bilgilendirildi') : 'Reddedildi · Ela\'ya notunla birlikte iletildi', ok ? 'ok' : 'info');
+    };
+    const pend = (ela ? RQ : []).filter(q => s.req[q.key] === 'open').map(q => Object.assign({}, q, {
+      opts: q.opts.map(([v, label]) => Object.assign({ label, pick: () => up('reqDur', o => Object.assign({}, o, { [q.key]: v })) }, chip(s.reqDur[q.key] === v))),
+      note: s.reqNote[q.key], setNote: e => { const v = e.target.value; up('reqNote', o => Object.assign({}, o, { [q.key]: v })); },
+      notes: NOTES.map(n => ({ n, pick: () => up('reqNote', o => Object.assign({}, o, { [q.key]: n })) })),
+      approve: decide(q, true), reject: decide(q, false), approveLabel: 'Onayla · ' + (q.type === 'time' ? s.reqDur[q.key] + ' dk' : s.reqDur[q.key])
+    }));
+    const hist = s.hist.map((h, i) => ({ d: h.d, t: h.t, type: h.type, detail: h.detail, reason: h.reason, note: h.note ? `Notun: “${h.note}”` : '', hasNote: !!h.note,
+      res: h.ok ? 'Onaylandı' : 'Reddedildi', resBg: h.ok ? 'rgba(43,191,167,.14)' : '#2A3349', resColor: h.ok ? '#5FDCC6' : '#A9B1C7', resIcon: h.ok ? 'ph-check-circle' : 'ph-minus-circle', line: i ? '#2E3850' : 'transparent' }));
+    // ---- Raporlar
+    const WEEKS = [
+      { label: '13 – 19 Ekim', days: [[52, 40, 26], [47, 33, 22], [50, 25, 20], [55, 48, 27], [48, 60, 33], [60, 82, 33], [58, 70, 32]], prev: 1000, breaks: [18, 21], within: 6 },
+      { label: '6 – 12 Ekim', days: [[40, 55, 30], [45, 50, 28], [38, 60, 31], [50, 52, 30], [42, 70, 35], [55, 95, 30], [50, 80, 39]], prev: 1060, breaks: [15, 21], within: 5 }
+    ];
+    const W = WEEKS[s.week];
+    const tot = W.days.reduce((a, d) => a + d[0] + d[1] + d[2], 0);
+    const diff = tot - W.prev;
+    const H = 180, MAXM = 200;
+    const sumCat = i => W.days.reduce((a, d) => a + d[i], 0);
+    // ---- Etkinlik
+    const ACT = [
+      { day: 'Bugün · Salı 20 Ekim', items: [
+        ['10:42', 'sync', 'ph-arrows-clockwise', 'Kurallar ELA-PC ile eşitlendi', ''],
+        ['10:38', 'req', 'ph-hand-waving', 'Ela 20 dk ek süre istedi', '“Minecraft\'ta yaptığım evi bitirmek istiyorum.”'],
+        ['10:31', 'break', 'ph-coffee', 'Mola tamamlandı · 10 dk', 'Zamanında'],
+        ['10:30', 'req', 'ph-globe-simple', 'Ela scratch.mit.edu için erişim istedi', ''],
+        ['10:05', 'site', 'ph-globe-simple', 'youtube.com kullanım planında değildi', 'Ela erişim istemedi'],
+        ['09:40', 'cmd', 'ph-book-open', 'Ders modu bitti · 45 dk', 'Plana göre'],
+        ['08:55', 'conn', 'ph-power', 'ELA-PC açıldı · Kindora başladı', 'Kalan süre cihaz kaydından yüklendi'] ] },
+      { day: 'Dün · Pazartesi 19 Ekim', items: [
+        ['20:58', 'cmd', 'ph-moon', 'Uyku saati · ELA-PC kapandı', ''],
+        ['19:12', 'cmd', 'ph-warning-circle', 'Kilitleme komutu uygulanamadı', 'Cihaz 30 sn içinde yanıt vermedi · 19:13\'te tekrar denendi ve uygulandı', 'err'],
+        ['18:40', 'conn', 'ph-wifi-slash', 'ELA-PC çevrimdışı oldu · 22 dk', 'Kurallar cihazda çalışmaya devam etti'],
+        ['18:20', 'cmd', 'ph-clock-countdown', 'Mola komutu sıraya alındı', 'Cihaz bağlanınca 19:02\'de uygulandı', 'wait'],
+        ['16:05', 'widget', 'ph-eye-slash', 'Widget gizlendi', 'Kurallar etkilenmedi'] ] }
+    ];
+    const ACOL = { sync: ['#A9B1C7', '#2A3349'], req: ['#B6AEF2', 'rgba(140,128,232,.16)'], break: ['#B6AEF2', 'rgba(140,128,232,.16)'], site: ['#F3C77A', 'rgba(231,168,62,.14)'], cmd: ['#8C9BFF', 'rgba(82,101,216,.18)'], conn: ['#5FDCC6', 'rgba(43,191,167,.14)'], widget: ['#A9B1C7', '#2A3349'], err: ['#F29AA6', 'rgba(217,91,104,.14)'], wait: ['#F3C77A', 'rgba(231,168,62,.14)'] };
+    const FILT = [['all', 'Tümü'], ['cmd', 'Komutlar'], ['req', 'Talepler'], ['break', 'Molalar'], ['site', 'Siteler'], ['conn', 'Bağlantı']];
+    const actDays = ACT.map(g => ({ day: g.day, items: g.items.filter(it => s.actFilter === 'all' || it[1] === s.actFilter || (s.actFilter === 'conn' && ['sync', 'widget'].includes(it[1]))).map(([t, k, icon, text, sub, tone]) => ({ t, icon, text, sub, hasSub: !!sub, c: ACOL[tone || k][0], bg: ACOL[tone || k][1] })) })).filter(g => g.items.length);
+    // ---- Ayarlar
+    const tg = (k, label, sub, locked) => ({ label, sub, isToggle: true, on: s.setOn[k], aria: s.setOn[k] ? 'true' : 'false', swBg: s.setOn[k] ? (locked ? '#9AA6E6' : '#5265D8') : '#4A5570', swJ: s.setOn[k] ? 'flex-end' : 'flex-start', cursor: locked ? 'not-allowed' : 'pointer', run: () => { if (locked) return this.toast('Bu ayar Kindora ilkesi gereği açık kalır'); up('setOn', o => Object.assign({}, o, { [k]: !o[k] })); } });
+    const val = (label, sub, v, btn, danger, run) => ({ label, sub, isValue: true, v, hasBtn: !!btn, btn, btnColor: danger ? '#F29AA6' : '#E9ECF5', btnBorder: danger ? 'rgba(217,91,104,.4)' : '#2E3850', run: run || (() => this.toast(btn + ' · demo')) });
+    const openProf = id => () => this.setState({ page: 'profile', profKid: id });
+    const seg = (label, sub, opts, cur, set) => ({ label, sub, isSeg: true, opts: opts.map(o => ({ label: o, pick: () => this.setState({ [set]: o }), bg: cur === o ? '#1A2233' : 'transparent', color: cur === o ? '#E9ECF5' : '#8D96AE', shadow: cur === o ? '0 1px 3px rgba(26,32,51,.12)' : 'none' })) });
+    const SECS = {
+      general: ['Genel kurallar', 'ph-sliders-horizontal', [
+        tg('warn1', 'Kilitlemeden önce 1 dk kaydetme uyarısı', 'Ani kilitlenme olmaz; çocuk çalışmasını kaydedebilir', true),
+        tg('reason', 'Ek süre isteğinde neden zorunlu', 'Çocuk kısa bir açıklama yazmadan gönderemez'),
+        tg('noSkip', 'Molalar atlanamaz', 'Çocuk molayı yalnızca ek süre isteyerek erteleyebilir'),
+        tg('sleep', 'Uyku saati', 'Hafta içi 21:00, hafta sonu 22:00 · cihaz uyku moduna geçer'),
+        val('Günlük süre dolunca', 'Önce mola ekranı, sonra kilit', 'Mola ekranı + kilit', 'Değiştir') ]],
+      notif: ['Bildirimler', 'ph-bell', [
+        tg('nReq', 'Ek süre talepleri', 'Anında bildirim'), tg('nSite', 'Site erişim talepleri', 'Anında bildirim'),
+        tg('nLock', 'Komut sonuçları', 'Kilitleme başarısız olursa her zaman bildirilir'), tg('nOff', 'Cihaz çevrimdışı', '15 dakikadan uzun sürerse'),
+        tg('nWeekly', 'Haftalık özet e-postası', 'Pazar 19:00') ]],
+      look: ['Görünüm ve dil', 'ph-palette', [
+        seg('Tema', 'Varsayılan: Light. Dark tema Phase 6\'da gözden geçirilecek.', ['Light', 'Dark', 'Sistem'], s.theme, 'theme'),
+        seg('Dil', 'Arayüz dili', ['Türkçe', 'English'], s.lang, 'lang') ]],
+      account: ['Ebeveyn hesabı', 'ph-user-circle', [
+        val('Ad', '', 'Selin Yılmaz', 'Düzenle'), val('E-posta', '', 'selin.yilmaz@ornek.com', 'Değiştir'), val('Şifre', 'Son değişiklik: 3 Ekim 2026', '••••••••', 'Şifreyi değiştir'),
+        tg('twofa', 'İki adımlı doğrulama', 'Girişte telefonunuza kod gönderilir'), val('Oturumlar', 'Bu bilgisayar · Chrome, İstanbul', '1 aktif oturum', 'Tümünden çık') ]],
+      kids: ['Çocuk profilleri', 'ph-users-three', [
+        val(s.profName.ela + ' · 10 yaş', 'ELA-PC · Maskot: Filiz · Bildirim: Normal', '', 'Profili aç', false, openProf('ela')),
+        val(s.profName.can + ' · 8 yaş', 'Cihaz yok', '', 'Profili aç', false, openProf('can')),
+        val('Yeni çocuk profili', 'Her profilin kendi kuralları ve cihazları olur', '', 'Profil ekle') ]],
+      security: ['Güvenlik ve gizlilik', 'ph-shield-check', [
+        tg('pinOn', 'Ebeveyn PIN\'i', 'Çocuk bilgisayarında Kindora\'yı kapatmak, kaldırmak veya ayar değiştirmek için gerekir', true),
+        val('PIN', '4 haneli', '••••', 'PIN\'i değiştir'),
+        val('Toplanan veriler', 'Süre, uygulama kategorisi, alan adı kuralları ve talepler. Ekran görüntüsü, tuş kaydı veya mesaj içeriği toplanmaz.', '', 'Verilerimi indir'),
+        val('Hesabı sil', 'Tüm profiller, kurallar ve geçmiş kalıcı olarak silinir', '', 'Hesabı sil', true) ]]
+    };
+    const sec = SECS[s.setSec];
+    const pk = s.profKid || 'ela', isEla = pk === 'ela';
+    const PCOL = { lav: ['rgba(140,128,232,.16)', '#B6AEF2'], teal: ['rgba(43,191,167,.14)', '#5FDCC6'], ind: ['rgba(82,101,216,.18)', '#8C9BFF'], amb: ['rgba(231,168,62,.14)', '#F3C77A'] };
+    const pc = PCOL[s.profColor[pk]];
+    const pName = s.profName[pk];
+
+    return {
+      isTime: page === 'time', isWeb: page === 'web', isReq: page === 'req', isReports: page === 'reports', isActivity: page === 'activity', isSettings: page === 'settings',
+      // time
+      limWd: fmt(s.lim.wd), limWe: fmt(s.lim.we), wdMinus: stepLim('wd', -15), wdPlus: stepLim('wd', 15), weMinus: stepLim('we', -15), wePlus: stepLim('we', 15),
+      brEveryOpts: [30, 45, 60].map(v => Object.assign({ label: v + ' dk', pick: () => this.setState({ brEvery: v, tDirty: true }) }, chip(s.brEvery === v))),
+      brLenOpts: [5, 10, 15].map(v => Object.assign({ label: v + ' dk', pick: () => this.setState({ brLen: v, tDirty: true }) }, chip(s.brLen === v))),
+      brSummary: `Her ${s.brEvery} dakikada ${s.brLen} dakika mola. Molaya 5 ve 1 dakika kala uyarı verilir.`,
+      brushes: Object.entries(TYPES).map(([k, [label, c]]) => ({ label, c, pick: () => this.setState({ brush: k }), border: s.brush === k ? '#5265D8' : '#2E3850', bg: s.brush === k ? 'rgba(82,101,216,.18)' : '#1A2233', pressed: s.brush === k ? 'true' : 'false' })),
+      hours: Array.from({ length: 16 }, (_, i) => ({ h: i % 2 === 0 ? String(7 + i).padStart(2, '0') : '' })),
+      gridRows,
+      copyWeekday: () => this.setState(p => ({ grid: p.grid.map((r, i) => (i < 5 ? p.grid[0] : r)), tDirty: true })),
+      extraOpts: [15, 30, 60].map(v => ({ label: '+' + v + ' dk', run: () => { sendCmd(`Bugün için +${v} dk`, `+${v} dk eklendi · ELA-PC onayladı`, () => this.setState(p => ({ tExtras: p.tExtras.concat([{ v, by: 'Sizin tarafınızdan', at: 'şimdi' }]) }))); } })),
+      tExtras: s.tExtras.map(x => ({ text: `+${x.v} dk · ${x.by}`, at: x.at })), hasExtras: s.tExtras.length > 0,
+      tDirty: s.tDirty && page === 'time',
+      tDiscard: () => this.setState({ lim: { wd: 150, we: 180 }, brEvery: 45, brLen: 10, grid: defaultGrid(), tDirty: false }),
+      tSave: () => { this.setState({ tDirty: false }); sendCmd('Ekran süresi planı', 'Yeni plan ELA-PC\'de aktif'); },
+      // web
+      webDefaults: [['allow', 'Listede olmayanlar açık', 'Yalnızca engellenen siteler kapalı'], ['only', 'Yalnızca izinli siteler', 'Listede olmayan her site kapalı']].map(([id, label, sub]) => Object.assign({ label, sub, pick: () => { this.setState({ webDefault: id }); sendCmd('Varsayılan site davranışı', 'Site davranışı güncellendi'); } }, chip(s.webDefault === id))),
+      webTabs: tabsDef.map(([id, label, icon]) => ({ label, icon, count: s.sites.filter(x => x.kind === id).length, pick: () => this.setState({ webTab: id }), color: s.webTab === id ? '#8C9BFF' : '#A9B1C7', border: s.webTab === id ? '#5265D8' : 'transparent', weight: s.webTab === id ? 600 : 500 })),
+      webRows: rows, webEmpty: rows.length === 0,
+      openRule: () => this.setState({ rule: { domain: '', kind: s.webTab, timeMode: 'always', days: [0, 1, 2, 3, 4], from: '15:00', to: '17:00', temp: '1 saat', editIdx: null } }),
+      ruleOpen: !!r, ruleTitle: r && r.editIdx != null ? 'Site kuralını düzenle' : 'Site kuralı oluştur',
+      rDomain: r ? r.domain : '', rSetDomain: e => setR({ domain: e.target.value }),
+      rNormWarn: normWarn, rErr: r && r.domain && !valid ? 'Geçerli bir alan adı girin, ör. ornek.com' : dup ? 'Bu site için zaten bir kural var' : '',
+      rKinds: [['block', 'Engelle', 'ph-prohibit'], ['allow', 'İzin ver', 'ph-check-circle'], ['study', 'Ders modunda izin ver', 'ph-book-open'], ['temp', 'Geçici izin', 'ph-timer']].map(([id, label, icon]) => Object.assign({ label, icon, pick: () => setR({ kind: id }) }, chip(r && r.kind === id))),
+      rIsTemp: !!r && r.kind === 'temp', rNotTemp: !!r && r.kind !== 'temp',
+      rTimeModes: [['always', 'Her zaman'], ['hours', 'Belirli saatlerde']].map(([id, label]) => Object.assign({ label, pick: () => setR({ timeMode: id }) }, chip(r && r.timeMode === id))),
+      rIsHours: !!r && r.kind !== 'temp' && r.timeMode === 'hours',
+      rDays: dayNames.map((d, i) => Object.assign({ label: d, pick: () => setR({ days: r.days.includes(i) ? r.days.filter(x => x !== i) : r.days.concat([i]).sort() }) }, chip(r && r.days.includes(i)))),
+      rFrom: r ? r.from : '', rTo: r ? r.to : '', rSetFrom: e => setR({ from: e.target.value }), rSetTo: e => setR({ to: e.target.value }),
+      rTemps: ['30 dk', '1 saat', '2 saat', 'Bugün'].map(v => Object.assign({ label: v, pick: () => setR({ temp: v }) }, chip(r && r.temp === v))),
+      rPreview: r && valid ? `${norm} ${whenText(r).toLowerCase() === 'her zaman' ? 'her zaman' : whenText(r)} ${verb[r.kind]}.` : 'Alan adını yazınca kuralın özeti burada görünür.',
+      rSaveBg: canSave ? '#5265D8' : '#5B6BC8', rSaveCursor: canSave ? 'pointer' : 'not-allowed', rSaveDisabled: canSave ? 'false' : 'true',
+      rClose: () => this.setState({ rule: null }),
+      rSave: () => {
+        if (!canSave) return;
+        const item = { domain: norm, kind: r.kind, timeMode: r.timeMode, days: r.days, from: r.from, to: r.to, temp: r.temp, when: whenText(r), by: 'Siz · bugün' };
+        this.setState(p => { const list = p.sites.slice(); if (r.editIdx != null) list[r.editIdx] = item; else list.push(item); return { sites: list, rule: null, webTab: r.kind }; });
+        sendCmd(norm + ' kuralı', norm + ' kuralı ELA-PC\'de aktif');
+      },
+      future: [['Kategori filtreleme', 'Oyun, sosyal medya gibi gruplar'], ['Tam URL kuralları', 'Tek bir sayfayı engelleme'], ['Video ve kanal düzeyi', 'Belirli bir videoya izin'], ['Güvenli arama', 'Arama motorlarında zorunlu filtre']].map(([t, d]) => ({ t, d })),
+      // requests
+      reqTabs: [['pending', 'Bekleyen', pend.length], ['history', 'Geçmiş', s.hist.length]].map(([id, label, n]) => ({ label, n, pick: () => this.setState({ reqTab: id }), color: s.reqTab === id ? '#8C9BFF' : '#A9B1C7', border: s.reqTab === id ? '#5265D8' : 'transparent', weight: s.reqTab === id ? 600 : 500 })),
+      reqPendingTab: s.reqTab === 'pending', reqHistoryTab: s.reqTab === 'history',
+      pend, pendEmpty: pend.length === 0, hist,
+      // reports
+      weekLabel: W.label, weekPrev: () => this.setState({ week: 1 }), weekNext: () => this.setState({ week: 0 }), weekPrevDis: s.week === 1 ? .35 : 1, weekNextDis: s.week === 0 ? .35 : 1,
+      kpis: [
+        { k: 'Haftalık toplam', v: fmt(tot), d: (diff <= 0 ? '↓ ' : '↑ ') + fmt(Math.abs(diff)) + ' önceki haftaya göre', dc: diff <= 0 ? '#5FDCC6' : '#F3C77A' },
+        { k: 'Günlük ortalama', v: fmt(Math.round(tot / 7)), d: 'Hafta içi limit 2 sa 30 dk', dc: '#8D96AE' },
+        { k: 'Zamanında molalar', v: `${W.breaks[0]} / ${W.breaks[1]}`, d: 'Ertelenen molalar ek süre istekleriyle', dc: '#8D96AE' },
+        { k: 'Limit içinde kalan gün', v: `${W.within} / 7`, d: 'Ek süre onayları dahil', dc: '#8D96AE' }
+      ],
+      bars: W.days.map((d, i) => { const lim = i < 5 ? 150 : 180; const t = d[0] + d[1] + d[2]; return { day: DAYS[i], total: fmt(t), eT: fmt(d[0]), gT: fmt(d[1]), oT: fmt(d[2]), limT: fmt(lim), e: Math.round(d[0] / MAXM * H) + 'px', g: Math.round(d[1] / MAXM * H) + 'px', o: Math.round(d[2] / MAXM * H) + 'px', limBottom: Math.round(lim / MAXM * H) + 'px', over: t > lim }; }),
+      cats: [['Eğitim', '#2BBFA7', sumCat(0), 'Khan Academy, Scratch, EBA'], ['Oyun', '#8C80E8', sumCat(1), 'Minecraft'], ['Diğer', '#4A5570', sumCat(2), 'Tarayıcı, video, müzik']].map(([k, c, v, apps]) => ({ k, c, v: fmt(v), pct: Math.round(v / tot * 100) + '%', apps })),
+      compare: [['Toplam süre', fmt(tot), fmt(W.prev)], ['Eğitim', fmt(sumCat(0)), s.week === 0 ? '5 sa 20 dk' : '4 sa 50 dk'], ['Oyun', fmt(sumCat(1)), s.week === 0 ? '7 sa 42 dk' : '7 sa 55 dk'], ['Ek süre istekleri', s.week === 0 ? '4 (3 onay)' : '6 (3 onay)', s.week === 0 ? '6 (3 onay)' : '5 (2 onay)']].map(([k, a, b]) => ({ k, a, b })),
+      ruleHist: [['18 Ekim', 'Hafta sonu limiti 3 saate çıkarıldı'], ['15 Ekim', 'scratch.mit.edu ders modu listesine eklendi'], ['12 Ekim', 'Mola sıklığı 60 → 45 dk'], ['3 Ekim', 'ELA-PC eşleştirildi · ilk plan oluşturuldu']].map(([d, t]) => ({ d, t })),
+      // activity
+      actFilters: FILT.map(([id, label]) => Object.assign({ label, pick: () => this.setState({ actFilter: id }) }, chip(s.actFilter === id))),
+      actDays, actEmpty: actDays.length === 0,
+      // settings
+      setNav: Object.entries(SECS).map(([id, [label, icon]]) => ({ label, icon, pick: () => this.setState({ setSec: id }), bg: s.setSec === id ? 'rgba(82,101,216,.18)' : 'transparent', color: s.setSec === id ? '#8C9BFF' : '#A9B1C7', weight: s.setSec === id ? 600 : 500 })),
+      isProfile: page === 'profile', pGen: gen(pName),
+      pName, pInitial: (pName || '?')[0].toUpperCase(), pAvBg: pc[0], pAvColor: pc[1], pAge: isEla ? '10 yaş · 2016 doğumlu' : '8 yaş · 2018 doğumlu',
+      pSetName: e => { const v = e.target.value.slice(0, 20); up('profName', o => Object.assign({}, o, { [pk]: v })); },
+      pColors: Object.entries(PCOL).map(([id, [bg, c]]) => ({ bg, c, ring: s.profColor[pk] === id ? `0 0 0 2px #1A2233, 0 0 0 4px ${c}` : 'none', pick: () => up('profColor', o => Object.assign({}, o, { [pk]: id })) })),
+      pBack: () => this.setState({ page: 'settings', setSec: 'kids' }),
+      pPlan: [['Hafta içi', fmt(s.lim.wd)], ['Hafta sonu', fmt(s.lim.we)], ['Mola', `Her ${s.brEvery} dk · ${s.brLen} dk`], ['Uyku saati', '21:00 / 22:00']].map(([k, v]) => ({ k, v })),
+      pGoTime: () => this.setState({ page: 'time' }), pGoWeb: () => this.setState({ page: 'web' }), pGoDevices: () => this.setState({ page: 'devices', child: pk }),
+      pHasDevice: isEla, pNoDevice: !isEla,
+      pDevSeen: offline ? 'Çevrimdışı · 2 sa 14 dk önce' : !canSend ? 'Bilinmiyor · 10:42' : 'Çevrimiçi · şimdi',
+      pDevColor: offline || !canSend ? '#A9B1C7' : '#5FDCC6',
+      pPrefs: (isEla ? [['Maskot adı', 'Filiz'], ['Maskot rengi', 'İndigo'], ['Konuşma', 'Normal'], ['Hareketi azalt', 'Kapalı']] : [['Maskot adı', 'Filiz'], ['Maskot rengi', 'İndigo'], ['Konuşma', 'Normal'], ['Hareketi azalt', 'Kapalı']]).map(([k, v]) => ({ k, v })),
+      pWeb: [['Engelli', s.sites.filter(x => x.kind === 'block').length, '#F29AA6'], ['İzinli', s.sites.filter(x => x.kind === 'allow').length, '#5FDCC6'], ['Ders modu', s.sites.filter(x => x.kind === 'study').length, '#8C9BFF'], ['Geçici', s.sites.filter(x => x.kind === 'temp').length, '#F3C77A']].map(([k, n, c]) => ({ k, n, c })),
+      pBadges: isEla ? '3 / 5 rozet' : 'Henüz rozet yok', pBadgeNote: isEla ? 'Son: Mola Ustası · 18 Ekim' : 'Cihaz eşleştirilince başlar',
+      pDelete: () => this.setState({ confirm: 'delProfile' }),
+      setTitle: sec[0], setRows: sec[2].map((x, i) => Object.assign({ line: i ? '#2E3850' : 'transparent', isToggle: false, isValue: false, isSeg: false }, x))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+// Kindora design tokens — Bootstrap 5.3+/6 uyumlu SCSS
+// Kullanım: Bootstrap'tan ÖNCE import edin.
+//   @import "kindora-tokens";
+//   @import "bootstrap/scss/bootstrap";
+// Dark tema: <html data-bs-theme="dark"> — aşağıdaki CSS değişkenleri otomatik değişir.
+
+// ── Brand ───────────────────────────────────────────────
+$kd-primary:        #5265D8;
+$kd-primary-hover:  #4657C8;
+$kd-primary-active: #3F50B8;
+$kd-secondary:      #8C80E8;
+$kd-accent:         #2BBFA7;
+$kd-warning:        #E7A83E;
+$kd-danger:         #D95B68;
+$kd-danger-solid:   #C9475A; // danger buton zemini (beyaz metin 4.5:1)
+
+// ── Tint (zemin) + text (metin) eşleri — light ─────────
+$kd-primary-tint:   #EEF0FC;  $kd-primary-text:   #3F50B8;
+$kd-secondary-tint: #F1EFFD;  $kd-secondary-text: #5B4FC0;
+$kd-success-tint:   #E3F7F3;  $kd-success-text:   #127A6A;  $kd-success-line: #A9E4D9;
+$kd-warning-tint:   #FDF4E3;  $kd-warning-text:   #8A5A0C;  $kd-warning-line: #F1D49C;
+$kd-danger-tint:    #FCEBED;  $kd-danger-text:    #A8364A;  $kd-danger-line:  #F0C2CA;
+$kd-neutral-tint:   #EEF0F5;
+$kd-info-text:      #2A3580;
+
+// ── Neutrals — light ───────────────────────────────────
+$kd-bg:          #F7F9FC;
+$kd-surface:     #FFFFFF;
+$kd-surface-2:   #F1F3F9;
+$kd-line:        #E4E8F1;
+$kd-line-strong: #D5DAE6;
+$kd-muted:       #C9CFDD; // yalnızca dekoratif / grafik
+$kd-ink:         #1A2033;
+$kd-ink-2:       #4A5370;
+$kd-ink-3:       #5D6680; // yardımcı metin, 12px'de AA
+$kd-disabled-bg: #F4F6FA;
+$kd-disabled-fg: #5D6680;
+
+// ── Neutrals — dark ────────────────────────────────────
+$kd-dark-bg:          #111827;
+$kd-dark-surface:     #1A2233;
+$kd-dark-surface-2:   #232D42;
+$kd-dark-line:        #2E3850;
+$kd-dark-line-strong: #3A4560;
+$kd-dark-ink:         #E9ECF5;
+$kd-dark-ink-2:       #A9B1C7;
+$kd-dark-ink-3:       #8D96AE;
+$kd-dark-primary-text:   #8C9BFF;
+$kd-dark-success-text:   #5FDCC6;
+$kd-dark-warning-text:   #F3C77A;
+$kd-dark-danger-text:    #F29AA6;
+$kd-dark-secondary-text: #B6AEF2;
+
+// ── Typography ─────────────────────────────────────────
+$kd-font-ui:    "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+$kd-font-child: "Fredoka", "Onest", system-ui, sans-serif; // yalnızca çocuk arayüzü
+$kd-font-mono:  ui-monospace, "Cascadia Mono", Menlo, monospace;
+// Ölçek (px): 11 12 13 14 15 16 18 20 22 26 32 40
+$kd-fs-xs: 12px;  $kd-fs-sm: 13px;  $kd-fs-base: 14px;  $kd-fs-md: 15px;  $kd-fs-lg: 16px;
+$kd-fs-xl: 20px;  $kd-fs-2xl: 26px; $kd-fs-3xl: 32px;   $kd-fs-hero: 40px;
+$kd-fw-regular: 400; $kd-fw-medium: 500; $kd-fw-semibold: 600; $kd-fw-bold: 700;
+$kd-lh-tight: 1.15; $kd-lh-base: 1.5; $kd-lh-relaxed: 1.6;
+
+// ── Spacing (4px taban) ────────────────────────────────
+$kd-space: (0: 0, 1: 4px, 2: 8px, 3: 12px, 4: 16px, 5: 20px, 6: 24px, 7: 28px, 8: 32px, 10: 40px, 12: 48px);
+
+// ── Radius ─────────────────────────────────────────────
+$kd-radius-control: 8px;   // buton, input (ebeveyn)
+$kd-radius-tile:    10px;  // hızlı işlem kutusu, liste kartı
+$kd-radius-card:    12px;  // ebeveyn kartı
+$kd-radius-modal:   16px;
+$kd-radius-widget:  22px;  // masaüstü widget
+$kd-radius-child:   28px;  // çocuk kartı
+$kd-radius-pill:    999px;
+
+// ── Shadow ─────────────────────────────────────────────
+$kd-shadow-card:   0 1px 2px rgba(26,32,51,.04), 0 12px 32px rgba(26,32,51,.06);
+$kd-shadow-pop:    0 12px 32px rgba(26,32,51,.12);
+$kd-shadow-modal:  0 24px 64px rgba(17,24,39,.25);
+$kd-shadow-widget: 0 10px 28px rgba(0,0,0,.28);
+
+// ── Focus / motion ─────────────────────────────────────
+$kd-focus-ring: 0 0 0 2px #FFFFFF, 0 0 0 5px #8C80E8; // 3px halka, 2px boşluk
+$kd-duration-fast: 150ms; $kd-duration-base: 200ms; $kd-duration-sheet: 250ms;
+$kd-ease-out: cubic-bezier(.2,.8,.2,1);
+
+// ── Bootstrap override'ları ────────────────────────────
+$primary:   $kd-primary;
+$secondary: $kd-secondary;
+$success:   $kd-accent;
+$warning:   $kd-warning;
+$danger:    $kd-danger;
+$body-bg:   $kd-bg;
+$body-color: $kd-ink;
+$border-color: $kd-line;
+$font-family-sans-serif: $kd-font-ui;
+$font-size-base: 0.875rem; // 14px
+$border-radius:    $kd-radius-control;
+$border-radius-lg: $kd-radius-card;
+$border-radius-pill: $kd-radius-pill;
+$focus-ring-width: 3px;
+$focus-ring-color: rgba(140,128,232,1);
+$enable-reduced-motion: true;
+
+// ── CSS değişkenleri (runtime tema) ─────────────────────
+:root, [data-bs-theme="light"] {
+  --kd-bg: #{$kd-bg}; --kd-surface: #{$kd-surface}; --kd-surface-2: #{$kd-surface-2};
+  --kd-line: #{$kd-line}; --kd-line-strong: #{$kd-line-strong};
+  --kd-ink: #{$kd-ink}; --kd-ink-2: #{$kd-ink-2}; --kd-ink-3: #{$kd-ink-3};
+  --kd-primary: #{$kd-primary}; --kd-primary-tint: #{$kd-primary-tint}; --kd-primary-text: #{$kd-primary-text};
+  --kd-secondary-tint: #{$kd-secondary-tint}; --kd-secondary-text: #{$kd-secondary-text};
+  --kd-success-tint: #{$kd-success-tint}; --kd-success-text: #{$kd-success-text};
+  --kd-warning-tint: #{$kd-warning-tint}; --kd-warning-text: #{$kd-warning-text}; --kd-warning-line: #{$kd-warning-line};
+  --kd-danger-tint: #{$kd-danger-tint}; --kd-danger-text: #{$kd-danger-text}; --kd-danger-line: #{$kd-danger-line};
+  --kd-neutral-tint: #{$kd-neutral-tint}; --kd-inverse: #{$kd-ink};
+}
+[data-bs-theme="dark"] {
+  --kd-bg: #{$kd-dark-bg}; --kd-surface: #{$kd-dark-surface}; --kd-surface-2: #{$kd-dark-surface-2};
+  --kd-line: #{$kd-dark-line}; --kd-line-strong: #{$kd-dark-line-strong};
+  --kd-ink: #{$kd-dark-ink}; --kd-ink-2: #{$kd-dark-ink-2}; --kd-ink-3: #{$kd-dark-ink-3};
+  --kd-primary-tint: rgba(82,101,216,.18); --kd-primary-text: #{$kd-dark-primary-text};
+  --kd-secondary-tint: rgba(140,128,232,.16); --kd-secondary-text: #{$kd-dark-secondary-text};
+  --kd-success-tint: rgba(43,191,167,.14); --kd-success-text: #{$kd-dark-success-text};
+  --kd-warning-tint: rgba(231,168,62,.14); --kd-warning-text: #{$kd-dark-warning-text}; --kd-warning-line: rgba(231,168,62,.4);
+  --kd-danger-tint: rgba(217,91,104,.14); --kd-danger-text: #{$kd-dark-danger-text}; --kd-danger-line: rgba(217,91,104,.4);
+  --kd-neutral-tint: #2A3349; --kd-inverse: #2E3850;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+// Uygulama içi "Hareketi azalt" aynı kuralı <html data-kd-motion="reduced"> ile uygular.
+
+// ── Komut durumları (ikon + kelime + renk) ─────────────
+// ready       Hazır                    ink / surface
+// sending     Gönderiliyor             warning-text / warning-tint
+// queued      Sırada                   warning-text / warning-tint (kesik çerçeve)
+// pending     Cihaz yanıtı bekleniyor  warning-text / warning-tint
+// applied     Uygulandı                success-text / success-tint
+// failed      Başarısız                danger-text / danger-tint   (yalnızca cihaz hata bildirdiğinde)
+// unverified  Doğrulanamadı            warning-text / warning-tint (zaman aşımı, kesik çerçeve)

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E9ECF3;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+</style>
+</helmet>
+<div role="note" style="display:flex;align-items:center;gap:10px;padding:10px 20px;background:#FDF4E3;border-bottom:1px solid #F1D49C;color:#6B4508;font-family:Onest,system-ui,sans-serif;font-size:13px;line-height:1.45"><i class="ph ph-info" style="font-size:16px"></i><span>Sonraki sürüm adayı · MVP dışı. Flutter bir öneridir, onaylanmış mimari karar değildir.</span></div>
+
+<section style="padding:48px;display:flex;flex-direction:column;gap:32px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:900px">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5D6680"><span style="padding:4px 10px;border-radius:999px;background:#EEF0FC;color:#3F50B8">Mobil ebeveyn</span><span>Flutter · Material 3</span></div>
+    <h1 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-.02em">Kindora ebeveyn uygulaması</h1>
+    <p style="margin:0;font-size:16px;line-height:1.6;color:#4A5370;text-wrap:pretty">Masaüstü panelin mobil karşılığı. Aynı renkler, Onest ve aynı durum dili; düzen Material 3 kalıplarıyla: alt gezinme çubuğu, alttan açılan onay sayfaları, 48 dp dokunma alanları. Odak, telefondan en sık yapılan işler: talebe yanıt vermek, mola veya kilit göndermek, süreyi görmek.</p>
+  </div>
+
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+
+    <div id="M1" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M1</span><span style="font-size:15px;font-weight:600">Bildirim · kilit ekranı</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div style="height:100%;background:#2B3550;display:flex;flex-direction:column;align-items:center;padding:56px 16px 16px;gap:28px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF"><span style="font-size:72px;font-weight:300;letter-spacing:-.02em;line-height:1">10:38</span><span style="font-size:15px;color:#D5DAE6">Salı, 20 Ekim</span></div>
+          <div style="width:100%;background:#F7F9FC;border-radius:24px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#5D6680"><span style="width:20px;height:20px;border-radius:6px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoXs }}</span>Kindora · şimdi</div>
+            <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">Ela 20 dk ek süre istiyor</span><span style="font-size:14px;line-height:1.45;color:#4A5370">“Minecraft'ta yaptığım evi bitirmek istiyorum.” · 48 dk kaldı</span></div>
+            <div style="display:flex;gap:8px;border-top:1px solid #E4E8F1;padding-top:10px"><span style="flex:1;text-align:center;padding:10px 0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600">20 dk onayla</span><span style="flex:1;text-align:center;padding:10px 0;border-radius:999px;background:#EEF0F5;color:#1A2033;font-size:14px;font-weight:600">Reddet</span><span style="padding:10px 14px;border-radius:999px;color:#3F50B8;font-size:14px;font-weight:600">Aç</span></div>
+          </div>
+          <div style="width:100%;background:rgba(247,249,252,.92);border-radius:24px;padding:14px 16px;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#5D6680"><span style="width:20px;height:20px;border-radius:6px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoXs }}</span>Kindora · 2 dk önce</div>
+            <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px"><i class="ph ph-warning-circle" style="color:#A8364A"></i>ELA-PC kilitlenemedi</span>
+            <span style="font-size:14px;color:#4A5370">Cihaz 30 sn içinde yanıt vermedi. Dokunarak tekrar deneyin.</span>
+          </div>
+          <span style="margin-top:auto;font-size:12px;color:#C9D0E2;text-align:center;line-height:1.5">Hata bildirimleri kapatılana kadar kalır.<br>Bildirimde onay, kilit ekranında parmak izi ister.</span>
+        </div>
+      </x-import>
+    </div>
+
+    <div id="M2" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M2</span><span style="font-size:15px;font-weight:600">Ana sayfa</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="height:100%;background:#F7F9FC;display:flex;flex-direction:column">
+          <div style="padding:8px 16px 12px;display:flex;align-items:center;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:1px;flex:1"><span style="font-size:22px;font-weight:600">Günaydın, Selin</span><span style="font-size:13px;color:#5D6680">Salı · Hafta içi planı</span></div>
+            <div style="display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border:1px solid #E4E8F1;border-radius:999px;background:#FFFFFF"><span style="width:30px;height:30px;border-radius:999px;background:#F1EFFD;color:#5B4FC0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">E</span><span style="font-size:14px;font-weight:600">Ela</span><i class="ph ph-caret-down" style="color:#5D6680"></i></div>
+          </div>
+          <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div style="position:relative;width:84px;height:84px;flex-shrink:0"><svg viewBox="0 0 84 84" width="84" height="84" style="transform:rotate(-90deg)"><circle cx="42" cy="42" r="35" fill="none" stroke="#EEF0F5" stroke-width="9"></circle><circle cx="42" cy="42" r="35" fill="none" stroke="#5265D8" stroke-width="9" stroke-linecap="round" stroke-dasharray="150 220"></circle></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:17px;font-weight:700">48 dk</span><span style="font-size:10px;color:#5D6680">kaldı</span></div></div>
+                <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+                  <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px"><i class="ph ph-desktop" style="color:#5D6680"></i>ELA-PC</span>
+                  <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:#E3F7F3;color:#127A6A;font-size:12px;font-weight:600"><i class="ph-fill ph-circle" style="font-size:7px"></i>Çevrimiçi · şimdi</span>
+                  <span style="font-size:13px;color:#4A5370">1 sa 42 dk / 2 sa 30 dk · mola 18 dk sonra</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px"><sc-for list="{{ modes }}" as="m" hint-placeholder-count="4"><span style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;height:40px;border-radius:999px;border:1px solid {{ m.border }};background:{{ m.bg }};color:{{ m.c }};font-size:13px;font-weight:600"><i class="ph {{ m.icon }}"></i>{{ m.label }}</span></sc-for></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ actions }}" as="a" hint-placeholder-count="6"><div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-height:84px;justify-content:center"><i class="ph {{ a.icon }}" style="font-size:22px;color:{{ a.c }}"></i><span style="font-size:12px;font-weight:600;line-height:1.25">{{ a.label }}</span></div></sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px"><span style="font-size:16px;font-weight:600">Bekleyen talepler</span><span style="font-size:13px;font-weight:600;color:#3F50B8">Tümü</span></div>
+            <sc-for list="{{ reqs }}" as="r" hint-placeholder-count="2">
+              <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center">
+                <div style="width:40px;height:40px;border-radius:12px;background:{{ r.bg }};color:{{ r.c }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ r.icon }}" style="font-size:20px"></i></div>
+                <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><span style="font-size:14px;font-weight:600">{{ r.t }}</span><span style="font-size:13px;color:#4A5370;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">“{{ r.reason }}”</span></div>
+                <i class="ph ph-caret-right" style="color:#5D6680"></i>
+              </div>
+            </sc-for>
+          </div>
+          <div style="height:80px;background:#FFFFFF;border-top:1px solid #E4E8F1;display:grid;grid-template-columns:repeat(5,1fr)">
+            <sc-for list="{{ navHome }}" as="n" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative"><span style="width:56px;height:30px;border-radius:999px;background:{{ n.pill }};display:flex;align-items:center;justify-content:center;color:{{ n.c }};position:relative"><i class="{{ n.icon }}" style="font-size:20px"></i><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-2px;right:10px;min-width:16px;height:16px;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ n.badge }}</span></sc-if></span><span style="font-size:11px;font-weight:{{ n.w }};color:{{ n.c }}">{{ n.label }}</span></div></sc-for>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div id="M3" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M3</span><span style="font-size:15px;font-weight:600">Talep yanıtı · bottom sheet</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="height:100%;background:rgba(17,24,39,.42);display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="background:#FFFFFF;border-radius:28px 28px 0 0;padding:10px 20px 20px;display:flex;flex-direction:column;gap:16px">
+            <span style="align-self:center;width:32px;height:4px;border-radius:999px;background:#C9CFDD"></span>
+            <div style="display:flex;gap:12px;align-items:center"><div style="width:44px;height:44px;border-radius:12px;background:#F1EFFD;color:#5B4FC0;display:flex;align-items:center;justify-content:center"><i class="ph ph-hourglass-medium" style="font-size:22px"></i></div><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:18px;font-weight:600">20 dakika ek süre</span><span style="font-size:13px;color:#5D6680">Ela · 4 dk önce · 48 dk kaldı</span></div></div>
+            <div style="background:#F7F9FC;border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.5">“Minecraft'ta yaptığım evi bitirmek istiyorum.”</div>
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Süre</span><div style="display:flex;gap:8px"><sc-for list="{{ durs }}" as="d" hint-placeholder-count="3"><span style="flex:1;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1.5px solid {{ d.border }};background:{{ d.bg }};color:{{ d.c }};font-size:15px;font-weight:600">{{ d.l }}</span></sc-for></div></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Ela'ya not <span style="font-weight:400;color:#5D6680">· isteğe bağlı</span></span>
+              <div style="display:flex;gap:6px;overflow:hidden"><span style="flex-shrink:0;padding:8px 12px;border-radius:999px;border:1px solid #E4E8F1;font-size:13px;color:#4A5370">Akşam yemeğinden sonra devam edersin.</span><span style="flex-shrink:0;padding:8px 12px;border-radius:999px;border:1px solid #E4E8F1;font-size:13px;color:#4A5370">Ödevin bitince…</span></div>
+              <div style="height:48px;border-radius:12px;border:1px solid #D5DAE6;padding:0 14px;display:flex;align-items:center;font-size:15px;color:#5D6680">Kısa ve nazik bir not</div>
+            </div>
+            <div style="display:flex;gap:10px"><span style="flex:1;height:52px;border-radius:999px;border:1px solid #D5DAE6;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600">Reddet</span><span style="flex:1.4;height:52px;border-radius:999px;background:#5265D8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:6px;font-size:15px;font-weight:600"><i class="ph ph-check"></i>20 dk onayla</span></div>
+            <span style="font-size:12px;color:#5D6680;text-align:center">Ela kararı ve notunu Filiz'den görür.</span>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div id="M4" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M4</span><span style="font-size:15px;font-weight:600">Kilit · onay ve bekleme</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="height:100%;background:#F7F9FC;display:flex;flex-direction:column;position:relative">
+          <div style="padding:8px 16px 12px;display:flex;align-items:center;gap:12px"><span style="font-size:22px;font-weight:600;flex:1">Günaydın, Selin</span></div>
+          <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:16px;background:#FDF4E3;border:1px solid #F1D49C"><i class="ph ph-hourglass-medium" style="font-size:22px;color:#8A5A0C"></i><div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:15px;font-weight:600;color:#8A5A0C">Kilit komutu bekliyor</span><span style="font-size:13px;line-height:1.45;color:#4A5370">ELA-PC'ye gönderildi. Ela'ya 1 dk kaydetme süresi tanınıyor; cihaz onaylayınca "Kilitli" görünecek.</span></div></div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;opacity:.95">
+              <div style="background:#FDF4E3;border:1px solid #F1D49C;border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-height:84px;justify-content:center"><i class="ph ph-hourglass-medium" style="font-size:22px;color:#8A5A0C"></i><span style="font-size:12px;font-weight:600;color:#8A5A0C">Kilit bekliyor</span></div>
+              <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-height:84px;justify-content:center"><i class="ph ph-coffee" style="font-size:22px;color:#5265D8"></i><span style="font-size:12px;font-weight:600">Mola</span></div>
+              <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-height:84px;justify-content:center"><i class="ph ph-plus-circle" style="font-size:22px;color:#5265D8"></i><span style="font-size:12px;font-weight:600">+15 dk</span></div>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;background:rgba(17,24,39,.42);display:flex;flex-direction:column;justify-content:flex-end">
+            <div style="background:#FFFFFF;border-radius:28px 28px 0 0;padding:10px 20px 20px;display:flex;flex-direction:column;gap:16px">
+              <span style="align-self:center;width:32px;height:4px;border-radius:999px;background:#C9CFDD"></span>
+              <div style="width:48px;height:48px;border-radius:14px;background:#FCEBED;color:#A8364A;display:flex;align-items:center;justify-content:center"><i class="ph ph-lock-simple" style="font-size:24px"></i></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:20px;font-weight:600">ELA-PC kilitlensin mi?</span><span style="font-size:15px;line-height:1.5;color:#4A5370">Ela'ya çalışmasını kaydetmesi için 1 dakika tanınır, sonra ekran kilitlenir. Kilidi buradan açabilirsiniz.</span></div>
+              <div style="display:flex;gap:10px"><span style="flex:1;height:52px;border-radius:999px;border:1px solid #D5DAE6;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600">Vazgeç</span><span style="flex:1.4;height:52px;border-radius:999px;background:#C9475A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600">1 dk sonra kilitle</span></div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+      <span style="font-size:12px;color:#5D6680;max-width:412px;line-height:1.5">Arkada: onaydan sonraki bekleme durumu. Sayfa kapanınca kart amber "bekliyor" olarak kalır.</span>
+    </div>
+
+    <div id="M5" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M5</span><span style="font-size:15px;font-weight:600">Ekran süresi</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="height:100%;background:#F7F9FC;display:flex;flex-direction:column">
+          <div style="padding:8px 16px 12px;display:flex;flex-direction:column;gap:2px"><span style="font-size:22px;font-weight:600">Ekran süresi</span><span style="font-size:13px;color:#5D6680">Ela · günlük limitler ve program</span></div>
+          <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ limits }}" as="l" hint-placeholder-count="2">
+              <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+                <div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:13px;color:#5D6680">{{ l.k }}</span><span style="font-size:22px;font-weight:700">{{ l.v }}</span></div>
+                <span style="width:48px;height:48px;border-radius:999px;border:1px solid #E4E8F1;display:flex;align-items:center;justify-content:center"><i class="ph ph-minus"></i></span><span style="width:48px;height:48px;border-radius:999px;border:1px solid #E4E8F1;display:flex;align-items:center;justify-content:center"><i class="ph ph-plus"></i></span>
+              </div>
+            </sc-for>
+            <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:15px;font-weight:600">Mola</span>
+              <div style="display:flex;gap:6px"><span style="flex:1;height:40px;border-radius:999px;border:1px solid #E4E8F1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">30 dk</span><span style="flex:1;height:40px;border-radius:999px;border:1.5px solid #5265D8;background:#EEF0FC;color:#3F50B8;display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;font-weight:600"><i class="ph ph-check"></i>45 dk</span><span style="flex:1;height:40px;border-radius:999px;border:1px solid #E4E8F1;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">60 dk</span></div>
+              <span style="font-size:13px;color:#4A5370">Her 45 dakikada 10 dakika mola</span>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:600">Bugünün programı</span><span style="font-size:13px;font-weight:600;color:#3F50B8">Haftalık</span></div>
+              <sc-for list="{{ today }}" as="b" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px"><span style="width:4px;align-self:stretch;border-radius:999px;background:{{ b.c }}"></span><span style="font-size:13px;color:#5D6680;width:92px;font-variant-numeric:tabular-nums">{{ b.t }}</span><span style="font-size:14px;font-weight:500;flex:1">{{ b.l }}</span><sc-if value="{{ b.now }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;color:#3F50B8;background:#EEF0FC;padding:2px 8px;border-radius:999px">Şimdi</span></sc-if></div></sc-for>
+            </div>
+            <span style="font-size:12px;color:#5D6680;line-height:1.5">Haftalık ızgara mobilde gün gün düzenlenir: güne dokun → saat aralıklarını sürükle.</span>
+          </div>
+          <div style="height:80px;background:#FFFFFF;border-top:1px solid #E4E8F1;display:grid;grid-template-columns:repeat(5,1fr)">
+            <sc-for list="{{ navTime }}" as="n" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="width:56px;height:30px;border-radius:999px;background:{{ n.pill }};display:flex;align-items:center;justify-content:center;color:{{ n.c }}"><i class="{{ n.icon }}" style="font-size:20px"></i></span><span style="font-size:11px;font-weight:{{ n.w }};color:{{ n.c }}">{{ n.label }}</span></div></sc-for>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div id="M6" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M6</span><span style="font-size:15px;font-weight:600">Web kuralları</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="height:100%;background:#F7F9FC;display:flex;flex-direction:column;position:relative">
+          <div style="padding:8px 16px 12px;display:flex;flex-direction:column;gap:2px"><span style="font-size:22px;font-weight:600">Siteler</span><span style="font-size:13px;color:#5D6680">Alan adı düzeyinde · tüm tarayıcılar</span></div>
+          <div style="padding:0 16px 12px;display:flex;gap:6px;overflow:hidden"><sc-for list="{{ webTabs }}" as="t" hint-placeholder-count="4"><span style="flex-shrink:0;height:36px;padding:0 14px;border-radius:999px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.c }};display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600">{{ t.l }}<span style="font-weight:500;opacity:.8">{{ t.n }}</span></span></sc-for></div>
+          <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:10px;padding:12px;border-radius:14px;background:#EEF0FC;font-size:13px;line-height:1.45;color:#2A3580"><i class="ph ph-info" style="margin-top:2px"></i><span>youtube.com engellenince tüm sayfaları engellenir. Tek video seçmek henüz yok.</span></div>
+            <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;overflow:hidden">
+              <sc-for list="{{ sites }}" as="x" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:64px;border-top:1px solid {{ x.line }}"><span style="width:36px;height:36px;border-radius:10px;background:#FCEBED;color:#A8364A;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">{{ x.letter }}</span><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:15px;font-weight:600">{{ x.d }}</span><span style="font-size:13px;color:#5D6680">{{ x.w }}</span></div><i class="ph ph-dots-three-vertical" style="font-size:20px;color:#5D6680"></i></div></sc-for>
+            </div>
+          </div>
+          <div style="position:absolute;right:16px;bottom:96px;height:56px;padding:0 20px;border-radius:16px;background:#5265D8;color:#FFFFFF;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;box-shadow:0 6px 16px rgba(82,101,216,.35)"><i class="ph ph-plus" style="font-size:20px"></i>Kural ekle</div>
+          <div style="height:80px;background:#FFFFFF;border-top:1px solid #E4E8F1;display:grid;grid-template-columns:repeat(5,1fr)">
+            <sc-for list="{{ navWeb }}" as="n" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="width:56px;height:30px;border-radius:999px;background:{{ n.pill }};display:flex;align-items:center;justify-content:center;color:{{ n.c }}"><i class="{{ n.icon }}" style="font-size:20px"></i></span><span style="font-size:11px;font-weight:{{ n.w }};color:{{ n.c }}">{{ n.label }}</span></div></sc-for>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div id="M7" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M7</span><span style="font-size:15px;font-weight:600">Haftalık rapor</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="height:100%;background:#F7F9FC;display:flex;flex-direction:column">
+          <div style="padding:8px 16px 12px;display:flex;align-items:center;gap:8px"><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:22px;font-weight:600">Bu hafta</span><span style="font-size:13px;color:#5D6680">13 – 19 Ekim · Ela</span></div><span style="width:48px;height:48px;display:flex;align-items:center;justify-content:center"><i class="ph ph-caret-left" style="font-size:20px"></i></span></div>
+          <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:#5D6680">Toplam</span><span style="font-size:22px;font-weight:700">15 sa 21 dk</span><span style="font-size:12px;color:#127A6A">↓ 1 sa 19 dk</span></div>
+              <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:#5D6680">Zamanında mola</span><span style="font-size:22px;font-weight:700">18 / 21</span><span style="font-size:12px;color:#5D6680">Limit içinde 6 / 7 gün</span></div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:150px">
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="7"><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;max-width:28px;height:120px;display:flex;flex-direction:column-reverse;gap:2px"><div style="height:{{ b.e }};background:#2BBFA7;border-radius:0 0 5px 5px"></div><div style="height:{{ b.g }};background:#8C80E8"></div><div style="height:{{ b.o }};background:#C9CFDD;border-radius:5px 5px 0 0"></div></div><span style="font-size:11px;color:#5D6680">{{ b.d }}</span></div></sc-for>
+              </div>
+              <div style="display:flex;gap:14px;font-size:12px;color:#4A5370"><span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:#2BBFA7"></span>Eğitim 6 sa 10 dk</span><span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:3px;background:#8C80E8"></span>Oyun 5 sa 58 dk</span></div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:6px 16px">
+              <sc-for list="{{ events }}" as="e" hint-placeholder-count="3"><div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid {{ e.line }}"><span style="width:32px;height:32px;border-radius:9px;background:{{ e.bg }};color:{{ e.c }};display:flex;align-items:center;justify-content:center"><i class="ph {{ e.icon }}"></i></span><div style="display:flex;flex-direction:column;gap:1px;flex:1"><span style="font-size:14px">{{ e.t }}</span><span style="font-size:12px;color:#5D6680">{{ e.when }}</span></div></div></sc-for>
+            </div>
+          </div>
+          <div style="height:80px;background:#FFFFFF;border-top:1px solid #E4E8F1;display:grid;grid-template-columns:repeat(5,1fr)">
+            <sc-for list="{{ navMore }}" as="n" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="width:56px;height:30px;border-radius:999px;background:{{ n.pill }};display:flex;align-items:center;justify-content:center;color:{{ n.c }}"><i class="{{ n.icon }}" style="font-size:20px"></i></span><span style="font-size:11px;font-weight:{{ n.w }};color:{{ n.c }}">{{ n.label }}</span></div></sc-for>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div id="M8" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="padding:3px 9px;border-radius:6px;background:#1A2033;color:#FFFFFF;font-size:12px;font-weight:700">M8</span><span style="font-size:15px;font-weight:600">Çevrimdışı · dark tema</span></div>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+        <div style="height:100%;background:#111827;color:#E9ECF5;display:flex;flex-direction:column">
+          <div style="padding:8px 16px 12px;display:flex;align-items:center;gap:12px"><div style="display:flex;flex-direction:column;gap:1px;flex:1"><span style="font-size:22px;font-weight:600">Günaydın, Selin</span><span style="font-size:13px;color:#A9B1C7">Salı · Hafta içi planı</span></div></div>
+          <div style="flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:16px;background:#232D42;border:1px solid #3A4560"><i class="ph ph-wifi-slash" style="font-size:22px;color:#E9ECF5"></i><div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:15px;font-weight:600">ELA-PC çevrimdışı</span><span style="font-size:13px;line-height:1.45;color:#A9B1C7">2 sa 14 dk önce bağlantı kesildi. Kurallar cihazda çalışıyor; komutlar bağlanınca iletilir.</span></div></div>
+            <div style="background:#1A2233;border:1px solid #2E3850;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:#A9B1C7">Bugünkü ekran süresi</span><span style="font-size:12px;color:#A9B1C7">08:28 itibarıyla</span></div>
+              <span style="font-size:26px;font-weight:700">1 sa 12 dk</span>
+              <div style="height:8px;border-radius:999px;background:#2E3850;overflow:hidden"><div style="width:48%;height:100%;background:#7B8BEA;border-radius:999px"></div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:15px;font-weight:600">Sıradaki komutlar</span>
+              <div style="background:#1A2233;border:1px solid #2E3850;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center"><span style="width:40px;height:40px;border-radius:12px;background:rgba(231,168,62,.14);color:#F3C77A;display:flex;align-items:center;justify-content:center"><i class="ph ph-clock-countdown" style="font-size:20px"></i></span><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:14px;font-weight:600">Mola · 10 dk</span><span style="font-size:13px;color:#A9B1C7">Cihaz bağlanınca uygulanacak</span></div><span style="font-size:13px;font-weight:600;color:#8C9BFF">İptal</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ darkActions }}" as="a" hint-placeholder-count="3"><div style="background:#1A2233;border:1px solid #2E3850;border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-height:84px;justify-content:center"><i class="ph {{ a.icon }}" style="font-size:22px;color:#8C9BFF"></i><span style="font-size:12px;font-weight:600">{{ a.l }}</span><span style="font-size:10px;color:#A9B1C7">Sıraya alınır</span></div></sc-for>
+            </div>
+          </div>
+          <div style="height:80px;background:#1A2233;border-top:1px solid #2E3850;display:grid;grid-template-columns:repeat(5,1fr)">
+            <sc-for list="{{ navDark }}" as="n" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="width:56px;height:30px;border-radius:999px;background:{{ n.pill }};display:flex;align-items:center;justify-content:center;color:{{ n.c }}"><i class="{{ n.icon }}" style="font-size:20px"></i></span><span style="font-size:11px;font-weight:{{ n.w }};color:{{ n.c }}">{{ n.label }}</span></div></sc-for>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </div>
+</section>
+
+<section style="padding:0 48px 64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;max-width:1500px">
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px">
+    <span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">Flutter tema eşlemesi</span>
+    <sc-for list="{{ themeMap }}" as="t" hint-placeholder-count="8"><div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;font-size:13px;padding:6px 0;border-top:1px solid #F1F3F9;align-items:center"><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#1A2033">{{ t.k }}</span><span style="display:flex;align-items:center;gap:6px;color:#4A5370"><span style="width:14px;height:14px;border-radius:4px;background:{{ t.sw }};border:1px solid #E4E8F1"></span>{{ t.v }}</span></div></sc-for>
+  </div>
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px">
+    <span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">Widget listesi</span>
+    <sc-for list="{{ widgets }}" as="w" hint-placeholder-count="8"><div style="display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid #F1F3F9"><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:600">{{ w.n }}</span><span style="font-size:13px;color:#4A5370;line-height:1.45">{{ w.d }}</span></div></sc-for>
+  </div>
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px">
+    <span style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#3F50B8">Mobil kurallar</span>
+    <sc-for list="{{ rules }}" as="r" hint-placeholder-count="7"><div style="display:flex;gap:10px;font-size:13px;line-height:1.5;padding:4px 0"><i class="ph ph-check" style="color:#127A6A;margin-top:3px"></i><span>{{ r }}</span></div></sc-for>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#FFFFFF' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+const NAV = [['ph-house', 'Ana sayfa'], ['ph-hand-waving', 'Talepler'], ['ph-hourglass-medium', 'Süre'], ['ph-globe-simple', 'Siteler'], ['ph-dots-three-outline', 'Daha fazla']];
+const nav = (active, dark) => NAV.map(([icon, label], i) => ({ label, icon: (i === active ? 'ph-fill ' : 'ph ') + icon, badge: i === 1 ? 2 : null,
+  pill: i === active ? (dark ? 'rgba(82,101,216,.28)' : '#EEF0FC') : 'transparent', c: i === active ? (dark ? '#C9D0FF' : '#3F50B8') : (dark ? '#A9B1C7' : '#4A5370'), w: i === active ? 600 : 500 }));
+
+class Component extends DCLogic {
+  renderVals() {
+    const days = [[52, 40, 26], [47, 33, 22], [50, 25, 20], [55, 48, 27], [48, 60, 33], [60, 82, 33], [58, 70, 32]];
+    const sc = 120 / 200;
+    return {
+      logoXs: logo(13),
+      modes: [['Serbest', 'ph-sun', true], ['Ders', 'ph-book-open'], ['Mola', 'ph-coffee'], ['Kısıtlı', 'ph-shield']].map(([label, icon, on]) => ({ label, icon, bg: on ? '#EEF0FC' : '#FFFFFF', border: on ? '#5265D8' : '#E4E8F1', c: on ? '#3F50B8' : '#4A5370' })),
+      actions: [['ph-lock-simple', 'Kilitle'], ['ph-coffee', 'Mola başlat'], ['ph-plus-circle', '+15 dk'], ['ph-book-open', 'Ders modu'], ['ph-globe-simple', 'Siteler'], ['ph-chart-bar', 'Rapor']].map(([icon, label]) => ({ icon, label, c: '#5265D8' })),
+      reqs: [{ icon: 'ph-hourglass-medium', bg: '#F1EFFD', c: '#5B4FC0', t: '20 dk ek süre', reason: 'Minecraft\'ta yaptığım evi bitirmek istiyorum.' }, { icon: 'ph-globe-simple', bg: '#EEF0FC', c: '#3F50B8', t: 'scratch.mit.edu', reason: 'Okul ödevi için oyun yapacağız.' }],
+      navHome: nav(0), navTime: nav(2), navWeb: nav(3), navMore: nav(4), navDark: nav(0, true),
+      durs: [['10 dk'], ['20 dk', true], ['30 dk']].map(([l, on]) => ({ l, border: on ? '#5265D8' : '#E4E8F1', bg: on ? '#EEF0FC' : '#FFFFFF', c: on ? '#3F50B8' : '#1A2033' })),
+      limits: [{ k: 'Hafta içi', v: '2 sa 30 dk' }, { k: 'Hafta sonu', v: '3 sa' }],
+      today: [['14:00 – 15:00', 'Serbest', '#2BBFA7'], ['15:00 – 16:00', 'Ders modu', '#5265D8'], ['16:00 – 21:00', 'Serbest', '#2BBFA7', true], ['21:00', 'Uyku', '#C9CFDD']].map(([t, l, c, now]) => ({ t, l, c, now: !!now })),
+      webTabs: [['Engelli', 4, true], ['İzinli', 2], ['Ders', 3], ['Geçici', 1]].map(([l, n, on]) => ({ l, n, border: on ? '#5265D8' : '#E4E8F1', bg: on ? '#EEF0FC' : '#FFFFFF', c: on ? '#3F50B8' : '#4A5370' })),
+      sites: [['tiktok.com', 'Her zaman'], ['twitch.tv', 'Her zaman'], ['youtube.com', 'Hafta içi 08:00–17:00'], ['roblox.com', 'Pzt – Per']].map(([d, w], i) => ({ d, w, letter: d[0].toUpperCase(), line: i ? '#E4E8F1' : 'transparent' })),
+      bars: days.map((d, i) => ({ d: ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'][i], e: Math.round(d[0] * sc) + 'px', g: Math.round(d[1] * sc) + 'px', o: Math.round(d[2] * sc) + 'px' })),
+      events: [['ph-check-circle', '#127A6A', '#E3F7F3', '15 dk ek süre onaylandı', 'Dün 19:40'], ['ph-warning-circle', '#A8364A', '#FCEBED', 'Kilit uygulanamadı, tekrar denendi', 'Dün 19:12'], ['ph-coffee', '#5B4FC0', '#F1EFFD', 'Mola tamamlandı', 'Bugün 10:31']].map(([icon, c, bg, t, when], i) => ({ icon, c, bg, t, when, line: i ? '#E4E8F1' : 'transparent' })),
+      darkActions: [['ph-lock-simple', 'Kilitle'], ['ph-coffee', 'Mola'], ['ph-plus-circle', '+15 dk']].map(([icon, l]) => ({ icon, l })),
+      themeMap: [
+        ['colorScheme.primary', '#5265D8', 'Primary'], ['colorScheme.secondary', '#8C80E8', 'Secondary'], ['colorScheme.tertiary', '#2BBFA7', 'Accent'],
+        ['colorScheme.surface', '#FFFFFF', 'Kart'], ['scaffoldBackgroundColor', '#F7F9FC', 'Zemin'], ['colorScheme.outlineVariant', '#E4E8F1', 'Çizgi'],
+        ['colorScheme.error', '#D95B68', 'Danger'], ['KdColors.warning (ext.)', '#E7A83E', 'Bekliyor'], ['textTheme', '#1A2033', 'GoogleFonts.onest'], ['onSurfaceVariant', '#5D6680', 'Yardımcı metin']
+      ].map(([k, sw, v]) => ({ k, sw, v })),
+      widgets: [
+        ['KdChildSwitcher', 'Üstteki çocuk seçici; birden fazla çocukta alttan açılan liste.'],
+        ['KdDeviceStatusCard', 'Halka + cihaz + durum çipi; çevrimiçi / çevrimdışı / bilinmiyor.'],
+        ['KdUsageRing', 'CustomPainter ile kalan süre halkası; Semantics ile değer okunur.'],
+        ['KdModeSelector', 'SegmentedButton tabanlı; bekleyen mod amber kesik çizgiyle.'],
+        ['KdQuickActionTile', 'Varsayılan, bekliyor, sırada, başarısız, kapalı durumları.'],
+        ['KdRequestCard + KdRequestSheet', 'Liste kartı ve showModalBottomSheet ile yanıt sayfası.'],
+        ['KdConfirmSheet', 'Kritik eylemler için onay sayfası; danger varyantı.'],
+        ['KdStatusChip', 'İkon + kelime + renk; tek kaynak tüm durumlar için.']
+      ].map(([n, d]) => ({ n, d })),
+      rules: [
+        'Dokunma alanları en az 48 dp; alt çubuk 80 dp.',
+        'Kritik eylemler (kilit, eşleştirme kaldırma) her zaman alttan açılan onay sayfası ister.',
+        'Bildirimden onay: kilit ekranında biyometrik doğrulama gerekir.',
+        'Cihaz onayı gelmeden hiçbir komut "başarılı" gösterilmez.',
+        'Hata bildirimleri kapatılana kadar kalır; bilgi bildirimleri 4 sn.',
+        'Haftalık ızgara mobilde gün bazlı düzenlenir; tam ızgara yalnızca masaüstünde.',
+        'Light varsayılan, dark sistem temasını izleyebilir (ayardan).'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

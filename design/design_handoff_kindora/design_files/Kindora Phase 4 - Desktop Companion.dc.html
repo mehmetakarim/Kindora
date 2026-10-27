@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#F7F9FC;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+button,input,textarea{font-family:inherit}
+button:focus-visible,textarea:focus-visible{outline:3px solid #8C80E8;outline-offset:2px}
+@keyframes kd-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes kd-hop{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-12px) scale(1.02,.98)}65%{transform:translateY(0) scale(1.04,.96)}}
+@keyframes kd-nudge{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+@keyframes kd-stretch{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.07)}}
+@keyframes kd-tilt{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes kd-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes kd-wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+@keyframes kd-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes kd-in{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes kd-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+
+<div style="min-width:1180px;padding:40px 40px 80px;display:flex;flex-direction:column;gap:72px">
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5D6680"><span style="padding:4px 10px;border-radius:999px;background:#EEF0FC;color:#3F50B8">Design Phase 4</span><span>Desktop Companion</span></div>
+    <h1 style="margin:0;font-size:32px;font-weight:600;letter-spacing:-.02em">Masaüstü widget'ı ve mola akışı</h1>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;text-wrap:pretty">Simüle edilmiş Windows masaüstü. Widget'ı sürükleyip bırakın, en yakın köşeye yapışır. Sağdaki panelden görünümü ve mola akışının adımlarını değiştirin; widget ve mola ekranındaki düğmeler de akışı ilerletir.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start">
+    <div ref="{{ stageRef }}" data-screen-label="Desktop" style="position:relative;height:660px;border-radius:16px;overflow:hidden;background:#3B4A6B;box-shadow:0 24px 64px rgba(26,32,51,.18);user-select:none">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 20% 10%,#56688F 0%,#3B4A6B 55%,#2B3550 100%)"></div>
+
+      <div style="position:absolute;left:{{ winLeft }};top:{{ winTop }};right:{{ winRight }};bottom:{{ winBottom }};background:#FFFFFF;border-radius:{{ winRadius }};box-shadow:0 18px 48px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;z-index:{{ winZ }}">
+        <div style="height:36px;flex-shrink:0;background:#F3F4F8;border-bottom:1px solid #E1E4EC;display:flex;align-items:center;padding:0 12px;gap:10px;font-size:12px;color:#4A5370">
+          <i class="ph ph-browser" style="font-size:15px"></i><span style="flex:1">Kesirler Oyunu — Okul sitesi</span>
+          <span style="display:flex;gap:16px;color:#5D6680"><i class="ph ph-minus"></i><i class="ph {{ winMaxIcon }}"></i><i class="ph ph-x"></i></span>
+        </div>
+        <div style="flex:1;display:grid;grid-template-columns:180px minmax(0,1fr);background:#FAFBFD">
+          <div style="border-right:1px solid #E9ECF2;padding:16px;display:flex;flex-direction:column;gap:10px"><div style="height:10px;width:70%;background:#E4E8F1;border-radius:4px"></div><div style="height:10px;width:55%;background:#E4E8F1;border-radius:4px"></div><div style="height:10px;width:62%;background:#E4E8F1;border-radius:4px"></div><div style="height:10px;width:48%;background:#E4E8F1;border-radius:4px"></div></div>
+          <div style="padding:24px;display:flex;flex-direction:column;gap:14px"><div style="height:16px;width:40%;background:#DCE1EC;border-radius:5px"></div><div style="flex:1;border-radius:12px;background:#EEF1F7;border:1px dashed #D3D9E6;display:flex;align-items:center;justify-content:center;color:#9AA2B8;font-size:13px">Uygulama içeriği</div></div>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:0;right:0;bottom:0;height:48px;background:rgba(32,38,56,.82);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;gap:8px;z-index:2">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.14)"></div><div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.22)"></div><div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.14)"></div><div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.14)"></div>
+        <div style="position:absolute;right:12px;top:0;bottom:0;display:flex;align-items:center;gap:12px;color:#E9ECF5;font-size:12px">
+          <button onClick="{{ showWidget }}" aria-label="Kindora" style="cursor:pointer;position:relative;width:30px;height:30px;border-radius:8px;border:0;background:{{ trayBg }};display:flex;align-items:center;justify-content:center;padding:0">{{ trayMascot }}<sc-if value="{{ hidden }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:999px;background:#2BBFA7;border:1.5px solid #2A3248"></span></sc-if></button>
+          <i class="ph ph-wifi-high" style="font-size:16px"></i><i class="ph ph-speaker-high" style="font-size:16px"></i>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.25"><span>{{ clock }}</span><span>20.10.2026</span></div>
+        </div>
+      </div>
+
+      <sc-if value="{{ showHiddenTip }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;right:12px;bottom:58px;z-index:6;width:260px;background:#FFFFFF;border-radius:14px;padding:12px 14px;box-shadow:0 10px 28px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:6px;animation:kd-in .2s ease-out">
+          <span style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px"><i class="ph ph-eye-slash" style="color:#5B4FC0"></i>Widget gizli</span>
+          <span style="font-size:12px;line-height:1.45;color:#4A5370">Kullanım planın çalışmaya devam ediyor. Molalar ve süre uyarıları bildirim olarak gelir.</span>
+          <button onClick="{{ showWidget }}" style="cursor:pointer;align-self:flex-start;border:0;background:transparent;color:#3F50B8;font-size:13px;font-weight:600;padding:0">Widget'ı göster</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ toastShow }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="position:absolute;z-index:7;top:{{ tTop }};left:{{ tLeft }};right:{{ tRight }};bottom:{{ tBottom }};margin-left:{{ tMl }};width:340px;background:#FFFFFF;border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,.32);display:flex;gap:10px;align-items:flex-start;animation:kd-in .2s ease-out">
+          <div style="width:40px;height:40px;border-radius:10px;background:#EEF0FC;display:flex;align-items:center;justify-content:center;flex-shrink:0">{{ toastMascot }}</div>
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:12px;color:#5D6680">Kindora · {{ mascotName }}</span><span style="font-size:13px;font-weight:600;line-height:1.4">{{ toastText }}</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ widgetShow }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;z-index:5;left:{{ wLeft }};top:{{ wTop }};right:{{ wRight }};bottom:{{ wBottom }};display:flex;flex-direction:{{ wDir }};align-items:{{ wAlign }};gap:8px;transition:{{ wTrans }}">
+          <sc-if value="{{ bubbleShow }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="width:260px;background:#FFFFFF;border-radius:18px;padding:12px 14px;box-shadow:0 10px 28px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:10px;animation:kd-in .2s ease-out;border:{{ bubbleBorder }}">
+              <span style="font-family:Fredoka,sans-serif;font-size:16px;font-weight:500;line-height:1.35;color:#1F1A5C">{{ bubbleText }}</span>
+              <sc-if value="{{ bubbleHasActions }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ bubbleActions }}" as="a" hint-placeholder-count="1">
+                    <button onClick="{{ a.run }}" style="cursor:pointer;border:{{ a.border }};background:{{ a.bg }};color:{{ a.color }};border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600">{{ a.label }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCompact }}" hint-placeholder-val="{{ true }}">
+            <div onPointerDown="{{ dragStart }}" tabindex="0" role="group" aria-label="Kindora widget. Ok tuşları köşe değiştirir, Enter genişletir, Esc küçültür." onKeyDown="{{ wKey }}" style="cursor:grab;width:224px;height:58px;background:{{ wBg }};backdrop-filter:{{ wBlur }};border-radius:999px;padding:4px 6px 4px 4px;display:flex;align-items:center;gap:8px;box-shadow:{{ wShadow }};outline:{{ wOutline }};outline-offset:2px">
+              <div style="width:50px;height:50px;border-radius:999px;background:{{ wAvatarBg }};display:flex;align-items:center;justify-content:center">{{ mascotSm }}</div>
+              <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0"><span style="font-family:Fredoka,sans-serif;font-size:19px;font-weight:600;color:#1A2033;line-height:1.1">{{ leftText }}</span><span style="font-size:12px;color:{{ statusColor }};display:flex;align-items:center;gap:5px;white-space:nowrap"><i class="ph {{ statusIcon }}"></i>{{ statusText }}</span></div>
+              <button onClick="{{ toExpanded }}" onPointerDown="{{ stop }}" aria-label="Genişlet" style="cursor:pointer;width:38px;height:38px;border:0;border-radius:999px;background:#F1F3F9;display:flex;align-items:center;justify-content:center;color:#4A5370"><i class="ph {{ expandIcon }}" style="font-size:16px"></i></button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isExpanded }}" hint-placeholder-val="{{ false }}">
+            <div style="width:300px;background:{{ wBg }};backdrop-filter:{{ wBlur }};border-radius:22px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:{{ wShadow }};outline:{{ wOutline }};outline-offset:2px">
+              <div onPointerDown="{{ dragStart }}" tabindex="0" role="group" aria-label="Kindora widget. Ok tuşları köşe değiştirir, Enter genişletir, Esc küçültür." onKeyDown="{{ wKey }}" style="cursor:grab;display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:8px"><div style="width:22px;height:22px;border-radius:7px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoXs }}</div><span style="font-size:13px;font-weight:600">kindora</span></div>
+                <div style="display:flex;gap:2px;align-items:center">
+                  <span style="width:26px;height:28px;display:flex;align-items:center;justify-content:center;color:#9AA2B8"><i class="ph ph-dots-six-vertical"></i></span>
+                  <button onClick="{{ toCompact }}" onPointerDown="{{ stop }}" aria-label="Küçült" style="cursor:pointer;width:28px;height:28px;border:0;border-radius:8px;background:#F1F3F9;color:#4A5370;display:flex;align-items:center;justify-content:center"><i class="ph ph-minus"></i></button>
+                  <button onClick="{{ hideWidget }}" onPointerDown="{{ stop }}" aria-label="Gizle" style="cursor:pointer;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:#4A5370;display:flex;align-items:center;justify-content:center" style-hover="background:#F1F3F9"><i class="ph ph-eye-slash"></i></button>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-end">
+                {{ mascotMd }}
+                <div style="flex:1;margin-bottom:18px;background:#F1EFFD;border-radius:16px 16px 16px 4px;padding:10px 12px;font-family:Fredoka,sans-serif;font-size:15px;font-weight:500;line-height:1.3;color:#1F1A5C">{{ inlineMsg }}</div>
+              </div>
+              <div style="background:#F7F9FC;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:#4A5370">Bugün kalan</span><span style="font-family:Fredoka,sans-serif;font-size:24px;font-weight:600">{{ leftText }}</span></div>
+                <div style="height:8px;border-radius:999px;background:#E4E8F1;overflow:hidden"><div style="width:{{ leftPct }};height:100%;border-radius:999px;background:{{ barColor }};transition:width .4s"></div></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:2px">
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#5D6680">Sonraki mola</span><span style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px"><i class="ph ph-coffee" style="color:#5B4FC0"></i>{{ nextBreak }}</span></div>
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#5D6680">Mod</span><span style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px"><i class="ph ph-sun" style="color:#127A6A"></i>Serbest</span></div>
+                </div>
+              </div>
+              <sc-if value="{{ pendingChip }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:#FDF4E3;color:#8A5A0C;font-size:12px;font-weight:600"><i class="ph ph-hourglass-medium" style="animation:kd-pulse 1.6s infinite"></i>{{ pendingChip }}</div></sc-if>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button onClick="{{ askMore }}" style="cursor:pointer;font-size:13px;font-weight:600;border:0;background:#5265D8;color:#FFFFFF;padding:10px 6px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px" style-hover="background:#3F50B8"><i class="ph ph-hand-waving"></i>Ek süre iste</button>
+                <button onClick="{{ openApp }}" style="cursor:pointer;font-size:13px;font-weight:600;background:#FFFFFF;border:1px solid #E4E8F1;color:#1A2033;padding:10px 6px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph ph-arrow-square-out"></i>Uygulama</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isMascot }}" hint-placeholder-val="{{ false }}">
+            <div onPointerDown="{{ dragStart }}" tabindex="0" role="group" aria-label="Kindora widget. Ok tuşları köşe değiştirir, Enter genişletir, Esc küçültür." onKeyDown="{{ wKey }}" style="cursor:grab;display:flex;flex-direction:column;align-items:center;gap:0;filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))">
+              {{ mascotLg }}
+              <span style="margin-top:-6px;background:#FFFFFF;border-radius:999px;padding:3px 10px;font-family:Fredoka,sans-serif;font-size:13px;font-weight:600;color:#1A2033;border:{{ chipBorder }}">{{ leftText }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ breakOverlay }}" hint-placeholder-val="{{ false }}">
+        <div role="dialog" aria-modal="true" aria-label="Mola" style="position:absolute;inset:0;z-index:10;background:#ECE9FC;display:flex;align-items:center;justify-content:center;padding:32px;animation:kd-in .3s ease-out">
+          <div style="position:absolute;top:18px;left:22px;display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:8px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoXs }}</div><span style="font-size:14px;font-weight:600;color:#1F1A5C">kindora</span></div>
+          <div style="width:100%;max-width:640px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
+            {{ mascotBreak }}
+            <span style="font-family:Fredoka,sans-serif;font-size:40px;font-weight:600;color:#1F1A5C;line-height:1.1">{{ brTitle }}</span>
+            <span style="font-size:16px;line-height:1.55;color:#4A4E78;max-width:500px">{{ brSub }}</span>
+
+            <sc-if value="{{ brIsStart }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:10px;margin-top:6px">
+                <button onClick="{{ readyBreak }}" style="cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;border-radius:16px;padding:14px 24px;font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px" style-hover="background:#3F50B8"><i class="ph ph-coffee"></i>Molaya hazırım</button>
+                <button onClick="{{ askMore }}" style="cursor:pointer;border:1.5px solid #CFC9F3;background:#FFFFFF;color:#1F1A5C;border-radius:16px;padding:14px 22px;font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px"><i class="ph ph-hand-waving"></i>Ek süre iste</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ brIsRunning }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+                <div style="position:relative;width:140px;height:140px">
+                  <svg viewBox="0 0 140 140" width="140" height="140" aria-hidden="true" style="transform:rotate(-90deg)"><circle cx="70" cy="70" r="60" fill="none" stroke="#DCD8F6" stroke-width="12"></circle><circle cx="70" cy="70" r="60" fill="none" stroke="#8C80E8" stroke-width="12" stroke-linecap="round" stroke-dasharray="{{ brDash }}" style="transition:stroke-dasharray 1s linear"></circle></svg>
+                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:Fredoka,sans-serif;font-size:32px;font-weight:600;color:#1F1A5C;font-variant-numeric:tabular-nums">{{ brClock }}</span><span style="font-size:12px;color:#4A4E78">kaldı</span></div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+                  <span style="display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;border-radius:999px;padding:8px 14px;font-size:14px;color:#1F1A5C"><i class="ph ph-eye" style="color:#5B4FC0"></i>20 sn uzağa bak</span>
+                  <span style="display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;border-radius:999px;padding:8px 14px;font-size:14px;color:#1F1A5C"><i class="ph ph-drop" style="color:#5B4FC0"></i>Bir bardak su iç</span>
+                  <span style="display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;border-radius:999px;padding:8px 14px;font-size:14px;color:#1F1A5C"><i class="ph ph-person-arms-spread" style="color:#5B4FC0"></i>Kollarını esnet</span>
+                </div>
+                <sc-if value="{{ brPending }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:14px;background:#FDF4E3;border:1px solid #F1D49C;color:#8A5A0C;font-size:14px;font-weight:600"><i class="ph ph-hourglass-medium" style="animation:kd-pulse 1.6s infinite"></i>{{ brPending }}</div></sc-if>
+                <sc-if value="{{ brRejected }}" hint-placeholder-val="{{ false }}"><div style="max-width:440px;display:flex;flex-direction:column;gap:4px;padding:12px 16px;border-radius:14px;background:#FFFFFF;border:1px solid #DCD8F6;text-align:left"><span style="font-size:14px;font-weight:600;color:#5B4FC0;display:flex;align-items:center;gap:6px"><i class="ph ph-chat-circle-text"></i>Annen şimdilik molayı seçti</span><span style="font-size:14px;color:#4A5370;line-height:1.5">“Mola bitince 10 dakika daha oynarsın, söz.”</span></div></sc-if>
+                <button onClick="{{ endBreak }}" style="cursor:pointer;border:1px dashed #B6AEF2;background:transparent;color:#5B4FC0;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600">Molayı bitir (demo)</button>
+              </div>
+            </sc-if>
+            <span style="font-size:13px;color:#5B5F86;display:flex;align-items:center;gap:6px"><i class="ph ph-floppy-disk"></i>{{ brNote }}</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ reqOverlay }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:12;background:rgba(31,26,92,.35);display:flex;align-items:center;justify-content:center;padding:24px">
+          <div role="dialog" aria-modal="true" style="width:440px;background:#FFFFFF;border-radius:26px;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 64px rgba(31,26,92,.3);animation:kd-in .2s ease-out">
+            <div style="display:flex;align-items:flex-end;gap:10px">{{ mascotReq }}<div style="flex:1;margin-bottom:22px;background:#F1EFFD;border-radius:18px 18px 18px 5px;padding:10px 12px;font-family:Fredoka,sans-serif;font-size:16px;font-weight:500;line-height:1.35;color:#1F1A5C">Biraz daha zamana mı ihtiyacın var? Birlikte soralım.</div></div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ amounts }}" as="a" hint-placeholder-count="3"><button onClick="{{ a.pick }}" aria-pressed="{{ a.pressed }}" style="cursor:pointer;border:1.5px solid {{ a.border }};background:{{ a.bg }};color:{{ a.color }};border-radius:14px;padding:10px;font-family:Fredoka,sans-serif;font-size:17px;font-weight:600">{{ a.label }}</button></sc-for>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Neden istiyorsun?</span>
+              <textarea value="{{ reason }}" onChange="{{ setReason }}" rows="2" placeholder="Örn. Bölümü bitirmek üzereyim" style="font-size:15px;line-height:1.5;padding:10px 12px;border:1.5px solid #DCD8F6;border-radius:14px;resize:none;color:#1A2033"></textarea>
+            </label>
+            <span style="font-size:12px;color:#4A5370;line-height:1.45">{{ reqNote }}</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button onClick="{{ cancelReq }}" style="cursor:pointer;border:1.5px solid #DCD8F6;background:#FFFFFF;color:#1F1A5C;border-radius:14px;padding:12px;font-size:14px;font-weight:600">{{ cancelLabel }}</button>
+              <button onClick="{{ sendReq }}" aria-disabled="{{ sendDisabled }}" style="cursor:{{ sendCursor }};border:0;background:{{ sendBg }};color:#FFFFFF;border-radius:14px;padding:12px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph ph-paper-plane-tilt"></i>Annene gönder</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <aside style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5D6680">Görünüm</span>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#F1F3F9;border-radius:10px;padding:4px">
+          <sc-for list="{{ views }}" as="v" hint-placeholder-count="3"><button onClick="{{ v.pick }}" style="cursor:pointer;border:0;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;background:{{ v.bg }};color:{{ v.color }};box-shadow:{{ v.shadow }}">{{ v.label }}</button></sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5D6680">Köşe</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:132px;padding:6px;border:1px solid #E4E8F1;border-radius:10px;aspect-ratio:16/10">
+          <sc-for list="{{ corners }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" aria-label="{{ c.label }}" style="cursor:pointer;border:1.5px solid {{ c.border }};background:{{ c.bg }};border-radius:6px;padding:0"></button></sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="3">
+          <button onClick="{{ t.run }}" role="switch" aria-checked="{{ t.aria }}" style="cursor:pointer;border:0;background:transparent;padding:8px 0;display:flex;align-items:center;gap:10px;text-align:left;color:#1A2033">
+            <span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:13px;font-weight:600">{{ t.label }}</span><span style="font-size:12px;color:#5D6680">{{ t.sub }}</span></span>
+            <span style="width:38px;height:22px;border-radius:999px;background:{{ t.bg }};padding:3px;display:flex;justify-content:{{ t.justify }}"><span style="width:16px;height:16px;border-radius:999px;background:#FFFFFF"></span></span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5D6680">Mola akışı</span>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="7">
+            <button onClick="{{ s.go }}" style="cursor:pointer;border:0;background:{{ s.bg }};border-radius:8px;padding:7px 8px;display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:center;text-align:left;color:#1A2033" style-hover="background:#F7F9FC">
+              <span style="width:22px;height:22px;border-radius:999px;background:{{ s.dotBg }};color:{{ s.dotColor }};font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.n }}</span>
+              <span style="font-size:13px;font-weight:{{ s.weight }}">{{ s.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5D6680">Ebeveyn yanıtı (demo)</span>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#F1F3F9;border-radius:10px;padding:4px">
+          <sc-for list="{{ answers }}" as="v" hint-placeholder-count="3"><button onClick="{{ v.pick }}" style="cursor:pointer;border:0;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;background:{{ v.bg }};color:{{ v.color }};box-shadow:{{ v.shadow }}">{{ v.label }}</button></sc-for>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+    <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-.01em">Maskot animasyon durumları</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;text-wrap:pretty">Her durum bir olaya bağlı. Kısa tek seferlik hareketler (zıplama, dürtme) en fazla 3 tekrar yapar ve durur; sürekli olanlar (süzülme, nefes) yavaş ve küçük genlikli. Azaltılmış hareket açıkken hepsi durur, yalnızca yüz ifadesi değişir.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px">
+    <sc-for list="{{ animStates }}" as="a" hint-placeholder-count="10">
+      <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px">
+        <div style="height:96px;display:flex;align-items:center;justify-content:center;background:#F6F5FE;border-radius:12px">{{ a.el }}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px"><span style="font-size:14px;font-weight:600">{{ a.tr }}</span><span style="font-size:12px;color:#5D6680;font-family:ui-monospace,Menlo,monospace">{{ a.id }}</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:1.4;color:#4A5370">
+          <span><b style="color:#1A2033;font-weight:600">Tetik:</b> {{ a.trigger }}</span>
+          <span><b style="color:#1A2033;font-weight:600">Hareket:</b> {{ a.motion }}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:820px">
+    <h2 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-.01em">Konuşma balonu ve bildirim türleri</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;text-wrap:pretty">Balon widget'ın yanında açılır, 6 saniye sonra kendiliğinden kapanır. Eylem gerektiren balonlar kullanıcı yanıt verene kadar kalır. Durum hiçbir zaman yalnızca renkle anlatılmaz.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+    <sc-for list="{{ bubbleKinds }}" as="b" hint-placeholder-count="4">
+      <div style="background:#3B4A6B;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:220px">
+        <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#C9D0E2">{{ b.kind }}</span>
+        <div style="background:#FFFFFF;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;border:{{ b.border }}">
+          <span style="font-family:Fredoka,sans-serif;font-size:16px;font-weight:500;line-height:1.35;color:#1F1A5C">{{ b.text }}</span>
+          <sc-if value="{{ b.hasAct }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><span style="border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;background:#5265D8;color:#FFFFFF">{{ b.a1 }}</span><sc-if value="{{ b.a2 }}" hint-placeholder-val="{{ false }}"><span style="border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;border:1px solid #DCD8F6;color:#1F1A5C">{{ b.a2 }}</span></sc-if></div></sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:auto">{{ b.el }}<span style="font-size:12px;color:#C9D0E2;line-height:1.4">{{ b.rule }}</span></div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+  <sc-for list="{{ behaviors }}" as="b" hint-placeholder-count="6">
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:14px;padding:18px;display:flex;gap:12px">
+      <i class="ph {{ b.icon }}" style="font-size:22px;color:#5265D8;margin-top:1px"></i>
+      <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:600">{{ b.t }}</span><span style="font-size:13px;line-height:1.5;color:#4A5370">{{ b.d }}</span></div>
+    </div>
+  </sc-for>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;reducedMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Erişilebilirlik&quot;}}">
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#FFFFFF' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+const ANIM = {
+  idle: 'kd-bob 3.4s ease-in-out infinite', greeting: 'kd-hop .8s ease-out 2', reminder: 'kd-nudge .5s ease-in-out 2',
+  break: 'kd-stretch 2.6s ease-in-out infinite', happy: 'kd-hop .7s ease-out 3', thinking: 'kd-tilt 2s ease-in-out infinite',
+  sleeping: 'kd-breathe 4s ease-in-out infinite', permission: 'kd-bob 2.4s ease-in-out infinite', approved: 'kd-hop .7s ease-out 2', encourage: 'kd-nudge .6s ease-in-out 2'
+};
+function mascot(state, size, o) {
+  const h = React.createElement;
+  const body = '#5265D8', ink = '#1B2150', k = [];
+  const P = (d, a) => k.push(h('path', Object.assign({ d }, a)));
+  const S = (d, w) => P(d, { stroke: w || ink, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+  if (!o.noShadow) k.push(h('ellipse', { cx: 60, cy: 112, rx: 26, ry: 4, fill: 'rgba(26,32,51,.14)' }));
+  const sleepy = state === 'sleeping';
+  if (sleepy) { S('M60 37 Q60 30 65 27', '#21A08B'); P('M65 27 C71 22 78 25 79 27 C75 33 68 32 65 27Z', { fill: '#2BBFA7' }); }
+  else { S('M60 37 L60 26', '#21A08B'); P('M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', { fill: '#2BBFA7' }); P('M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', { fill: '#3ED0B8' }); }
+  const arm = (d, wave) => k.push(h('path', { d, stroke: body, strokeWidth: 8, fill: 'none', strokeLinecap: 'round', style: wave && o.motion ? { transformOrigin: '93px 70px', animation: 'kd-wave .6s ease-in-out 3' } : null }));
+  if (state === 'greeting') { arm('M27 80 Q19 86 21 93'); arm('M93 70 Q106 60 104 46', true); }
+  else if (state === 'break' || state === 'happy') { arm('M29 64 Q17 52 21 40'); arm('M91 64 Q103 52 99 40'); }
+  else if (state === 'permission') { arm('M30 86 Q38 96 48 96'); arm('M90 86 Q82 96 72 96'); }
+  else { arm('M27 80 Q19 86 21 93'); arm('M93 80 Q101 86 99 93'); }
+  P('M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', { fill: body });
+  P('M42 46 C48 41 54 40 58 40', { stroke: 'rgba(255,255,255,.35)', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  k.push(h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }));
+  const joy = ['happy', 'approved', 'greeting'].includes(state), closed = sleepy || state === 'break';
+  const eyes = (dx, dy, ry) => k.push(h('g', { style: o.motion && !closed ? { transformOrigin: '60px 72px', animation: 'kd-blink 5s infinite' } : null },
+    h('ellipse', { cx: 50 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink }), h('ellipse', { cx: 70 + dx, cy: 72 + dy, rx: 3.6, ry, fill: ink })));
+  if (joy) { S('M46 74 Q50 68 54 74'); S('M66 74 Q70 68 74 74'); }
+  else if (closed) { S('M46 72 Q50 76 54 72'); S('M66 72 Q70 76 74 72'); }
+  else if (state === 'thinking') eyes(2, -3, 4);
+  else if (state === 'encourage') { k.push(h('ellipse', { cx: 50, cy: 72, rx: 3.6, ry: 4.8, fill: ink })); S('M66 73 Q70 69 74 73'); }
+  else eyes(0, 0, 4.8);
+  if (!sleepy) { k.push(h('circle', { cx: 42, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); k.push(h('circle', { cx: 78, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); }
+  if (joy || state === 'encourage') P('M53 80 Q60 89 67 80 Z', { fill: ink });
+  else if (state === 'permission') k.push(h('ellipse', { cx: 60, cy: 83, rx: 2.6, ry: 3, fill: ink }));
+  else if (sleepy) S('M57 83 L63 83');
+  else if (state === 'thinking') S('M56 83 Q60 81 64 83');
+  else S('M55 81 Q60 85 65 81');
+  const badge = (fill, kid) => k.push(h('g', null, h('circle', { cx: 99, cy: 40, r: 11, fill, stroke: '#FFFFFF', strokeWidth: 2.5 }), kid));
+  if (state === 'reminder') badge('#E7A83E', h('path', { d: 'M99 34 L99 40 L103 43', stroke: '#FFFFFF', strokeWidth: 2.5, fill: 'none', strokeLinecap: 'round' }));
+  if (state === 'approved') badge('#2BBFA7', h('path', { d: 'M94 40 L98 44 L104 36', stroke: '#FFFFFF', strokeWidth: 2.8, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }));
+  if (state === 'permission') badge('#8C80E8', h('path', { d: 'M95.5 34 L102.5 34 L95.5 46 L102.5 46 Z', stroke: '#FFFFFF', strokeWidth: 2, fill: 'none', strokeLinejoin: 'round' }));
+  if (state === 'encourage') P('M99 28 L102 36 L110 36 L104 41 L106 49 L99 44 L92 49 L94 41 L88 36 L96 36 Z', { fill: '#E7A83E' });
+  if (state === 'thinking') [[93, 46, 2.5], [100, 38, 3.3], [108, 29, 4.2]].forEach(([cx, cy, r]) => k.push(h('circle', { cx, cy, r, fill: '#B6AEF2' })));
+  if (sleepy) { k.push(h('text', { x: 90, y: 44, fontSize: 15, fontWeight: 700, fill: '#8C80E8', fontFamily: 'Fredoka,sans-serif' }, 'z')); k.push(h('text', { x: 101, y: 32, fontSize: 11, fontWeight: 700, fill: '#B6AEF2', fontFamily: 'Fredoka,sans-serif' }, 'z')); }
+  if (state === 'happy') { P('M18 30 L20 36 L26 38 L20 40 L18 46 L16 40 L10 38 L16 36 Z', { fill: '#E7A83E' }); P('M104 22 L105.5 26 L109.5 27.5 L105.5 29 L104 33 L102.5 29 L98.5 27.5 L102.5 26 Z', { fill: '#2BBFA7' }); }
+  return h('div', { key: state + (o.k || ''), style: { width: size, height: size, flexShrink: 0, transformOrigin: '50% 90%', animation: o.motion ? ANIM[state] : 'none' } }, h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true }, ...k));
+}
+
+const FLOW = {
+  normal:      { n: 1, label: 'Normal kullanım', left: 48, st: 'idle', status: 'Serbest zaman', tone: 'ok' },
+  warn5:       { n: 2, label: 'Molaya 5 dk kala', left: 48, st: 'reminder', status: 'Mola 5 dk sonra', tone: 'warn', bubble: '5 dakika sonra küçük bir mola vereceğiz. Çalışmanı kaydetmeyi unutma.' },
+  warn1:       { n: 3, label: 'Molaya 1 dk kala', left: 44, st: 'reminder', status: 'Mola 1 dk sonra', tone: 'warn', bubble: '1 dakika kaldı. Kaydettin mi?' },
+  timeup:      { n: 4, label: 'Mola zamanı geldi', left: 44, st: 'break', status: 'Mola', tone: 'break' },
+  pending:     { n: 0, left: 44, st: 'permission', status: 'İsteğin bekliyor', tone: 'warn', bubble: 'İsteğini ilettim. Yanıt gelene kadar süren değişmez.' },
+  rejectedPre: { n: 0, left: 44, st: 'encourage', status: 'Mola 1 dk sonra', tone: 'warn', bubble: 'Bu sefer olmadı. Sorun değil; 1 dakika sonra mola başlıyor.' },
+  break:       { n: 5, label: 'Mola sürüyor', left: 44, st: 'break', status: 'Mola', tone: 'break' },
+  approved:    { n: 0, left: 15, st: 'approved', status: 'Mola 15 dk sonra', tone: 'ok', bubble: 'Annen ek süre verdi! Molayı biraz sonra vereceğiz.' },
+  breakDone:   { n: 6, label: 'Mola bitti', left: 44, st: 'happy', status: 'Serbest zaman', tone: 'ok', bubble: 'Mola bitti, tekrar hoş geldin! Kaldığın yerden devam edebilirsin.' },
+  restart:     { n: 7, label: 'Uygulama yeniden başladı', left: 48, st: 'greeting', status: 'Serbest zaman', tone: 'ok', bubble: 'Tekrar buradayım. Kullanım planın aynı, kalan süren 48 dk.' }
+};
+const BREAK_LEN = 600;
+
+class Component extends DCLogic {
+  state = { view: 'compact', corner: 'br', transparent: false, fullscreen: false, hidden: false, flow: 'normal', reqFrom: null, amount: 15, reason: '', reqOpen: false, breakLeft: BREAK_LEN, answer: 'Onay', drag: null, bubbleOff: false, rejectedInBreak: false, pendingInBreak: false, restarting: false };
+  stage = null;
+  timers = [];
+  componentDidMount() {
+    this._tick = setInterval(() => { if (['break'].includes(this.state.flow)) this.setState(p => ({ breakLeft: Math.max(0, p.breakLeft - 1) })); }, 1000);
+    this._move = e => this.onMove(e); this._up = e => this.onUp(e);
+    window.addEventListener('pointermove', this._move); window.addEventListener('pointerup', this._up);
+  }
+  componentWillUnmount() { clearInterval(this._tick); this.timers.forEach(clearTimeout); clearTimeout(this._bt); window.removeEventListener('pointermove', this._move); window.removeEventListener('pointerup', this._up); }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  go(flow, extra) {
+    clearTimeout(this._bt);
+    const patch = Object.assign({ flow, bubbleOff: false, reqOpen: false }, extra || {});
+    if (flow === 'break' && !(extra && 'breakLeft' in extra)) patch.breakLeft = this.state.flow === 'break' ? this.state.breakLeft : BREAK_LEN;
+    if (flow !== 'break') { patch.rejectedInBreak = false; patch.pendingInBreak = false; }
+    if (flow === 'restart') { patch.restarting = true; this.later(() => this.setState({ restarting: false }), 1600); }
+    this.setState(patch);
+    const f = FLOW[flow];
+    if (f && f.bubble && !['warn1', 'pending'].includes(flow)) this._bt = setTimeout(() => this.setState({ bubbleOff: true }), 6000);
+  }
+  onDown(e) {
+    if (!this.stage || e.button !== 0) return;
+    const r = e.currentTarget.parentElement.getBoundingClientRect(), sr = this.stage.getBoundingClientRect();
+    this._d = { ox: e.clientX - r.left, oy: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false, sr, w: r.width, h: r.height };
+  }
+  onMove(e) {
+    const d = this._d; if (!d) return;
+    if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 4) return;
+    d.moved = true;
+    const x = Math.min(Math.max(0, e.clientX - d.sr.left - d.ox), d.sr.width - d.w), y = Math.min(Math.max(0, e.clientY - d.sr.top - d.oy), d.sr.height - d.h);
+    this.setState({ drag: { x, y } });
+  }
+  onUp(e) {
+    const d = this._d; this._d = null; if (!d) return;
+    if (!d.moved) { if (this.state.view === 'mascot') this.setState({ view: 'expanded' }); return; }
+    const cx = e.clientX - d.sr.left, cy = e.clientY - d.sr.top;
+    this.setState({ drag: null, corner: (cy < d.sr.height / 2 ? 't' : 'b') + (cx < d.sr.width / 2 ? 'l' : 'r') });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const motion = !(this.props.reducedMotion ?? false);
+    const N = 'Filiz';
+    const m = (st, z, extra) => mascot(st, z, Object.assign({ motion }, extra || {}));
+    const f = FLOW[s.flow];
+    const inBreak = s.flow === 'timeup' || s.flow === 'break';
+    const st = s.restarting ? 'thinking' : f.st;
+    const warn = f.tone === 'warn';
+    const top = s.corner[0] === 't', left = s.corner[1] === 'l';
+    const M = 16, TB = 48 + 12;
+    const pos = s.drag ? { l: s.drag.x + 'px', t: s.drag.y + 'px', r: 'auto', b: 'auto' }
+      : { l: left ? M + 'px' : 'auto', r: left ? 'auto' : M + 'px', t: top ? M + 'px' : 'auto', b: top ? 'auto' : TB + 'px' };
+    const bubbleText = s.restarting ? 'Kindora yeniden başladı. Kuralların yükleniyor…' : f.bubble;
+    const bubbleShow = !!bubbleText && !s.bubbleOff && !s.fullscreen && !s.hidden && !inBreak && !s.reqOpen && !(s.view === 'expanded');
+    const ask = from => () => this.setState({ reqOpen: true, reqFrom: from || s.flow, reason: '' });
+    const bubbleActions = s.flow === 'warn5' ? [{ label: 'Tamam', run: () => this.setState({ bubbleOff: true }) }]
+      : s.flow === 'warn1' ? [{ label: 'Kaydettim', run: () => this.setState({ bubbleOff: true }) }, { label: 'Ek süre iste', run: ask('warn1'), secondary: true }]
+      : s.flow === 'pending' ? [{ label: 'Tamam', run: () => this.setState({ bubbleOff: true }) }] : [];
+    const notifyMode = (s.fullscreen || s.hidden) && !!bubbleText && !s.bubbleOff && !inBreak;
+    const reasonOk = s.reason.trim().length >= 5;
+    const fromBreak = s.reqFrom === 'timeup' || s.reqFrom === 'break';
+    const resolve = () => {
+      if (s.answer === 'Yanıt yok') return;
+      this.later(() => {
+        const ok = this.state.answer === 'Onay';
+        if (fromBreak) { if (ok) this.go('approved'); else this.setState({ rejectedInBreak: true, pendingInBreak: false }); }
+        else ok ? this.go('approved') : this.go('rejectedPre');
+      }, 3200);
+    };
+    const C = 2 * Math.PI * 60;
+    const mm = Math.floor(s.breakLeft / 60), ss = String(s.breakLeft % 60).padStart(2, '0');
+    const clock = { normal: '15:12', warn5: '15:40', warn1: '15:44', timeup: '15:45', break: '15:46', pending: '15:44', rejectedPre: '15:44', approved: '15:45', breakDone: '15:55', restart: '16:02' }[s.flow];
+    const stepKeys = ['normal', 'warn5', 'warn1', 'timeup', 'break', 'breakDone', 'restart'];
+    const curN = f.n || (s.flow === 'approved' ? 4 : 3);
+    const ab = (on) => ({ bg: on ? '#FFFFFF' : 'transparent', color: on ? '#1A2033' : '#7A829C', shadow: on ? '0 1px 3px rgba(26,32,51,.12)' : 'none' });
+    const toastTop = s.fullscreen;
+
+    return {
+      stageRef: el => { this.stage = el; },
+      wKey: e => { const k = e.key, c = this.state.corner; const map = { ArrowUp: 't' + c[1], ArrowDown: 'b' + c[1], ArrowLeft: c[0] + 'l', ArrowRight: c[0] + 'r' };
+        if (map[k]) { e.preventDefault(); this.setState({ corner: map[k] }); }
+        else if ((k === 'Enter' || k === ' ') && e.target === e.currentTarget) { e.preventDefault(); this.setState({ view: 'expanded' }); }
+        else if (k === 'Escape') this.setState({ view: 'compact' }); },
+      logoXs: logo(16),
+      winLeft: s.fullscreen ? '0' : '60px', winTop: s.fullscreen ? '0' : '40px', winRight: s.fullscreen ? '0' : '200px', winBottom: s.fullscreen ? '0' : '96px', winRadius: s.fullscreen ? '0' : '10px', winZ: s.fullscreen ? 3 : 1, winMaxIcon: s.fullscreen ? 'ph-corners-in' : 'ph-square',
+      trayMascot: m('idle', 24, { noShadow: true, k: 'tray', motion: false }), trayBg: s.hidden ? 'rgba(255,255,255,.18)' : 'transparent', hidden: s.hidden,
+      showWidget: () => this.setState({ hidden: false }), hideWidget: () => this.setState({ hidden: true }),
+      showHiddenTip: s.hidden && !notifyMode && !inBreak, clock,
+      toastShow: notifyMode, toastText: bubbleText, toastMascot: m(st, 36, { noShadow: true, k: 't' }), mascotName: N,
+      tTop: toastTop ? '16px' : 'auto', tLeft: toastTop ? '50%' : 'auto', tMl: toastTop ? '-170px' : '0', tRight: toastTop ? 'auto' : '12px', tBottom: toastTop ? 'auto' : '60px',
+      widgetShow: !s.hidden && !s.fullscreen,
+      wLeft: pos.l, wTop: pos.t, wRight: pos.r, wBottom: pos.b, wDir: top ? 'column-reverse' : 'column', wAlign: left ? 'flex-start' : 'flex-end', wTrans: s.drag ? 'none' : 'left .2s, top .2s',
+      bubbleShow, bubbleText, bubbleBorder: warn ? '1.5px solid #F1D49C' : '0', bubbleHasActions: bubbleActions.length > 0,
+      bubbleActions: bubbleActions.map(a => ({ label: a.label, run: a.run, bg: a.secondary ? '#FFFFFF' : '#5265D8', color: a.secondary ? '#1F1A5C' : '#FFFFFF', border: a.secondary ? '1px solid #DCD8F6' : '0' })),
+      isCompact: s.view === 'compact', isExpanded: s.view === 'expanded', isMascot: s.view === 'mascot',
+      dragStart: e => this.onDown(e), stop: e => e.stopPropagation(),
+      wBg: s.transparent ? 'rgba(255,255,255,.72)' : '#FFFFFF', wBlur: s.transparent ? 'blur(14px)' : 'none',
+      wShadow: '0 10px 28px rgba(0,0,0,.28)', wOutline: warn ? '2px solid #E7A83E' : '0 solid transparent', wAvatarBg: warn ? '#FDF4E3' : '#EEF0FC',
+      chipBorder: warn ? '1.5px solid #E7A83E' : '0',
+      mascotSm: m(st, 44, { noShadow: true, k: 'sm' }), mascotMd: m(st, 72, { k: 'md' }), mascotLg: m(st, 92, { k: 'lg' }),
+      leftText: f.left + ' dk', leftPct: Math.round(f.left / 150 * 100) + '%', barColor: warn ? '#E7A83E' : '#2BBFA7',
+      statusText: f.status, statusIcon: warn ? 'ph-coffee' : f.tone === 'break' ? 'ph-coffee' : 'ph-sun', statusColor: warn ? '#8A5A0C' : '#4A5370',
+      expandIcon: top ? 'ph-caret-down' : 'ph-caret-up',
+      toExpanded: () => this.setState({ view: 'expanded' }), toCompact: () => this.setState({ view: 'compact' }),
+      inlineMsg: bubbleText || 'Her şey yolunda. Sonraki mola 18 dakika sonra.',
+      nextBreak: { warn5: '5 dk sonra', warn1: '1 dk sonra', pending: '1 dk sonra', rejectedPre: '1 dk sonra', approved: '15 dk sonra', breakDone: '45 dk sonra' }[s.flow] || '18 dk sonra',
+      pendingChip: s.flow === 'pending' ? `${s.amount} dk isteğin annende` : null,
+      askMore: ask(), openApp: () => this.setState({ bubbleOff: false }),
+      breakOverlay: inBreak, mascotBreak: m(s.flow === 'timeup' ? 'break' : (s.rejectedInBreak ? 'encourage' : 'break'), 150, { k: 'br' }),
+      brTitle: s.flow === 'timeup' ? 'Mola zamanı!' : 'Mola veriyoruz',
+      brSub: s.flow === 'timeup' ? 'Gözlerin ve sırtın biraz dinlensin. Çalışman açık kalıyor; mola bitince kaldığın yerden devam edersin.' : 'Ekrandan biraz uzaklaş. Bilgisayar seni bekliyor, hiçbir şey kapanmadı.',
+      brIsStart: s.flow === 'timeup', brIsRunning: s.flow === 'break',
+      brDash: `${(C * s.breakLeft / BREAK_LEN).toFixed(1)} ${C.toFixed(1)}`, brClock: `${mm}:${ss}`,
+      brPending: s.pendingInBreak ? `${s.amount} dk isteğin annende. Yanıt gelene kadar mola devam ediyor.` : null,
+      brRejected: s.rejectedInBreak,
+      brNote: s.flow === 'timeup' ? '1 dakika önce kaydetmen için hatırlattım.' : 'Açık pencerelerin ve çalışman olduğu gibi duruyor.',
+      readyBreak: () => this.go('break', { breakLeft: BREAK_LEN }), endBreak: () => this.go('breakDone'),
+      reqOverlay: s.reqOpen, mascotReq: m('permission', 84, { k: 'rq' }),
+      amounts: [10, 15, 30].map(v => ({ label: v + ' dk', pressed: s.amount === v ? 'true' : 'false', border: s.amount === v ? '#5265D8' : '#DCD8F6', bg: s.amount === v ? '#EEF0FC' : '#FFFFFF', color: s.amount === v ? '#3F50B8' : '#1F1A5C', pick: () => this.setState({ amount: v }) })),
+      reason: s.reason, setReason: e => this.setState({ reason: e.target.value }),
+      reqNote: fromBreak ? 'Yanıt gelene kadar mola başlar. Süren kendiliğinden uzamaz.' : 'Yanıt gelene kadar süren değişmez. Süre dolarsa mola başlar.',
+      cancelLabel: fromBreak ? 'Molaya geç' : 'Vazgeç',
+      cancelReq: () => { if (fromBreak) this.go('break', { breakLeft: BREAK_LEN }); else this.setState({ reqOpen: false }); },
+      sendReq: () => { if (!reasonOk) return; if (fromBreak) this.go('break', { breakLeft: BREAK_LEN, pendingInBreak: true }); else this.go('pending'); resolve(); },
+      sendDisabled: reasonOk ? 'false' : 'true', sendBg: reasonOk ? '#5265D8' : '#B9C2EE', sendCursor: reasonOk ? 'pointer' : 'not-allowed',
+      views: [['compact', 'Compact'], ['expanded', 'Expanded'], ['mascot', 'Mascot']].map(([id, label]) => Object.assign({ label, pick: () => this.setState({ view: id }) }, ab(s.view === id))),
+      corners: [['tl', 'Sol üst'], ['tr', 'Sağ üst'], ['bl', 'Sol alt'], ['br', 'Sağ alt']].map(([id, label]) => ({ label, border: s.corner === id ? '#5265D8' : '#E4E8F1', bg: s.corner === id ? '#EEF0FC' : '#F7F9FC', pick: () => this.setState({ corner: id, drag: null }) })),
+      toggles: [
+        ['Şeffaf arka plan', 'Widget masaüstünü hafifçe gösterir', s.transparent, () => this.setState(p => ({ transparent: !p.transparent }))],
+        ['Tam ekran uygulama', 'Widget gizlenir, uyarılar üstte bildirim olur', s.fullscreen, () => this.setState(p => ({ fullscreen: !p.fullscreen }))],
+        ['Widget gizli', 'Kurallar arka planda çalışmaya devam eder', s.hidden, () => this.setState(p => ({ hidden: !p.hidden }))]
+      ].map(([label, sub, on, run]) => ({ label, sub, run, aria: on ? 'true' : 'false', bg: on ? '#5265D8' : '#C9CFDD', justify: on ? 'flex-end' : 'flex-start' })),
+      steps: stepKeys.map(k => { const x = FLOW[k], on = x.n === curN; return { n: x.n, label: x.label, go: () => this.go(k), bg: on ? '#EEF0FC' : 'transparent', dotBg: on ? '#5265D8' : x.n < curN ? '#E3F7F3' : '#F1F3F9', dotColor: on ? '#FFFFFF' : x.n < curN ? '#127A6A' : '#7A829C', weight: on ? 600 : 500 }; }),
+      answers: ['Onay', 'Ret', 'Yanıt yok'].map(label => Object.assign({ label, pick: () => this.setState({ answer: label }) }, ab(s.answer === label))),
+      animStates: [
+        ['idle', 'Bekleme', 'Varsayılan', 'Yavaş süzülme, 3.4 sn döngü'],
+        ['greeting', 'Karşılama', 'Oturum açılışı', 'El sallama + 2 zıplama'],
+        ['reminder', 'Hatırlatma', 'Molaya 5 / 1 dk', '2 kez hafif dürtme'],
+        ['break', 'Mola', 'Mola başladı', 'Esneme, 2.6 sn döngü'],
+        ['happy', 'Mutlu', 'Hedef, rozet', '3 zıplama, sonra durur'],
+        ['thinking', 'Düşünüyor', 'Yükleme, eşitleme', 'Hafif sallanma'],
+        ['sleeping', 'Sessiz mod', 'Sessiz mod, gece', 'Yavaş nefes, 4 sn'],
+        ['permission', 'İzin bekliyor', 'Talep gönderildi', 'Yavaş süzülme'],
+        ['approved', 'Onaylandı', 'Ebeveyn onayı', '2 zıplama'],
+        ['encourage', 'Cesaretlendirme', 'Ders modu, ret', '2 kez dürtme']
+      ].map(([id, tr, trigger, motionTxt]) => ({ id, tr, trigger, motion: motionTxt, el: m(id, 84, { k: 'a' }) })),
+      bubbleKinds: [
+        { kind: 'Bilgi', text: 'Hey! Bugün 45 dakikadır bilgisayar başındasın.', rule: '6 sn sonra kapanır', border: '0', hasAct: false, el: m('idle', 40, { noShadow: true, k: 'b1' }) },
+        { kind: 'Hatırlatma · eylemli', text: '1 dakika kaldı. Kaydettin mi?', rule: 'Yanıt verilene kadar kalır', border: '1.5px solid #F1D49C', hasAct: true, a1: 'Kaydettim', a2: 'Ek süre iste', el: m('reminder', 40, { noShadow: true, k: 'b2' }) },
+        { kind: 'Bekleme', text: 'İsteğini ilettim. Yanıt gelene kadar süren değişmez.', rule: 'Widget\'ta amber çip kalır', border: '0', hasAct: true, a1: 'Tamam', el: m('permission', 40, { noShadow: true, k: 'b3' }) },
+        { kind: 'Erişim', text: 'Bu site şu anda kullanım planında yok. Erişim isteği gönderebilirsin.', rule: 'Site açılmak istendiğinde', border: '0', hasAct: true, a1: 'İzin iste', a2: 'Kapat', el: m('thinking', 40, { noShadow: true, k: 'b4' }) }
+      ],
+      behaviors: [
+        { icon: 'ph-keyboard', t: 'Klavye ile kullanım', d: 'Widget odaktayken ok tuşları köşeyi değiştirir, Enter genişletir, Esc küçültür. Tab sırası: widget, sonra içindeki düğmeler.' },
+        { icon: 'ph-frame-corners', t: 'Çerçevesiz ve her zaman üstte', d: 'Başlık çubuğu yok. Diğer pencerelerin üstünde durur ama tıklamaları yalnızca kendi alanında yakalar.' },
+        { icon: 'ph-hand-grabbing', t: 'Sürükle ve köşeye yapış', d: 'Bırakıldığı yere en yakın köşeye 16 px boşlukla yapışır. Görev çubuğunun üstünde kalır.' },
+        { icon: 'ph-arrows-out', t: 'Tam ekranda gizlenir', d: 'Oyun veya video tam ekrandayken widget kaybolur. Uyarılar ekranın üstünde kısa bildirim olarak görünür.' },
+        { icon: 'ph-eye-slash', t: 'Gizlemek kuralları durdurmaz', d: 'Widget kapatılabilir; süre, mola ve site kuralları arka planda çalışmaya devam eder. Simge görev çubuğunda kalır.' },
+        { icon: 'ph-hourglass-medium', t: 'Onaysız süre uzamaz', d: 'Ek süre isteği gönderilince süre değişmez. Mola zamanı geldiyse mola başlar, yanıt gelince haber verilir.' },
+        { icon: 'ph-arrow-clockwise', t: 'Yeniden başlatmada aynı durum', d: 'Uygulama kapanıp açılırsa kalan süre ve plan cihazdaki kayıttan yüklenir; sıfırlanmaz.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

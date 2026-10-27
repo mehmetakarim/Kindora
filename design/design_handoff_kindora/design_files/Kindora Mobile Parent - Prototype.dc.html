@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#E9ECF3;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--kd-p-text)}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+:root{--kd-bg:#F7F9FC;--kd-surface:#FFFFFF;--kd-surface-2:#F1F3F9;--kd-line:#E4E8F1;--kd-line-strong:#D5DAE6;--kd-muted:#C9CFDD;--kd-disabled:#B9C2EE;--kd-neutral-tint:#EEF0F5;--kd-p-tint:#EEF0FC;--kd-ok-tint:#E3F7F3;--kd-warn-tint:#FDF4E3;--kd-err-tint:#FCEBED;--kd-sec-tint:#F1EFFD;--kd-warn-line:#F1D49C;--kd-err-line:#F0C2CA;--kd-ok-line:#A9E4D9;--kd-ink:#1A2033;--kd-ink2:#4A5370;--kd-ink3:#5D6680;--kd-info-text:#2A3580;--kd-ok-text:#127A6A;--kd-warn-text:#8A5A0C;--kd-err-text:#A8364A;--kd-p-text:#3F50B8;--kd-sec-text:#5B4FC0;--kd-inverse:#1A2033}
+[data-kd-theme="dark"]{--kd-bg:#111827;--kd-surface:#1A2233;--kd-surface-2:#232D42;--kd-line:#2E3850;--kd-line-strong:#3A4560;--kd-muted:#4A5570;--kd-disabled:#3A4580;--kd-neutral-tint:#2A3349;--kd-p-tint:rgba(82,101,216,.22);--kd-ok-tint:rgba(43,191,167,.14);--kd-warn-tint:rgba(231,168,62,.14);--kd-err-tint:rgba(217,91,104,.14);--kd-sec-tint:rgba(140,128,232,.16);--kd-warn-line:rgba(231,168,62,.4);--kd-err-line:rgba(217,91,104,.4);--kd-ok-line:rgba(43,191,167,.4);--kd-ink:#E9ECF5;--kd-ink2:#A9B1C7;--kd-ink3:#8D96AE;--kd-info-text:#C9D0FF;--kd-ok-text:#5FDCC6;--kd-warn-text:#F3C77A;--kd-err-text:#F29AA6;--kd-p-text:#A9B4FF;--kd-sec-text:#C3BCF6;--kd-inverse:#2E3850;color-scheme:dark}
+input{color:var(--kd-ink)}
+
+button,input{font-family:inherit}
+button{-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:3px solid #8C80E8;outline-offset:2px}
+@keyframes kd-spin{to{transform:rotate(360deg)}}
+@keyframes kd-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes kd-up{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+@keyframes kd-fade{0%{opacity:0}100%{opacity:1}}
+@keyframes kd-down{0%{transform:translateY(-120%)}100%{transform:translateY(0)}}
+@keyframes kd-pop{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+<div role="note" style="display:flex;align-items:center;gap:10px;padding:10px 20px;background:#FDF4E3;border-bottom:1px solid #F1D49C;color:#6B4508;font-family:Onest,system-ui,sans-serif;font-size:13px;line-height:1.45"><i class="ph ph-info" style="font-size:16px"></i><span>Sonraki sürüm adayı · MVP dışı. Mobil teknoloji (Flutter) henüz onaylanmadı. Kilit metinleri masaüstü paneline göre güncellenmedi.</span></div>
+
+<div style="min-height:100vh;padding:32px;display:flex;gap:36px;justify-content:center;align-items:flex-start;flex-wrap:wrap">
+
+  <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ isDark }}" hint-size="412px,892px">
+    <div data-screen-label="Mobile Prototype" data-kd-theme="{{ theme }}" style="color:var(--kd-ink);height:100%;background:var(--kd-bg);display:flex;flex-direction:column;position:relative;overflow:hidden">
+
+      <div style="padding:6px 8px 10px 16px;display:flex;align-items:center;gap:8px;min-height:64px;flex-shrink:0">
+        <sc-if value="{{ hasBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ back }}" aria-label="Geri" style="cursor:pointer;width:48px;height:48px;margin-left:-12px;border:0;border-radius:999px;background:transparent;color:var(--kd-ink);display:flex;align-items:center;justify-content:center" style-active="background:var(--kd-neutral-tint)"><i class="ph ph-arrow-left" style="font-size:22px"></i></button></sc-if>
+        <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0"><span style="font-size:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</span><span style="font-size:13px;color:var(--kd-ink3)">{{ subtitle }}</span></div>
+        <sc-if value="{{ showChild }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openChild }}" style="cursor:pointer;display:flex;align-items:center;gap:6px;height:40px;padding:0 10px 0 4px;border:1px solid var(--kd-line);border-radius:999px;background:var(--kd-surface);color:var(--kd-ink)"><span style="width:32px;height:32px;border-radius:999px;background:{{ kidBg }};color:{{ kidC }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">{{ kidI }}</span><span style="font-size:14px;font-weight:600">{{ kidName }}</span><i class="ph ph-caret-down" style="color:var(--kd-ink3)"></i></button>
+        </sc-if>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px 20px;display:flex;flex-direction:column;gap:12px">
+
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ offline }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:16px;background:var(--kd-surface-2);border:1px solid var(--kd-line-strong)"><i class="ph ph-wifi-slash" style="font-size:22px"></i><div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:15px;font-weight:600">ELA-PC çevrimdışı</span><span style="font-size:13px;line-height:1.45;color:var(--kd-ink2)">Kurallar cihazda çalışıyor. Göndereceğiniz komutlar cihaz bağlanınca iletilir.</span></div></div>
+          </sc-if>
+          <sc-if value="{{ hasDevice }}" hint-placeholder-val="{{ true }}">
+            <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100" style="position:relative;width:88px;height:88px;flex-shrink:0"><svg viewBox="0 0 88 88" width="88" height="88" style="transform:rotate(-90deg)" aria-hidden="true"><circle cx="44" cy="44" r="37" fill="none" stroke="var(--kd-neutral-tint)" stroke-width="9"></circle><circle cx="44" cy="44" r="37" fill="none" stroke="#5265D8" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ ringDash }}" style="transition:stroke-dasharray .5s"></circle></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:17px;font-weight:700">{{ leftText }}</span><span style="font-size:10px;color:var(--kd-ink3)">kaldı</span></div></div>
+                <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
+                  <span style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px"><i class="ph ph-desktop" style="color:var(--kd-ink3)"></i>ELA-PC</span>
+                  <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:{{ stBg }};color:{{ stC }};font-size:12px;font-weight:600"><i class="ph {{ stIcon }}" style="font-size:11px"></i>{{ stLabel }}</span>
+                  <span style="font-size:13px;color:var(--kd-ink2)">{{ usedLine }}</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:12px;color:{{ modeNoteC }}">{{ modeNote }}</span>
+                <div role="radiogroup" aria-label="Mod" style="display:flex;gap:6px"><sc-for list="{{ modes }}" as="m" hint-placeholder-count="4"><button role="radio" aria-checked="{{ m.on }}" onClick="{{ m.pick }}" style="cursor:pointer;flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:999px;border:1px {{ m.bs }} {{ m.border }};background:{{ m.bg }};color:{{ m.c }};font-size:13px;font-weight:600;padding:0 4px"><i class="ph {{ m.icon }}" style="animation:{{ m.anim }}"></i>{{ m.label }}</button></sc-for></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ actions }}" as="a" hint-placeholder-count="6"><button onClick="{{ a.run }}" style="cursor:pointer;background:{{ a.bg }};border:1px solid {{ a.border }};border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;min-height:88px;justify-content:center;color:var(--kd-ink)" style-active="transform:scale(.97)"><i class="ph {{ a.icon }}" style="font-size:22px;color:{{ a.ic }};animation:{{ a.anim }}"></i><span style="font-size:12px;font-weight:600;line-height:1.25;color:{{ a.lc }}">{{ a.label }}</span><sc-if value="{{ a.sub }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;line-height:1.25;color:{{ a.sc }}">{{ a.sub }}</span></sc-if></button></sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px"><span style="font-size:16px;font-weight:600">Bekleyen talepler</span><button onClick="{{ goReq }}" style="cursor:pointer;border:0;background:transparent;font-size:13px;font-weight:600;color:var(--kd-p-text);padding:8px 0">Tümü</button></div>
+            <sc-for list="{{ openReqs }}" as="r" hint-placeholder-count="2">
+              <button onClick="{{ r.open }}" style="cursor:pointer;text-align:left;background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center;color:var(--kd-ink)" style-active="background:var(--kd-bg)">
+                <div style="width:40px;height:40px;border-radius:12px;background:{{ r.bg }};color:{{ r.c }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ r.icon }}" style="font-size:20px"></i></div>
+                <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><span style="font-size:14px;font-weight:600">{{ r.title }}</span><span style="font-size:13px;color:var(--kd-ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">“{{ r.reason }}”</span></div>
+                <span style="font-size:11px;color:var(--kd-ink3);white-space:nowrap">{{ r.ago }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noOpen }}" hint-placeholder-val="{{ false }}"><div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:16px;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--kd-ink2)"><i class="ph ph-check-circle" style="font-size:20px;color:var(--kd-ok-text)"></i>Bekleyen talep yok</div></sc-if>
+          </sc-if>
+          <sc-if value="{{ noDevice }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+              <div style="width:56px;height:56px;border-radius:16px;background:var(--kd-p-tint);color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph ph-desktop" style="font-size:28px"></i></div>
+              <span style="font-size:17px;font-weight:600">{{ noDeviceTitle }}</span>
+              <span style="font-size:14px;line-height:1.5;color:var(--kd-ink2)">Bilgisayara Kindora'yı kurup ekrandaki kodu girin.</span>
+              <button onClick="{{ openPair }}" style="cursor:pointer;height:48px;padding:0 22px;border:0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px"><i class="ph ph-plus"></i>Cihaz eşleştir</button>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ isReq }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:4px;background:var(--kd-neutral-tint);border-radius:999px;padding:4px"><sc-for list="{{ reqSegs }}" as="g" hint-placeholder-count="2"><button onClick="{{ g.pick }}" style="cursor:pointer;flex:1;height:40px;border:0;border-radius:999px;background:{{ g.bg }};color:{{ g.c }};font-size:14px;font-weight:600;box-shadow:{{ g.sh }}">{{ g.label }}</button></sc-for></div>
+          <sc-if value="{{ reqOpenTab }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ openReqs }}" as="r" hint-placeholder-count="2">
+              <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:12px;background:{{ r.bg }};color:{{ r.c }};display:flex;align-items:center;justify-content:center"><i class="ph {{ r.icon }}" style="font-size:20px"></i></div><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:15px;font-weight:600">{{ r.title }}</span><span style="font-size:12px;color:var(--kd-ink3)">Ela · {{ r.ago }}</span></div></div>
+                <span style="font-size:14px;line-height:1.5;background:var(--kd-bg);border-radius:12px;padding:10px 12px">“{{ r.reason }}”</span>
+                <div style="display:flex;gap:8px"><button onClick="{{ r.quickReject }}" style="cursor:pointer;flex:1;height:44px;border-radius:999px;border:1px solid var(--kd-line-strong);background:var(--kd-surface);color:var(--kd-ink);font-size:14px;font-weight:600">Reddet</button><button onClick="{{ r.open }}" style="cursor:pointer;flex:1.4;height:44px;border-radius:999px;border:0;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600">Yanıtla</button></div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noOpen }}" hint-placeholder-val="{{ false }}"><div style="padding:48px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:var(--kd-ok-tint);color:var(--kd-ok-text);display:flex;align-items:center;justify-content:center"><i class="ph ph-check" style="font-size:26px"></i></div><span style="font-size:16px;font-weight:600">Bekleyen talep yok</span><span style="font-size:13px;color:var(--kd-ink3)">Yeni istek geldiğinde bildirim alırsınız.</span></div></sc-if>
+          </sc-if>
+          <sc-if value="{{ reqHistTab }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:4px 16px">
+              <sc-for list="{{ hist }}" as="h" hint-placeholder-count="4"><div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid {{ h.line }}"><div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><span style="font-size:14px;font-weight:600">{{ h.title }}</span><span style="font-size:13px;color:var(--kd-ink2);line-height:1.4">“{{ h.reason }}”</span><sc-if value="{{ h.note }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--kd-ink3)">Notunuz: {{ h.note }}</span></sc-if><span style="font-size:12px;color:var(--kd-ink3)">{{ h.when }}</span></div><span style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;background:{{ h.bg }};color:{{ h.c }};font-size:11px;font-weight:600;white-space:nowrap"><i class="ph {{ h.icon }}"></i>{{ h.res }}</span></div></sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ isTime }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ limits }}" as="l" hint-placeholder-count="2">
+            <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:10px">
+              <div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:13px;color:var(--kd-ink3)">{{ l.k }}</span><span style="font-size:22px;font-weight:700">{{ l.v }}</span></div>
+              <button onClick="{{ l.minus }}" aria-label="15 dk azalt" style="cursor:pointer;width:48px;height:48px;border-radius:999px;border:1px solid var(--kd-line);background:var(--kd-surface);color:var(--kd-ink);display:flex;align-items:center;justify-content:center" style-active="background:var(--kd-neutral-tint)"><i class="ph ph-minus" style="font-size:18px"></i></button>
+              <button onClick="{{ l.plus }}" aria-label="15 dk artır" style="cursor:pointer;width:48px;height:48px;border-radius:999px;border:1px solid var(--kd-line);background:var(--kd-surface);color:var(--kd-ink);display:flex;align-items:center;justify-content:center" style-active="background:var(--kd-neutral-tint)"><i class="ph ph-plus" style="font-size:18px"></i></button>
+            </div>
+          </sc-for>
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:15px;font-weight:600">Mola sıklığı</span>
+            <div style="display:flex;gap:6px"><sc-for list="{{ brOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="cursor:pointer;flex:1;height:44px;border-radius:999px;border:1.5px solid {{ o.border }};background:{{ o.bg }};color:{{ o.c }};display:flex;align-items:center;justify-content:center;gap:4px;font-size:14px;font-weight:600"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check"></i></sc-if>{{ o.label }}</button></sc-for></div>
+            <span style="font-size:13px;color:var(--kd-ink2)">{{ brText }}</span>
+          </div>
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:15px;font-weight:600">Bugün için ek süre</span>
+            <div style="display:flex;gap:6px"><sc-for list="{{ extraOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.run }}" style="cursor:pointer;flex:1;height:44px;border-radius:999px;border:1px solid var(--kd-line);background:var(--kd-surface);color:var(--kd-p-text);font-size:14px;font-weight:600" style-active="background:var(--kd-p-tint)">{{ o.label }}</button></sc-for></div>
+            <span style="font-size:12px;color:var(--kd-ink3)">Yalnızca bugüne eklenir. Şu anki limit: {{ todayLimit }}</span>
+          </div>
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:15px;font-weight:600">Bugünün programı</span>
+            <sc-for list="{{ today }}" as="b" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;min-height:28px"><span style="width:4px;align-self:stretch;border-radius:999px;background:{{ b.c }}"></span><span style="font-size:13px;color:var(--kd-ink3);width:96px;font-variant-numeric:tabular-nums">{{ b.t }}</span><span style="font-size:14px;font-weight:500;flex:1">{{ b.l }}</span><sc-if value="{{ b.now }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;color:var(--kd-p-text);background:var(--kd-p-tint);padding:2px 8px;border-radius:999px">Şimdi</span></sc-if></div></sc-for>
+          </div>
+          <sc-if value="{{ tDirty }}" hint-placeholder-val="{{ false }}">
+            <div style="position:sticky;bottom:0;background:var(--kd-inverse);color:#FFFFFF;border-radius:16px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:8px;animation:kd-pop .2s ease-out"><span style="flex:1;font-size:13px">Kaydedilmemiş değişiklik</span><button onClick="{{ tDiscard }}" style="cursor:pointer;height:40px;padding:0 12px;border:0;background:transparent;color:#C9D0FF;font-size:14px;font-weight:600">Vazgeç</button><button onClick="{{ tSave }}" style="cursor:pointer;height:40px;padding:0 16px;border:0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600">Kaydet</button></div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ isWeb }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px"><sc-for list="{{ webTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" style="cursor:pointer;flex-shrink:0;height:40px;padding:0 14px;border-radius:999px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.c }};display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600">{{ t.l }}<span style="font-weight:500;opacity:.8">{{ t.n }}</span></button></sc-for></div>
+          <div style="display:flex;gap:10px;padding:12px;border-radius:14px;background:var(--kd-p-tint);font-size:13px;line-height:1.45;color:var(--kd-info-text)"><i class="ph ph-info" style="margin-top:2px"></i><span>Kurallar alan adı düzeyinde. youtube.com engellenince tüm sayfaları engellenir.</span></div>
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;overflow:hidden">
+            <sc-for list="{{ siteRows }}" as="x" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:10px 6px 10px 14px;min-height:64px;border-top:1px solid {{ x.line }}"><span style="width:36px;height:36px;border-radius:10px;background:{{ x.bg }};color:{{ x.c }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">{{ x.letter }}</span><div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><span style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis">{{ x.d }}</span><span style="font-size:13px;color:var(--kd-ink3)">{{ x.w }}</span></div><button onClick="{{ x.menu }}" aria-label="Seçenekler" style="cursor:pointer;width:48px;height:48px;border:0;border-radius:999px;background:transparent;color:var(--kd-ink3);display:flex;align-items:center;justify-content:center" style-active="background:var(--kd-neutral-tint)"><i class="ph ph-dots-three-vertical" style="font-size:20px"></i></button></div></sc-for>
+            <sc-if value="{{ siteEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:28px 16px;text-align:center;font-size:14px;color:var(--kd-ink3)">Bu listede site yok</div></sc-if>
+          </div>
+          <div style="height:64px"></div>
+        </sc-if>
+
+        <sc-if value="{{ isMore }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;overflow:hidden">
+            <sc-for list="{{ moreItems }}" as="i" hint-placeholder-count="5"><button onClick="{{ i.go }}" style="cursor:pointer;width:100%;border:0;border-top:1px solid {{ i.line }};background:var(--kd-surface);display:flex;align-items:center;gap:14px;padding:0 16px;min-height:60px;text-align:left;color:var(--kd-ink)" style-active="background:var(--kd-bg)"><i class="ph {{ i.icon }}" style="font-size:22px;color:#5265D8"></i><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:15px;font-weight:500">{{ i.l }}</span><span style="font-size:12px;color:var(--kd-ink3)">{{ i.s }}</span></span><i class="ph ph-caret-right" style="color:var(--kd-ink3)"></i></button></sc-for>
+          </div>
+          <span style="font-size:12px;color:var(--kd-ink3);text-align:center;line-height:1.5">Kindora yalnızca süre, kategori ve site kurallarını işler.<br>Ekran görüntüsü, tuş kaydı veya mesaj içeriği yoktur.</span>
+        </sc-if>
+
+        <sc-if value="{{ isReport }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--kd-ink3)">{{ k.k }}</span><span style="font-size:20px;font-weight:700">{{ k.v }}</span><span style="font-size:12px;color:{{ k.dc }}">{{ k.d }}</span></div></sc-for>
+          </div>
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:15px;font-weight:600">Günlük kullanım</span>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end">
+              <sc-for list="{{ bars }}" as="b" hint-placeholder-count="7"><button onClick="{{ b.pick }}" aria-label="{{ b.aria }}" style="cursor:pointer;border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;max-width:30px;height:130px;display:flex;flex-direction:column-reverse;gap:2px;opacity:{{ b.op }}"><div style="height:{{ b.e }};background:#2BBFA7;border-radius:0 0 5px 5px"></div><div style="height:{{ b.g }};background:#8C80E8"></div><div style="height:{{ b.o }};background:var(--kd-muted);border-radius:5px 5px 0 0"></div></div><span style="font-size:11px;color:{{ b.dc }};font-weight:{{ b.dw }}">{{ b.d }}</span></button></sc-for>
+            </div>
+            <div style="background:var(--kd-bg);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:600">{{ dayLabel }}</span><span style="color:var(--kd-ink2)">{{ dayDetail }}</span></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isActivity }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:4px 16px">
+            <sc-for list="{{ events }}" as="e" hint-placeholder-count="6"><div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid {{ e.line }}"><span style="width:34px;height:34px;border-radius:10px;background:{{ e.bg }};color:{{ e.c }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ e.icon }}"></i></span><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:14px;line-height:1.4">{{ e.t }}</span><span style="font-size:12px;color:var(--kd-ink3)">{{ e.when }}</span></div></div></sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDevices }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px;border-radius:12px;background:var(--kd-p-tint);color:#5265D8;display:flex;align-items:center;justify-content:center"><i class="ph ph-desktop" style="font-size:22px"></i></div><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:16px;font-weight:600">ELA-PC</span><span style="font-size:13px;color:var(--kd-ink3)">Windows 11 · Kindora 0.9.2</span></div><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:{{ stBg }};color:{{ stC }};font-size:12px;font-weight:600"><i class="ph {{ stIcon }}" style="font-size:11px"></i>{{ stShort }}</span></div>
+            <sc-for list="{{ devInfo }}" as="d" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;border-top:1px solid var(--kd-surface-2)"><span style="color:var(--kd-ink2)">{{ d.k }}</span><span style="font-weight:500">{{ d.v }}</span></div></sc-for>
+            <button onClick="{{ ping }}" style="cursor:pointer;height:48px;border-radius:999px;border:1px solid var(--kd-line-strong);background:var(--kd-surface);color:var(--kd-ink);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><i class="ph {{ pingIcon }}" style="animation:{{ pingAnim }}"></i>{{ pingLabel }}</button>
+          </div>
+          <button onClick="{{ openPair }}" style="cursor:pointer;height:56px;border-radius:16px;border:1.5px dashed var(--kd-muted);background:transparent;color:var(--kd-p-text);font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><i class="ph ph-plus"></i>Başka bir bilgisayar ekle</button>
+        </sc-if>
+
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px"><span style="font-size:15px;font-weight:500">Tema</span><div style="display:flex;gap:4px;background:var(--kd-neutral-tint);border-radius:999px;padding:4px"><sc-for list="{{ themeSegs }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="cursor:pointer;flex:1;height:40px;border:0;border-radius:999px;background:{{ o.bg }};color:{{ o.c }};box-shadow:{{ o.sh }};font-size:14px;font-weight:600">{{ o.l }}</button></sc-for></div><span style="font-size:12px;color:var(--kd-ink3)">Sistem: telefonun açık/koyu ayarını izler.</span></div>
+          <div style="background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;overflow:hidden">
+            <sc-for list="{{ setRows }}" as="r" hint-placeholder-count="5"><button onClick="{{ r.run }}" role="switch" aria-checked="{{ r.aria }}" style="cursor:pointer;width:100%;border:0;border-top:1px solid {{ r.line }};background:var(--kd-surface);display:flex;align-items:center;gap:14px;padding:12px 16px;min-height:64px;text-align:left;color:var(--kd-ink)"><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:500">{{ r.l }}</span><span style="font-size:12px;color:var(--kd-ink3);line-height:1.4">{{ r.s }}</span></span><span style="width:52px;height:32px;border-radius:999px;background:{{ r.bg }};padding:4px;display:flex;justify-content:{{ r.j }};flex-shrink:0;transition:background .15s"><span style="width:24px;height:24px;border-radius:999px;background:var(--kd-surface);box-shadow:0 1px 2px rgba(0,0,0,.2)"></span></span></button></sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isRule }}" hint-placeholder-val="{{ false }}">
+          <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:600">Alan adı</span><input value="{{ rDomain }}" onChange="{{ rSetDomain }}" placeholder="ornek.com" autocapitalize="off" style="height:52px;font-size:16px;padding:0 14px;border:1px solid {{ rBorder }};border-radius:12px;color:var(--kd-ink);background:var(--kd-surface)">
+            <sc-if value="{{ rWarn }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--kd-warn-text);line-height:1.45;display:flex;gap:6px"><i class="ph ph-info" style="margin-top:2px"></i>{{ rWarn }}</span></sc-if>
+            <sc-if value="{{ rErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--kd-err-text);display:flex;gap:6px"><i class="ph ph-warning-circle" style="margin-top:2px"></i>{{ rErr }}</span></sc-if>
+          </label>
+          <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Kural</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><sc-for list="{{ rKinds }}" as="k" hint-placeholder-count="4"><button onClick="{{ k.pick }}" style="cursor:pointer;height:52px;border-radius:14px;border:1.5px solid {{ k.border }};background:{{ k.bg }};color:{{ k.c }};font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;padding:0 12px;text-align:left"><i class="ph {{ k.icon }}" style="font-size:18px"></i>{{ k.l }}</button></sc-for></div></div>
+          <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">{{ rWhenLabel }}</span><div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ rWhens }}" as="w" hint-placeholder-count="3"><button onClick="{{ w.pick }}" style="cursor:pointer;min-height:48px;border-radius:12px;border:1.5px solid {{ w.border }};background:{{ w.bg }};color:{{ w.c }};font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between;padding:0 14px">{{ w.l }}<sc-if value="{{ w.on }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check"></i></sc-if></button></sc-for></div></div>
+          <div style="display:flex;gap:10px;background:var(--kd-p-tint);border-radius:12px;padding:12px;font-size:13px;line-height:1.5;color:var(--kd-info-text)"><i class="ph ph-eye" style="margin-top:2px"></i><span>{{ rPreview }}</span></div>
+          <button onClick="{{ rSave }}" aria-disabled="{{ rDis }}" style="cursor:{{ rCursor }};height:52px;border:0;border-radius:999px;background:{{ rBg }};color:#FFFFFF;font-size:15px;font-weight:600">{{ rSaveLabel }}</button>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ showFab }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ newRule }}" style="cursor:pointer;position:absolute;right:16px;bottom:96px;height:56px;padding:0 20px;border:0;border-radius:16px;background:#5265D8;color:#FFFFFF;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;box-shadow:0 6px 16px rgba(82,101,216,.35);z-index:3" style-active="background:#3F50B8"><i class="ph ph-plus" style="font-size:20px"></i>Kural ekle</button>
+      </sc-if>
+
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <nav style="height:80px;flex-shrink:0;background:var(--kd-surface);border-top:1px solid var(--kd-line);display:grid;grid-template-columns:repeat(5,1fr)">
+          <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5"><button onClick="{{ n.go }}" aria-current="{{ n.cur }}" style="cursor:pointer;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:{{ n.c }}"><span style="width:60px;height:32px;border-radius:999px;background:{{ n.pill }};display:flex;align-items:center;justify-content:center;position:relative;transition:background .15s"><i class="{{ n.icon }}" style="font-size:21px"></i><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-2px;right:10px;min-width:16px;height:16px;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ n.badge }}</span></sc-if></span><span style="font-size:11px;font-weight:{{ n.w }}">{{ n.label }}</span></button></sc-for>
+        </nav>
+      </sc-if>
+
+      <sc-if value="{{ snack }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="position:absolute;left:12px;right:12px;bottom:{{ snackBottom }};z-index:6;background:var(--kd-inverse);color:#FFFFFF;border-radius:12px;padding:6px 6px 6px 16px;min-height:52px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(17,24,39,.3);animation:kd-pop .18s ease-out">
+          <i class="ph {{ snackIcon }}" style="font-size:18px;color:{{ snackIconC }};animation:{{ snackAnim }}"></i><span style="flex:1;font-size:14px;line-height:1.4">{{ snack }}</span>
+          <sc-if value="{{ snackAction }}" hint-placeholder-val="{{ false }}"><button onClick="{{ snackRun }}" style="cursor:pointer;height:40px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#C9D0FF;font-size:14px;font-weight:600">{{ snackAction }}</button></sc-if>
+          <sc-if value="{{ snackSticky }}" hint-placeholder-val="{{ false }}"><button onClick="{{ snackClose }}" aria-label="Kapat" style="cursor:pointer;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:#FFFFFF;display:flex;align-items:center;justify-content:center"><i class="ph ph-x"></i></button></sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ push }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:8px;right:8px;top:6px;z-index:8;background:var(--kd-surface);border-radius:22px;padding:12px 14px;box-shadow:0 10px 30px rgba(17,24,39,.25);display:flex;flex-direction:column;gap:8px;animation:kd-down .25s ease-out">
+          <button onClick="{{ pushOpen }}" style="cursor:pointer;border:0;background:transparent;padding:0;text-align:left;display:flex;flex-direction:column;gap:4px;color:var(--kd-ink)">
+            <span style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--kd-ink3)"><span style="width:18px;height:18px;border-radius:5px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoXs }}</span>Kindora · şimdi</span>
+            <span style="font-size:15px;font-weight:600">{{ pushTitle }}</span><span style="font-size:13px;color:var(--kd-ink2);line-height:1.4">“{{ pushReason }}”</span>
+          </button>
+          <div style="display:flex;gap:8px"><button onClick="{{ pushApprove }}" style="cursor:pointer;flex:1;height:40px;border:0;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:13px;font-weight:600">{{ pushApproveLabel }}</button><button onClick="{{ pushOpen }}" style="cursor:pointer;flex:1;height:40px;border:0;border-radius:999px;background:var(--kd-neutral-tint);color:var(--kd-ink);font-size:13px;font-weight:600">Yanıtla</button><button onClick="{{ pushDismiss }}" aria-label="Kapat" style="cursor:pointer;width:40px;height:40px;border:0;border-radius:999px;background:transparent;color:var(--kd-ink3)"><i class="ph ph-x"></i></button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sheet }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(17,24,39,.42);animation:kd-fade .2s"></div>
+          <div role="dialog" aria-modal="true" style="position:relative;background:var(--kd-surface);border-radius:28px 28px 0 0;padding:10px 20px 24px;display:flex;flex-direction:column;gap:16px;animation:kd-up .25s cubic-bezier(.2,.8,.2,1);max-height:90%;overflow-y:auto">
+            <span style="align-self:center;width:32px;height:4px;border-radius:999px;background:var(--kd-muted)"></span>
+
+            <sc-if value="{{ sReq }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:12px;align-items:center"><div style="width:44px;height:44px;border-radius:12px;background:{{ sr.bg }};color:{{ sr.c }};display:flex;align-items:center;justify-content:center"><i class="ph {{ sr.icon }}" style="font-size:22px"></i></div><div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:18px;font-weight:600">{{ sr.title }}</span><span style="font-size:13px;color:var(--kd-ink3)">Ela · {{ sr.ago }} · {{ leftText }} kaldı</span></div></div>
+              <div style="background:var(--kd-bg);border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.5">“{{ sr.reason }}”</div>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">{{ sr.durLabel }}</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ sr.opts }}" as="d" hint-placeholder-count="3"><button onClick="{{ d.pick }}" style="cursor:pointer;flex:1;min-width:64px;height:44px;border-radius:12px;border:1.5px solid {{ d.border }};background:{{ d.bg }};color:{{ d.c }};font-size:14px;font-weight:600">{{ d.l }}</button></sc-for></div><sc-if value="{{ sr.hint }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:var(--kd-ink3)">{{ sr.hint }}</span></sc-if></div>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:600">Ela'ya not <span style="font-weight:400;color:var(--kd-ink3)">· isteğe bağlı</span></span>
+                <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px"><sc-for list="{{ notes }}" as="n" hint-placeholder-count="3"><button onClick="{{ n.pick }}" style="cursor:pointer;flex-shrink:0;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--kd-line);background:var(--kd-surface);font-size:13px;color:var(--kd-ink2)">{{ n.t }}</button></sc-for></div>
+                <input value="{{ sr.note }}" onChange="{{ sr.setNote }}" placeholder="Kısa ve nazik bir not" style="height:48px;border-radius:12px;border:1px solid var(--kd-line-strong);padding:0 14px;font-size:15px;color:var(--kd-ink);background:var(--kd-surface)">
+              </div>
+              <div style="display:flex;gap:10px"><button onClick="{{ sr.reject }}" style="cursor:pointer;flex:1;height:52px;border-radius:999px;border:1px solid var(--kd-line-strong);background:var(--kd-surface);color:var(--kd-ink);font-size:15px;font-weight:600">Reddet</button><button onClick="{{ sr.approve }}" style="cursor:pointer;flex:1.4;height:52px;border-radius:999px;border:0;background:#5265D8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:6px;font-size:15px;font-weight:600"><i class="ph ph-check"></i>{{ sr.approveLabel }}</button></div>
+              <span style="font-size:12px;color:var(--kd-ink3);text-align:center">{{ sr.foot }}</span>
+            </sc-if>
+
+            <sc-if value="{{ sConfirm }}" hint-placeholder-val="{{ false }}">
+              <div style="width:48px;height:48px;border-radius:14px;background:{{ cf.ibg }};color:{{ cf.ic }};display:flex;align-items:center;justify-content:center"><i class="ph {{ cf.icon }}" style="font-size:24px"></i></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:20px;font-weight:600">{{ cf.title }}</span><span style="font-size:15px;line-height:1.5;color:var(--kd-ink2)">{{ cf.body }}</span></div>
+              <div style="display:flex;gap:10px"><button onClick="{{ closeSheet }}" style="cursor:pointer;flex:1;height:52px;border-radius:999px;border:1px solid var(--kd-line-strong);background:var(--kd-surface);color:var(--kd-ink);font-size:15px;font-weight:600">Vazgeç</button><button onClick="{{ cf.run }}" style="cursor:pointer;flex:1.4;height:52px;border-radius:999px;border:0;background:{{ cf.bg }};color:#FFFFFF;font-size:15px;font-weight:600">{{ cf.cta }}</button></div>
+            </sc-if>
+
+            <sc-if value="{{ sChild }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:18px;font-weight:600">Çocuk seç</span>
+              <sc-for list="{{ kids }}" as="k" hint-placeholder-count="2"><button onClick="{{ k.pick }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;min-height:60px;padding:0 12px;border-radius:14px;border:1.5px solid {{ k.border }};background:{{ k.bg }};color:var(--kd-ink);text-align:left"><span style="width:40px;height:40px;border-radius:999px;background:{{ k.avBg }};color:{{ k.avC }};display:flex;align-items:center;justify-content:center;font-weight:700">{{ k.i }}</span><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font-size:15px;font-weight:600">{{ k.n }}</span><span style="font-size:12px;color:var(--kd-ink3)">{{ k.s }}</span></span><sc-if value="{{ k.on }}" hint-placeholder-val="{{ false }}"><i class="ph ph-check" style="font-size:20px;color:var(--kd-p-text)"></i></sc-if></button></sc-for>
+            </sc-if>
+
+            <sc-if value="{{ sSite }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:18px;font-weight:600">{{ smDomain }}</span>
+              <button onClick="{{ smEdit }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;min-height:56px;padding:0 4px;border:0;background:transparent;color:var(--kd-ink);font-size:15px;text-align:left"><i class="ph ph-pencil-simple" style="font-size:22px;color:var(--kd-ink2)"></i>Kuralı düzenle</button>
+              <button onClick="{{ smRemove }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;min-height:56px;padding:0 4px;border:0;background:transparent;color:var(--kd-err-text);font-size:15px;text-align:left"><i class="ph ph-trash" style="font-size:22px"></i>Kuralı kaldır</button>
+            </sc-if>
+
+            <sc-if value="{{ sPair }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:18px;font-weight:600">Cihaz eşleştir</span>
+              <span style="font-size:14px;line-height:1.5;color:var(--kd-ink2)">Bilgisayarda kindora.app/indir adresinden Kindora'yı kurun ve bu kodu girin.</span>
+              <div style="display:flex;gap:6px;justify-content:center"><sc-for list="{{ code }}" as="g" hint-placeholder-count="7"><span style="width:{{ g.w }};height:56px;border-radius:10px;background:{{ g.bg }};display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700">{{ g.v }}</span></sc-for></div>
+              <span style="align-self:center;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--kd-warn-tint);color:var(--kd-warn-text);font-size:13px;font-weight:600"><i class="ph ph-circle-notch" style="animation:kd-spin 1s linear infinite"></i>Cihaz bekleniyor · 9:42</span>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </x-import>
+
+  <aside style="width:300px;background:var(--kd-surface);border:1px solid var(--kd-line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:16px;font-weight:600">Demo kontrolleri</span><span style="font-size:13px;line-height:1.5;color:var(--kd-ink2)">Flutter ile iOS ve Android'de aynı görünüm. Telefonda her şey tıklanabilir; bu panel yalnızca cihaz yanıtlarını simüle eder.</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--kd-ink3)">ELA-PC bağlantısı</span><div style="display:flex;gap:4px;background:var(--kd-surface-2);border-radius:10px;padding:4px"><sc-for list="{{ connOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" style="cursor:pointer;flex:1;height:36px;border:0;border-radius:7px;background:{{ o.bg }};color:{{ o.c }};box-shadow:{{ o.sh }};font-size:13px;font-weight:600">{{ o.l }}</button></sc-for></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--kd-ink3)">Kilit sonucu</span><div style="display:flex;gap:4px;background:var(--kd-surface-2);border-radius:10px;padding:4px"><sc-for list="{{ lockOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" style="cursor:pointer;flex:1;height:36px;border:0;border-radius:7px;background:{{ o.bg }};color:{{ o.c }};box-shadow:{{ o.sh }};font-size:13px;font-weight:600">{{ o.l }}</button></sc-for></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5D6680">Tema</span><div style="display:flex;gap:4px;background:#F1F3F9;border-radius:10px;padding:4px"><sc-for list="{{ themeOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="cursor:pointer;flex:1;height:36px;border:0;border-radius:7px;background:{{ o.bg }};color:{{ o.c }};box-shadow:{{ o.sh }};font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph {{ o.icon }}"></i>{{ o.l }}</button></sc-for></div></div>
+    <button onClick="{{ sendPush }}" style="cursor:pointer;height:44px;border:0;border-radius:10px;background:#5265D8;color:#FFFFFF;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px" style-hover="background:#3F50B8"><i class="ph ph-bell-ringing"></i>Yeni talep bildirimi gönder</button>
+    <button onClick="{{ reset }}" style="cursor:pointer;height:40px;border:1px solid var(--kd-line);border-radius:10px;background:var(--kd-surface);color:var(--kd-ink);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph ph-arrow-counter-clockwise"></i>Prototipi sıfırla</button>
+    <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--kd-line);padding-top:16px">
+      <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--kd-ink3)">Denenecek akışlar</span>
+      <sc-for list="{{ tryList }}" as="t" hint-placeholder-count="6"><div style="display:flex;gap:8px;font-size:13px;line-height:1.45;color:var(--kd-ink)"><i class="ph ph-arrow-right" style="color:#5265D8;margin-top:3px"></i><span>{{ t }}</span></div></sc-for>
+    </div>
+    <a href="Kindora Mobile Parent - Flutter.dc.html" style="font-size:13px;font-weight:600">Tüm ekranlar (statik pano) →</a>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#FFFFFF' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+const fmt = m => (m >= 60 ? `${Math.floor(m / 60)} sa${m % 60 ? ' ' + (m % 60) + ' dk' : ''}` : `${m} dk`);
+const TIME_OPTS = [10, 20, 30], SITE_OPTS = ['30 dk', '1 saat', 'Bugün', 'Her zaman'];
+const REQS = () => [
+  { id: 'a', type: 'time', title: '20 dakika ek süre', reason: 'Minecraft\'ta yaptığım evi bitirmek istiyorum.', ago: '4 dk önce', dur: 20, note: '', status: 'open' },
+  { id: 'b', type: 'site', title: 'scratch.mit.edu', reason: 'Okul ödevi için oyun yapacağız.', ago: '12 dk önce', dur: '1 saat', note: '', status: 'open' }
+];
+const HIST = [
+  { title: '15 dk ek süre', reason: 'Bölümün sonuna geldim.', ok: true, note: '', when: 'Dün 19:40' },
+  { title: 'youtube.com · 30 dk', reason: 'Fen ödevi için deney videosu izleyeceğim.', ok: true, note: 'Ödev bitince kapatalım.', when: 'Dün 17:05' },
+  { title: '30 dk ek süre', reason: 'Arkadaşlarımla oyundayız.', ok: false, note: 'Uyku saati geldi, yarın devam edersin.', when: '18 Ekim 21:10' }
+];
+const SITES = () => [
+  { d: 'tiktok.com', kind: 'block', w: 'Her zaman' }, { d: 'twitch.tv', kind: 'block', w: 'Her zaman' }, { d: 'youtube.com', kind: 'block', w: 'Hafta içi okul saatleri' }, { d: 'roblox.com', kind: 'block', w: 'Hafta içi' },
+  { d: 'khanacademy.org', kind: 'allow', w: 'Her zaman' }, { d: 'wikipedia.org', kind: 'allow', w: 'Her zaman' },
+  { d: 'eba.gov.tr', kind: 'study', w: 'Ders modunda' }, { d: 'sozluk.gov.tr', kind: 'study', w: 'Ders modunda' },
+  { d: 'minecraft.net', kind: 'temp', w: 'Bugün 18:00\'e kadar' }
+];
+const KIND = { block: ['Engelli', 'var(--kd-err-tint)', 'var(--kd-err-text)', 'ph-prohibit'], allow: ['İzinli', 'var(--kd-ok-tint)', 'var(--kd-ok-text)', 'ph-check-circle'], study: ['Ders', 'var(--kd-p-tint)', 'var(--kd-p-text)', 'ph-book-open'], temp: ['Geçici', 'var(--kd-warn-tint)', 'var(--kd-warn-text)', 'ph-timer'] };
+const INIT = () => ({ tab: 'home', route: null, sheet: null, snack: null, push: null, child: 'ela', online: true, lockFail: false,
+  mode: 'Serbest', pendingMode: null, lock: 'idle', extra: 0, reqs: REQS(), hist: HIST.slice(), reqSeg: 'open', pushN: 0,
+  lim: { wd: 150, we: 180 }, savedLim: { wd: 150, we: 180 }, br: 45, savedBr: 45, sites: SITES(), siteTab: 'block', rule: null, day: 1, ping: 'idle',
+  themePref: 'light', set: { push: true, bio: true, lockRes: true, offline: true, weekly: false } });
+
+class Component extends DCLogic {
+  state = INIT();
+  timers = [];
+  componentWillUnmount() { this.timers.forEach(clearTimeout); clearTimeout(this._st); }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  snack(text, kind, action) {
+    clearTimeout(this._st);
+    this.setState({ snack: { text, kind: kind || 'info', action } });
+    if (kind !== 'err' && kind !== 'wait') this._st = setTimeout(() => this.setState({ snack: null }), 4000);
+  }
+  send(label, okText, apply) {
+    if (!this.state.online) { this.snack(`${label} sıraya alındı · ELA-PC bağlanınca iletilecek`, 'info'); return; }
+    this.snack(`${label} gönderildi · cihaz onayı bekleniyor`, 'wait');
+    this.later(() => { apply && apply(); this.snack(okText, 'ok'); }, 1700);
+  }
+  doLock() {
+    const s = this.state;
+    this.setState({ sheet: null });
+    if (!s.online) { this.setState({ lock: 'queued' }); return this.snack('Kilit sıraya alındı · cihaz bağlanınca uygulanacak'); }
+    this.setState({ lock: 'pending' }); this.snack('Kilit gönderildi · cihaz onayı bekleniyor', 'wait');
+    this.later(() => {
+      const fail = this.state.lockFail;
+      this.setState({ lock: fail ? 'failed' : 'done' });
+      if (fail) this.snack('ELA-PC yanıt vermedi · kilit uygulanmadı', 'err', { label: 'Tekrar dene', run: () => this.doLock() });
+      else this.snack('ELA-PC kilitlendi', 'ok');
+    }, 2400);
+  }
+  decide(id, ok) {
+    const s = this.state, r = s.reqs.find(x => x.id === id);
+    if (!r) return;
+    const durTxt = r.type === 'time' ? r.dur + ' dk' : r.dur;
+    this.setState(p => ({
+      sheet: null, push: p.push && p.push.id === id ? null : p.push,
+      reqs: p.reqs.map(x => (x.id === id ? Object.assign({}, x, { status: ok ? 'ok' : 'no' }) : x)),
+      hist: [{ title: r.type === 'time' ? `${durTxt} ek süre` : `${r.title} · ${durTxt}`, reason: r.reason, ok, note: r.note, when: 'Bugün 10:4' + (p.hist.length % 10) }].concat(p.hist),
+      extra: ok && r.type === 'time' && p.online ? p.extra + r.dur : p.extra,
+      sites: ok && r.type === 'site' ? p.sites.concat([{ d: r.title, kind: r.dur === 'Her zaman' ? 'allow' : 'temp', w: r.dur === 'Her zaman' ? 'Her zaman' : `${r.dur} · bugün` }]) : p.sites
+    }));
+    this.snack(ok ? (s.online ? `Onaylandı · ${durTxt} · Ela bilgilendirildi` : 'Onaylandı · ELA-PC bağlanınca uygulanacak') : 'Reddedildi · notunuz Ela\'ya iletildi', ok ? 'ok' : 'info');
+  }
+
+  renderVals() {
+    const s = this.state;
+    const ela = s.child === 'ela';
+    const route = s.route, tab = s.tab;
+    const limitToday = s.savedLim.wd + s.extra, used = 102, left = Math.max(0, limitToday - used);
+    const C = 2 * Math.PI * 37, pct = Math.round(used / limitToday * 100);
+    const chip = on => ({ border: on ? '#5265D8' : 'var(--kd-line)', bg: on ? 'var(--kd-p-tint)' : 'var(--kd-surface)', c: on ? 'var(--kd-p-text)' : 'var(--kd-ink)' });
+    const seg = on => ({ bg: on ? 'var(--kd-surface)' : 'transparent', c: on ? 'var(--kd-ink)' : 'var(--kd-ink3)', sh: on ? '0 1px 3px rgba(26,32,51,.12)' : 'none' });
+    const openReqs = s.reqs.filter(r => r.status === 'open');
+    const reqVis = r => ({ icon: r.type === 'time' ? 'ph-hourglass-medium' : 'ph-globe-simple', bg: r.type === 'time' ? 'var(--kd-sec-tint)' : 'var(--kd-p-tint)', c: r.type === 'time' ? 'var(--kd-sec-text)' : 'var(--kd-p-text)' });
+    const openSheetReq = id => () => this.setState({ sheet: { type: 'req', id }, push: null });
+    const titles = { home: ela ? 'Günaydın, Selin' : 'Can', req: 'Talepler', time: 'Ekran süresi', web: 'Siteler', more: 'Daha fazla' };
+    const subs = { home: 'Salı · Hafta içi planı', req: 'Ela\'nın istekleri', time: 'Ela · limitler ve program', web: 'Alan adı düzeyinde · tüm tarayıcılar', more: 'Selin Yılmaz' };
+    const RT = { report: ['Haftalık rapor', '13 – 19 Ekim · Ela'], activity: ['Etkinlik geçmişi', 'Komutlar, talepler, bağlantı'], devices: ['Cihazlar', 'Ela'], settings: ['Ayarlar', 'Bildirim ve güvenlik'], rule: [s.rule && s.rule.edit != null ? 'Kuralı düzenle' : 'Kural ekle', 'Siteler'] };
+
+    const st = s.online ? { l: 'Çevrimiçi · şimdi', short: 'Çevrimiçi', bg: 'var(--kd-ok-tint)', c: 'var(--kd-ok-text)', i: 'ph-circle' } : { l: 'Çevrimdışı · 2 sa önce', short: 'Çevrimdışı', bg: 'var(--kd-neutral-tint)', c: 'var(--kd-ink2)', i: 'ph-wifi-slash' };
+    const pickMode = label => {
+      if (label === s.mode || s.pendingMode) return;
+      this.setState({ pendingMode: label });
+      if (!s.online) return this.snack(`${label} modu sıraya alındı`);
+      this.later(() => { this.setState({ mode: label, pendingMode: null }); this.snack(`${label} modu aktif · ELA-PC onayladı`, 'ok'); }, 1600);
+    };
+    const L = {
+      idle: ['ph-lock-simple', 'Kilitle', null, '#5265D8', 'var(--kd-surface)', 'var(--kd-line)', 'var(--kd-ink)'],
+      pending: ['ph-hourglass-medium', 'Bekliyor', 'Cihaz yanıtı…', 'var(--kd-warn-text)', 'var(--kd-warn-tint)', 'var(--kd-warn-line)', 'var(--kd-warn-text)', 'kd-pulse 1.4s infinite'],
+      queued: ['ph-clock-countdown', 'Sırada', 'Bağlanınca', 'var(--kd-warn-text)', 'var(--kd-warn-tint)', 'var(--kd-warn-line)', 'var(--kd-warn-text)'],
+      done: ['ph-lock-key', 'Kilitli', 'Kilidi aç', 'var(--kd-ok-text)', 'var(--kd-ok-tint)', 'var(--kd-ok-line)', 'var(--kd-ok-text)'],
+      failed: ['ph-warning-circle', 'Kilitlenemedi', 'Tekrar dene', 'var(--kd-err-text)', 'var(--kd-err-tint)', 'var(--kd-err-line)', 'var(--kd-err-text)']
+    }[s.lock];
+    const lockRun = () => { if (s.lock === 'pending') return; if (s.lock === 'done') return this.setState({ sheet: { type: 'unlock' } }); this.setState({ sheet: { type: 'lock' } }); };
+    const off = !s.online;
+    const actions = [
+      { icon: L[0], label: L[1], sub: L[2], ic: L[3], bg: L[4], border: L[5], lc: L[6], sc: L[6], anim: L[7] || 'none', run: lockRun },
+      { icon: 'ph-coffee', label: 'Mola başlat', sub: off ? 'Sıraya alınır' : null, run: () => this.send('Mola', 'Mola başladı · Ela bilgilendirildi') },
+      { icon: 'ph-plus-circle', label: '+15 dk', sub: off ? 'Sıraya alınır' : null, run: () => this.send('+15 dk', '15 dk eklendi · ' + fmt(left + 15) + ' kaldı', () => this.setState(p => ({ extra: p.extra + 15 }))) },
+      { icon: 'ph-book-open', label: 'Ders modu', sub: off ? 'Sıraya alınır' : null, run: () => pickMode('Ders') },
+      { icon: 'ph-globe-simple', label: 'Siteler', run: () => this.setState({ tab: 'web', route: null }) },
+      { icon: 'ph-chart-bar', label: 'Rapor', run: () => this.setState({ tab: 'more', route: 'report' }) }
+    ].map(a => Object.assign({ ic: '#5265D8', bg: 'var(--kd-surface)', border: 'var(--kd-line)', lc: 'var(--kd-ink)', sc: 'var(--kd-ink3)', anim: 'none', sub: null }, a));
+
+    const cfMap = {
+      lock: { icon: 'ph-lock-simple', ibg: 'var(--kd-err-tint)', ic: 'var(--kd-err-text)', title: 'ELA-PC kilitlensin mi?', body: off ? 'Bilgisayar çevrimdışı. Kilit sıraya alınır ve cihaz bağlanınca, Ela\'ya 1 dk kaydetme süresi tanınarak uygulanır.' : 'Ela\'ya çalışmasını kaydetmesi için 1 dakika tanınır, sonra ekran kilitlenir. Kilidi buradan açabilirsiniz.', cta: off ? 'Sıraya al' : '1 dk sonra kilitle', bg: '#C9475A', run: () => this.doLock() },
+      unlock: { icon: 'ph-lock-open', ibg: 'var(--kd-p-tint)', ic: 'var(--kd-p-text)', title: 'Kilit açılsın mı?', body: `ELA-PC normal plana döner. Kalan süre: ${fmt(left)}.`, cta: 'Kilidi aç', bg: '#5265D8', run: () => { this.setState({ sheet: null, lock: 'idle' }); this.send('Kilit açma', 'ELA-PC kilidi açıldı'); } },
+      removeSite: { icon: 'ph-trash', ibg: 'var(--kd-err-tint)', ic: 'var(--kd-err-text)', title: `${s.sheet && s.sheet.idx != null && s.sites[s.sheet.idx] ? s.sites[s.sheet.idx].d : ''} kuralı kaldırılsın mı?`, body: 'Site bu listeden çıkar ve varsayılan davranışa döner.', cta: 'Kaldır', bg: '#C9475A', run: () => { const i = s.sheet.idx, d = s.sites[i].d; this.setState(p => ({ sheet: null, sites: p.sites.filter((_, j) => j !== i) })); this.send(d + ' kuralı kaldırma', d + ' kuralı kaldırıldı'); } }
+    };
+    const sh = s.sheet;
+    const cf = sh && cfMap[sh.type] ? cfMap[sh.type] : {};
+    const R = sh && sh.type === 'req' ? s.reqs.find(r => r.id === sh.id) : null;
+    const setR = patch => this.setState(p => ({ reqs: p.reqs.map(x => (x.id === R.id ? Object.assign({}, x, patch) : x)) }));
+    const sr = R ? Object.assign({ title: R.title, reason: R.reason, ago: R.ago, note: R.note }, reqVis(R), {
+      durLabel: R.type === 'time' ? 'Süre' : 'İzin süresi',
+      opts: (R.type === 'time' ? TIME_OPTS : SITE_OPTS).map(v => { const c = chip(R.dur === v); return { l: R.type === 'time' ? v + ' dk' : v, border: c.border, bg: c.bg, c: c.c, pick: () => setR({ dur: v }) }; }),
+      hint: R.type === 'site' ? '"Her zaman" seçilirse İzinliler listesine eklenir.' : null,
+      setNote: e => setR({ note: e.target.value }),
+      approve: () => this.decide(R.id, true), reject: () => this.decide(R.id, false),
+      approveLabel: (R.type === 'time' ? R.dur + ' dk' : R.dur) + ' onayla',
+      foot: off ? 'ELA-PC çevrimdışı · onay cihaz bağlanınca uygulanır' : 'Ela kararı ve notunu Filiz\'den görür.'
+    }) : {};
+
+    const r = s.rule;
+    let norm = '', warn = '', valid = false, dup = false;
+    if (r) {
+      const raw = r.domain.trim().toLowerCase();
+      norm = raw.replace(/^[a-z]+:\/\//, '').replace(/^www\./, '').split(/[\/?#]/)[0];
+      warn = raw && norm && raw.replace(/^www\./, '') !== norm ? `Yalnızca alan adı kaydedilir: kural tüm ${norm} için geçerli olur.` : '';
+      valid = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(norm);
+      dup = valid && s.sites.some((x, j) => x.d === norm && j !== r.edit);
+    }
+    const ok = valid && !dup;
+    const whens = r && r.kind === 'temp' ? ['30 dk', '1 saat', 'Bugün'] : r && r.kind === 'study' ? ['Ders modunda'] : ['Her zaman', 'Hafta içi okul saatleri', 'Hafta sonu'];
+    const verb = { block: 'engellenecek', allow: 'izinli olacak', study: 'ders modunda açık olacak', temp: 'geçici olarak açık olacak' };
+
+    const days = [[52, 40, 26], [47, 33, 22], [50, 25, 20], [55, 48, 27], [48, 60, 33], [60, 82, 33], [58, 70, 32]];
+    const DN = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'], DL = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+    const sel = days[s.day];
+    const tDirty = s.lim.wd !== s.savedLim.wd || s.lim.we !== s.savedLim.we || s.br !== s.savedBr;
+    const showNav = !route;
+    const showSnackHigh = (tab === 'web' && !route);
+    const kidsList = [{ id: 'ela', n: 'Ela', i: 'E', s: '10 yaş · ELA-PC', avBg: 'var(--kd-sec-tint)', avC: 'var(--kd-sec-text)' }, { id: 'can', n: 'Can', i: 'C', s: '8 yaş · cihaz yok', avBg: 'var(--kd-ok-tint)', avC: 'var(--kd-ok-text)' }];
+    const kid = kidsList.find(k => k.id === s.child);
+    const goMore = id => () => this.setState({ route: id });
+    const navDef = [['home', 'ph-house', 'Ana sayfa'], ['req', 'ph-hand-waving', 'Talepler'], ['time', 'ph-hourglass-medium', 'Süre'], ['web', 'ph-globe-simple', 'Siteler'], ['more', 'ph-dots-three-outline', 'Daha fazla']];
+    const SN = s.snack ? { ok: ['ph-check-circle', '#5FDCC6'], info: ['ph-info', '#8C9BFF'], wait: ['ph-circle-notch', '#F3C77A'], err: ['ph-warning-circle', '#F29AA6'] }[s.snack.kind] : ['', ''];
+
+    const sysDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = s.themePref === 'dark' || (s.themePref === 'system' && sysDark);
+    const tOpts = [['light', 'Açık', 'ph-sun'], ['dark', 'Koyu', 'ph-moon'], ['system', 'Sistem', 'ph-circle-half']];
+    return {
+      isDark, theme: isDark ? 'dark' : 'light',
+      themeOpts: tOpts.map(([id, l, icon]) => ({ l, icon, pick: () => this.setState({ themePref: id }), bg: s.themePref === id ? '#FFFFFF' : 'transparent', c: s.themePref === id ? '#1A2033' : '#5D6680', sh: s.themePref === id ? '0 1px 3px rgba(26,32,51,.12)' : 'none' })),
+      themeSegs: tOpts.map(([id, l]) => Object.assign({ l, pick: () => this.setState({ themePref: id }) }, seg(s.themePref === id))),
+      logoXs: logo(12),
+      hasBack: !!route, back: () => this.setState({ route: null, rule: null }),
+      title: route ? RT[route][0] : titles[tab], subtitle: route ? RT[route][1] : subs[tab],
+      showChild: !route && (tab === 'home' || tab === 'req' || tab === 'time'), openChild: () => this.setState({ sheet: { type: 'child' } }),
+      kidName: kid.n, kidI: kid.i, kidBg: kid.avBg, kidC: kid.avC,
+      isHome: !route && tab === 'home', isReq: !route && tab === 'req', isTime: !route && tab === 'time', isWeb: !route && tab === 'web', isMore: !route && tab === 'more',
+      isReport: route === 'report', isActivity: route === 'activity', isDevices: route === 'devices', isSettings: route === 'settings', isRule: route === 'rule',
+      offline: off && ela && !route && tab === 'home', hasDevice: ela, noDevice: !ela, noDeviceTitle: 'Can için cihaz yok', openPair: () => this.setState({ sheet: { type: 'pair' } }),
+      pct, ringDash: `${(C * left / limitToday).toFixed(1)} ${C.toFixed(1)}`, leftText: fmt(left),
+      stBg: st.bg, stC: st.c, stIcon: st.i, stLabel: st.l, stShort: st.short,
+      usedLine: `${fmt(used)} / ${fmt(limitToday)} · mola ${off ? '—' : '18 dk sonra'}`,
+      modeNote: s.pendingMode ? (off ? `${s.pendingMode} · cihaz bağlanınca` : `${s.pendingMode} · onay bekleniyor`) : 'Aktif mod', modeNoteC: s.pendingMode ? 'var(--kd-warn-text)' : 'var(--kd-ink3)',
+      modes: [['Serbest', 'ph-sun'], ['Ders', 'ph-book-open'], ['Mola', 'ph-coffee'], ['Kısıtlı', 'ph-shield']].map(([label, icon]) => { const on = s.mode === label, pend = s.pendingMode === label; return { label, icon: pend ? 'ph-hourglass-medium' : icon, on: on ? 'true' : 'false', anim: pend ? 'kd-pulse 1.4s infinite' : 'none', border: on ? '#5265D8' : pend ? '#E7A83E' : 'var(--kd-line)', bs: pend ? 'dashed' : 'solid', bg: on ? 'var(--kd-p-tint)' : pend ? 'var(--kd-warn-tint)' : 'var(--kd-surface)', c: on ? 'var(--kd-p-text)' : pend ? 'var(--kd-warn-text)' : 'var(--kd-ink2)', pick: () => pickMode(label) }; }),
+      actions,
+      openReqs: (ela ? openReqs : []).map(x => Object.assign({ title: x.title, reason: x.reason, ago: x.ago, open: openSheetReq(x.id), quickReject: () => this.decide(x.id, false) }, reqVis(x))),
+      noOpen: !ela || openReqs.length === 0, goReq: () => this.setState({ tab: 'req' }),
+      reqSegs: [['open', `Bekleyen (${ela ? openReqs.length : 0})`], ['hist', 'Geçmiş']].map(([id, label]) => Object.assign({ label, pick: () => this.setState({ reqSeg: id }) }, seg(s.reqSeg === id))),
+      reqOpenTab: s.reqSeg === 'open', reqHistTab: s.reqSeg === 'hist',
+      hist: s.hist.map((h, i) => ({ title: h.title, reason: h.reason, note: h.note || null, when: h.when, res: h.ok ? 'Onaylandı' : 'Reddedildi', bg: h.ok ? 'var(--kd-ok-tint)' : 'var(--kd-neutral-tint)', c: h.ok ? 'var(--kd-ok-text)' : 'var(--kd-ink2)', icon: h.ok ? 'ph-check-circle' : 'ph-minus-circle', line: i ? 'var(--kd-line)' : 'transparent' })),
+      limits: [['wd', 'Hafta içi'], ['we', 'Hafta sonu']].map(([k, label]) => ({ k: label, v: fmt(s.lim[k]), minus: () => this.setState(p => ({ lim: Object.assign({}, p.lim, { [k]: Math.max(30, p.lim[k] - 15) }) })), plus: () => this.setState(p => ({ lim: Object.assign({}, p.lim, { [k]: Math.min(360, p.lim[k] + 15) }) })) })),
+      brOpts: [30, 45, 60].map(v => { const c = chip(s.br === v); return { label: v + ' dk', on: s.br === v, border: c.border, bg: c.bg, c: c.c, pick: () => this.setState({ br: v }) }; }),
+      brText: `Her ${s.br} dakikada 10 dakika mola · 5 ve 1 dk kala uyarı`,
+      extraOpts: [15, 30, 60].map(v => ({ label: '+' + v + ' dk', run: () => this.send(`Bugün için +${v} dk`, `+${v} dk eklendi`, () => this.setState(p => ({ extra: p.extra + v }))) })),
+      todayLimit: fmt(limitToday),
+      today: [['14:00 – 15:00', 'Serbest', '#2BBFA7'], ['15:00 – 16:00', 'Ders modu', '#5265D8'], ['16:00 – 21:00', 'Serbest', '#2BBFA7', true], ['21:00', 'Uyku', 'var(--kd-muted)']].map(([t, l, c, now]) => ({ t, l, c, now: !!now })),
+      tDirty, tDiscard: () => this.setState(p => ({ lim: Object.assign({}, p.savedLim), br: p.savedBr })),
+      tSave: () => { const lim = Object.assign({}, s.lim), br = s.br; this.send('Ekran süresi planı', 'Yeni plan ELA-PC\'de aktif', () => this.setState({ savedLim: lim, savedBr: br })); if (!s.online) this.setState({ savedLim: lim, savedBr: br }); else this.setState({ savedLim: lim, savedBr: br }); },
+      webTabs: Object.entries(KIND).map(([id, [l]]) => { const c = chip(s.siteTab === id); return { l, n: s.sites.filter(x => x.kind === id).length, border: c.border, bg: c.bg, c: c.c, pick: () => this.setState({ siteTab: id }) }; }),
+      siteRows: s.sites.map((x, i) => Object.assign({}, x, { i })).filter(x => x.kind === s.siteTab).map((x, j) => ({ d: x.d, w: x.w, letter: x.d[0].toUpperCase(), bg: KIND[x.kind][1], c: KIND[x.kind][2], line: j ? 'var(--kd-line)' : 'transparent', menu: () => this.setState({ sheet: { type: 'site', idx: x.i } }) })),
+      siteEmpty: !s.sites.some(x => x.kind === s.siteTab),
+      showFab: !route && tab === 'web', newRule: () => this.setState({ route: 'rule', rule: { domain: '', kind: s.siteTab, when: s.siteTab === 'temp' ? '1 saat' : s.siteTab === 'study' ? 'Ders modunda' : 'Her zaman', edit: null } }),
+      moreItems: [['report', 'ph-chart-bar', 'Haftalık rapor', '15 sa 21 dk · ↓ 1 sa 19 dk'], ['activity', 'ph-clock-counter-clockwise', 'Etkinlik geçmişi', 'Son olay: kurallar eşitlendi'], ['devices', 'ph-desktop', 'Cihazlar', 'ELA-PC · ' + st.short], ['settings', 'ph-gear-six', 'Ayarlar', 'Bildirimler, biyometrik onay']].map(([id, icon, l, sub], i) => ({ icon, l, s: sub, line: i ? 'var(--kd-line)' : 'transparent', go: goMore(id) })),
+      kpis: [['Toplam', '15 sa 21 dk', '↓ 1 sa 19 dk', 'var(--kd-ok-text)'], ['Günlük ort.', '2 sa 12 dk', 'Limit 2 sa 30 dk', 'var(--kd-ink3)'], ['Zamanında mola', '18 / 21', 'Bu hafta', 'var(--kd-ink3)'], ['Limit içinde', '6 / 7 gün', 'Onaylar dahil', 'var(--kd-ink3)']].map(([k, v, d, dc]) => ({ k, v, d, dc })),
+      bars: days.map((d, i) => ({ d: DN[i], aria: DL[i], e: Math.round(d[0] * .65) + 'px', g: Math.round(d[1] * .65) + 'px', o: Math.round(d[2] * .65) + 'px', op: s.day === i ? 1 : .55, dc: s.day === i ? 'var(--kd-ink)' : 'var(--kd-ink3)', dw: s.day === i ? 700 : 500, pick: () => this.setState({ day: i }) })),
+      dayLabel: DL[s.day], dayDetail: `${fmt(sel[0] + sel[1] + sel[2])} · eğitim ${sel[0]} dk · oyun ${sel[1]} dk`,
+      events: [['ph-arrows-clockwise', 'var(--kd-ink2)', 'var(--kd-neutral-tint)', 'Kurallar ELA-PC ile eşitlendi', 'Bugün 10:42'], ['ph-hand-waving', 'var(--kd-sec-text)', 'var(--kd-sec-tint)', 'Ela 20 dk ek süre istedi', 'Bugün 10:38'], ['ph-coffee', 'var(--kd-sec-text)', 'var(--kd-sec-tint)', 'Mola tamamlandı · 10 dk', 'Bugün 10:31'], ['ph-globe-simple', 'var(--kd-warn-text)', 'var(--kd-warn-tint)', 'youtube.com kullanım planında değildi', 'Bugün 10:05'], ['ph-warning-circle', 'var(--kd-err-text)', 'var(--kd-err-tint)', 'Kilit uygulanamadı · 19:13\'te tekrar denendi', 'Dün 19:12'], ['ph-wifi-slash', 'var(--kd-ink2)', 'var(--kd-neutral-tint)', 'ELA-PC 22 dk çevrimdışı kaldı', 'Dün 18:40']].map(([icon, c, bg, t, when], i) => ({ icon, c, bg, t, when, line: i ? 'var(--kd-line)' : 'transparent' })),
+      devInfo: [['Son bağlantı', s.online ? 'Şimdi' : '2 sa 14 dk önce'], ['Kural eşitleme', s.online ? '10:42 · güncel' : '08:28'], ['Widget', 'Görünür · sağ alt'], ['Eşleştirme', '3 Ekim 2026']].map(([k, v]) => ({ k, v })),
+      ping: () => { if (s.ping === 'run') return; this.setState({ ping: 'run' }); this.later(() => { this.setState({ ping: 'idle' }); this.snack(this.state.online ? 'ELA-PC yanıt verdi · 84 ms' : 'ELA-PC yanıt vermedi · çevrimdışı', this.state.online ? 'ok' : 'err'); }, 1400); },
+      pingIcon: s.ping === 'run' ? 'ph-circle-notch' : 'ph-arrows-clockwise', pingAnim: s.ping === 'run' ? 'kd-spin 1s linear infinite' : 'none', pingLabel: s.ping === 'run' ? 'Test ediliyor…' : 'Bağlantıyı test et',
+      setRows: [['push', 'Talep bildirimleri', 'Ek süre ve site istekleri anında'], ['bio', 'Biyometrik onay', 'Bildirimden onay ve kilit için parmak izi / yüz'], ['lockRes', 'Komut sonuçları', 'Başarısız komutlar her zaman bildirilir'], ['offline', 'Cihaz çevrimdışı', '15 dakikadan uzun sürerse'], ['weekly', 'Haftalık özet', 'Pazar 19:00']].map(([k, l, sub], i) => ({ l, s: sub, line: i ? 'var(--kd-line)' : 'transparent', aria: s.set[k] ? 'true' : 'false', bg: s.set[k] ? '#5265D8' : 'var(--kd-muted)', j: s.set[k] ? 'flex-end' : 'flex-start', run: () => this.setState(p => ({ set: Object.assign({}, p.set, { [k]: !p.set[k] }) })) })),
+      rDomain: r ? r.domain : '', rSetDomain: e => this.setState(p => ({ rule: Object.assign({}, p.rule, { domain: e.target.value }) })),
+      rWarn: warn || null, rErr: r && r.domain && !valid ? 'Geçerli bir alan adı girin, ör. ornek.com' : dup ? 'Bu site için zaten bir kural var' : null,
+      rBorder: r && r.domain && (!valid || dup) ? '#D95B68' : 'var(--kd-line-strong)',
+      rKinds: Object.entries(KIND).map(([id, [l, , , icon]]) => { const c = chip(r && r.kind === id); return { l: { block: 'Engelle', allow: 'İzin ver', study: 'Ders modu', temp: 'Geçici izin' }[id], icon, border: c.border, bg: c.bg, c: c.c, pick: () => this.setState(p => ({ rule: Object.assign({}, p.rule, { kind: id, when: id === 'temp' ? '1 saat' : id === 'study' ? 'Ders modunda' : 'Her zaman' }) })) }; }),
+      rWhenLabel: r && r.kind === 'temp' ? 'Süre' : 'Ne zaman',
+      rWhens: whens.map(w => { const c = chip(r && r.when === w); return { l: w, on: !!r && r.when === w, border: c.border, bg: c.bg, c: c.c, pick: () => this.setState(p => ({ rule: Object.assign({}, p.rule, { when: w }) })) }; }),
+      rPreview: r && valid ? `${norm} · ${r.when.toLowerCase()} ${verb[r.kind]}.` : 'Alan adını yazınca kuralın özeti burada görünür.',
+      rBg: ok ? '#5265D8' : 'var(--kd-disabled)', rCursor: ok ? 'pointer' : 'not-allowed', rDis: ok ? 'false' : 'true', rSaveLabel: 'Kaydet ve gönder',
+      rSave: () => { if (!ok) return; const item = { d: norm, kind: r.kind, w: r.when }; this.setState(p => { const l = p.sites.slice(); if (r.edit != null) l[r.edit] = item; else l.push(item); return { sites: l, route: null, rule: null, tab: 'web', siteTab: r.kind }; }); this.send(norm + ' kuralı', norm + ' kuralı ELA-PC\'de aktif'); },
+      showNav, nav: navDef.map(([id, icon, label]) => ({ label, icon: (tab === id ? 'ph-fill ' : 'ph ') + icon, cur: tab === id ? 'page' : 'false', badge: id === 'req' && ela && openReqs.length ? openReqs.length : null, pill: tab === id ? 'var(--kd-p-tint)' : 'transparent', c: tab === id ? 'var(--kd-p-text)' : 'var(--kd-ink2)', w: tab === id ? 600 : 500, go: () => this.setState({ tab: id, route: null }) })),
+      snack: s.snack ? s.snack.text : null, snackIcon: SN[0], snackIconC: SN[1], snackAnim: s.snack && s.snack.kind === 'wait' ? 'kd-spin 1s linear infinite' : 'none',
+      snackAction: s.snack && s.snack.action ? s.snack.action.label : null, snackRun: () => { const a = s.snack && s.snack.action; this.setState({ snack: null }); a && a.run(); },
+      snackSticky: !!s.snack && s.snack.kind === 'err', snackClose: () => this.setState({ snack: null }),
+      snackBottom: showNav ? (showSnackHigh ? '164px' : '92px') : '16px',
+      push: !!s.push, pushTitle: s.push ? s.push.title : '', pushReason: s.push ? s.push.reason : '', pushApproveLabel: s.push ? (s.push.type === 'time' ? s.push.dur + ' dk onayla' : s.push.dur + ' izin ver') : '',
+      pushOpen: () => s.push && this.setState({ sheet: { type: 'req', id: s.push.id }, push: null, child: 'ela' }),
+      pushApprove: () => s.push && this.decide(s.push.id, true), pushDismiss: () => this.setState({ push: null }),
+      sheet: !!sh, closeSheet: () => this.setState({ sheet: null }),
+      sReq: !!R, sr, notes: ['Akşam yemeğinden sonra devam edersin.', 'Ödevin bitince birlikte bakalım.', 'Bugün olmaz, yarın tekrar sorabilirsin.'].map(t => ({ t, pick: () => R && setR({ note: t }) })),
+      sConfirm: !!(sh && cfMap[sh.type]), cf,
+      sChild: !!sh && sh.type === 'child', kids: kidsList.map(k => Object.assign({}, k, { on: k.id === s.child, border: k.id === s.child ? '#5265D8' : 'var(--kd-line)', bg: k.id === s.child ? 'var(--kd-p-tint)' : 'var(--kd-surface)', pick: () => this.setState({ child: k.id, sheet: null }) })),
+      sSite: !!sh && sh.type === 'site', smDomain: sh && sh.type === 'site' && s.sites[sh.idx] ? s.sites[sh.idx].d : '',
+      smEdit: () => { const x = s.sites[sh.idx]; this.setState({ sheet: null, route: 'rule', rule: { domain: x.d, kind: x.kind, when: x.w, edit: sh.idx } }); },
+      smRemove: () => this.setState({ sheet: { type: 'removeSite', idx: sh.idx } }),
+      sPair: !!sh && sh.type === 'pair',
+      code: [...'482'.split('').map(v => ({ v, w: '44px', bg: 'var(--kd-surface-2)' })), { v: '', w: '8px', bg: 'transparent' }, ...'913'.split('').map(v => ({ v, w: '44px', bg: 'var(--kd-surface-2)' }))],
+      connOpts: [[true, 'Çevrimiçi'], [false, 'Çevrimdışı']].map(([v, l]) => Object.assign({ l, pick: () => this.setState({ online: v }) }, seg(s.online === v))),
+      lockOpts: [[false, 'Başarılı'], [true, 'Başarısız']].map(([v, l]) => Object.assign({ l, pick: () => this.setState({ lockFail: v }) }, seg(s.lockFail === v))),
+      sendPush: () => {
+        const n = s.pushN;
+        const pool = [{ type: 'site', title: 'youtube.com', reason: 'Fen ödevi için deney videosu izleyeceğim.', dur: '30 dk' }, { type: 'time', title: '15 dakika ek süre', reason: 'Ödevimin son sorusunu çözüyorum.', dur: 10 }];
+        const p = Object.assign({ id: 'p' + n, ago: 'şimdi', note: '', status: 'open' }, pool[n % 2]);
+        if (p.type === 'time') p.dur = 20;
+        this.setState(st2 => ({ reqs: st2.reqs.concat([p]), push: p, pushN: st2.pushN + 1 }));
+      },
+      reset: () => { this.timers.forEach(clearTimeout); this.timers = []; clearTimeout(this._st); this.setState(INIT()); },
+      tryList: ['Bildirim gönder → banttan "Yanıtla" → süre ve not seç → onayla', 'Ana sayfa → Kilitle → onay → bekliyor → sonuç (paneldeki kilit sonucuna göre)', 'Bağlantıyı "Çevrimdışı" yap → mod veya mola gönder → sıraya alınır', 'Süre → limiti değiştir → altta "Kaydet"', 'Siteler → "Kural ekle" → adres olarak youtube.com/watch?v=1 yaz', 'Üstteki çocuk seçiciden Can → cihaz eşleştirme']
+    };
+  }
+}
+</script>
+</body>
+</html>

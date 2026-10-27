@@ -1,0 +1,116 @@
+# Kindora .gitignore
+# Not: AGENTS.md, CLAUDE.md, brain.md, docs/, design/ ve .claude/settings.json
+# bilerek izlenir. Bu dosyaya geniş kapsamlı (*.md, *.html, design/ vb.) kural eklemeyin.
+
+# ── İşletim sistemi ─────────────────────────────────────
+.DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── IDE / editör ────────────────────────────────────────
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+.fleet/
+
+# ── Claude Code / AI araçları (yerel) ───────────────────
+.claude/settings.local.json
+.claude/*.local.*
+CLAUDE.local.md
+
+# ── Ortam değişkenleri ve sırlar ────────────────────────
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.mobileprovision
+# Supabase yerel sırları / CLI durumu
+supabase/.env
+supabase/.temp/
+supabase/.branches/
+supabase/functions/.env
+supabase/functions/**/.env
+# Flutter / mobil platform kimlik dosyaları
+**/android/key.properties
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+**/ios/Runner/*.xcconfig.local
+
+# ── Node / Vue / Vite ───────────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.tsbuildinfo
+coverage/
+.pnpm-store/
+.npm/
+.yarn/cache/
+.eslintcache
+.stylelintcache
+
+# ── Rust / Tauri ────────────────────────────────────────
+target/
+**/src-tauri/target/
+**/src-tauri/gen/schemas/
+**/*.rs.bk
+
+# ── Flutter / Dart ──────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+**/android/.gradle/
+**/android/local.properties
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/ephemeral/
+**/ios/Runner.xcworkspace/xcuserdata/
+**/macos/Flutter/ephemeral/
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/
+*.g.dart.incremental
+
+# ── Yerel veritabanları (SQLite) ────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# ── Log, cache, geçici ──────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.cache/
+tmp/
+temp/
+*.tmp

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+body{margin:0;background:#F7F9FC;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div data-screen-label="Acceptance Report" style="max-width:1120px;margin:0 auto;padding:40px 32px 72px;display:flex;flex-direction:column;gap:40px">
+
+  <header style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:#FDF4E3;color:#8A5A0C;font-size:13px;font-weight:600"><i class="ph ph-hourglass-medium"></i>Kullanıcı onayı bekliyor</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:#EEF0F5;color:#4A5370;font-size:13px;font-weight:600">Geliştirmeye aktarılmadı</span>
+    </div>
+    <h1 style="margin:0;font-size:34px;font-weight:600;letter-spacing:-.02em">Tasarım kabulü ve devir uzlaştırması</h1>
+    <p style="margin:0;max-width:780px;font-size:16px;line-height:1.6;color:#4A5370;text-wrap:pretty">27 Ekim 2026. Mevcut dosyalar incelendi, onaylı görsel dil korunarak düzeltildi. Tasarım aşaması siz onaylayana kadar açık kalır.</p>
+    <nav style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ toc }}" as="t" hint-placeholder-count="10"><a href="#r{{ t.n }}" style="text-decoration:none;font-size:13px;padding:5px 10px;border-radius:8px;background:#FFFFFF;border:1px solid #E4E8F1;color:#1A2033">{{ t.n }}. {{ t.t }}</a></sc-for></nav>
+  </header>
+
+  <section id="r1" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">1. İncelenen dosyalar</h2>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px">
+      <sc-for list="{{ files }}" as="f" hint-placeholder-count="13"><div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) 120px;gap:16px;padding:11px 0;border-top:1px solid {{ f.line }};font-size:14px;align-items:start"><span style="font-weight:600">{{ f.n }}</span><span style="color:#4A5370">{{ f.d }}</span><span style="justify-self:start;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:{{ f.bg }};color:{{ f.c }}">{{ f.s }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <section id="r2" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">2. Onaylı tasarım kararları</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+      <sc-for list="{{ approved }}" as="g" hint-placeholder-count="3"><div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#3F50B8">{{ g.t }}</span><sc-for list="{{ g.items }}" as="i" hint-placeholder-count="4"><span style="font-size:14px;line-height:1.45;display:flex;gap:8px"><i class="ph ph-check" style="color:#127A6A;margin-top:3px"></i>{{ i }}</span></sc-for></div></sc-for>
+    </div>
+  </section>
+
+  <section id="r3" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">3. Düzeltilen sorunlar</h2>
+    <p style="margin:0;font-size:14px;color:#4A5370">Her satır dosya kaynağı okunarak kontrol edildi. "Önceden çözülmüş" satırları bu turda değişmedi; çözümün dosyada olduğu doğrulandı.</p>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px">
+      <div style="display:grid;grid-template-columns:150px minmax(0,1.5fr) minmax(0,1fr) 130px;gap:16px;padding:10px 0;font-size:12px;font-weight:600;color:#5D6680"><span>Alan</span><span>Ne değişti</span><span>Dosya</span><span>Durum</span></div>
+      <sc-for list="{{ fixed }}" as="x" hint-placeholder-count="12"><div style="display:grid;grid-template-columns:150px minmax(0,1.5fr) minmax(0,1fr) 130px;gap:16px;padding:11px 0;border-top:1px solid #E4E8F1;font-size:14px;line-height:1.45;align-items:start"><span style="font-weight:600">{{ x.a }}</span><span style="color:#4A5370">{{ x.d }}</span><span style="color:#4A5370">{{ x.f }}</span><span style="justify-self:start;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:{{ x.bg }};color:{{ x.c }}">{{ x.s }}</span></div></sc-for>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:15px;font-weight:600">Komut durum modeli (Phase 5 ve Dark panelde kilit komutuyla uygulandı)</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">
+        <sc-for list="{{ cmd }}" as="c" hint-placeholder-count="7"><div style="border:1px {{ c.style }} {{ c.bd }};background:{{ c.bg }};border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px"><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:{{ c.c }}"><i class="ph {{ c.i }}"></i>{{ c.t }}</span><span style="font-size:12px;line-height:1.4;color:#4A5370">{{ c.d }}</span></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.5;color:#4A5370">
+        <span><b style="color:#1A2033">Zaman aşımı ≠ başarısızlık.</b> 30 sn içinde cihaz yanıtı gelmezse durum Doğrulanamadı olur (amber). Kırmızı Başarısız yalnızca cihaz açıkça hata bildirdiğinde.</span>
+        <span><b style="color:#1A2033">Tekrar güvenliği.</b> Her komutun bir kimliği var (ör. K-1042). İşlenirken tekrar tıklamak yeni komut üretmez. Doğrulanamadı'da düğme "durumu kontrol et" olur ve yeni komut göndermez. Başarısız'da yeniden gönderme aynı kimlikle yapılır, cihaz komutu bir kez uygular.</span>
+        <span><b style="color:#1A2033">Windows oturumu ≠ Kindora kısıtlaması.</b> Kilit, 1 dk kaydetme süresinden sonra Windows oturumunu kilitler ve Kindora kısıtlamasını başlatır. "Kısıtlamayı kaldır" yalnızca Kindora kısıtlamasını kaldırır; Windows oturumu açılmaz, çocuk kendi Windows şifresi veya PIN'iyle girer.</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="r4" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">4. Henüz açık sorunlar</h2>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px">
+      <sc-for list="{{ open }}" as="o" hint-placeholder-count="9"><div style="display:grid;grid-template-columns:90px 160px minmax(0,1fr);gap:16px;padding:11px 0;border-top:1px solid {{ o.line }};font-size:14px;line-height:1.45;align-items:start"><span style="justify-self:start;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:{{ o.bg }};color:{{ o.c }}">{{ o.sev }}</span><span style="font-weight:600">{{ o.a }}</span><span style="color:#4A5370">{{ o.d }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <section id="r5" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">5. Ekran kabul matrisi</h2>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:#4A5370">
+      <span style="display:flex;align-items:center;gap:6px"><span style="padding:2px 8px;border-radius:999px;background:#EEF0FC;color:#2A3580;font-weight:600">Tasarım hazır</span>görsel ve metin tamam, sizin onayınızı bekliyor</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="padding:2px 8px;border-radius:999px;background:#FDF4E3;color:#8A5A0C;font-weight:600">Teknik doğrulanmadı</span>görsel hazır, Windows/Tauri'de çalıştığı kanıtlanmadı</span>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px;overflow-x:auto">
+      <div style="min-width:760px">
+        <div style="display:grid;grid-template-columns:36px minmax(0,1fr) minmax(0,1.1fr) 130px minmax(0,1.2fr) 110px;gap:12px;padding:10px 0;font-size:12px;font-weight:600;color:#5D6680"><span>#</span><span>Ekran</span><span>Kanonik dosya · bölüm</span><span>Tasarım</span><span>Teknik doğrulama</span><span>Kabul</span></div>
+        <sc-for list="{{ matrix }}" as="m" hint-placeholder-count="26"><div style="display:grid;grid-template-columns:36px minmax(0,1fr) minmax(0,1.1fr) 130px minmax(0,1.2fr) 110px;gap:12px;padding:9px 0;border-top:1px solid #E4E8F1;font-size:13px;line-height:1.4;align-items:start"><span style="color:#5D6680;font-variant-numeric:tabular-nums">{{ m.n }}</span><span style="font-weight:600">{{ m.s }}</span><span style="color:#4A5370">{{ m.f }}</span><span style="justify-self:start;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:#EEF0FC;color:#2A3580">Tasarım hazır</span><span style="color:{{ m.tc }}">{{ m.t }}</span><span style="justify-self:start;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:#FDF4E3;color:#8A5A0C">Onay bekliyor</span></div></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="r6" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">6. Maskot kabul durumu</h2>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.55;color:#4A5370">
+      <span><b style="color:#1A2033">Filiz konsept olarak kabul edildi, nihai karakter değil.</b> Adı (varsayılan Filiz, çocuk değiştirebilir) ve davranış kuralları onaylı. Çizim SVG konsepttir.</span>
+      <span>Ayrı kabul kapısı: <a href="Kindora Mascot Review.dc.html">Kindora Mascot Review</a>. Altı inceleme var: tam görünüm, 96/48/32/24 px ölçekler, 10 durum pozu, konuşma balonu, compact widget, açık/koyu zemin. Altısı da onay bekliyor.</span>
+      <span>Nihai illüstrasyon <a href="Kindora Mascot Brief.dc.html">illüstrasyon brifine</a> göre çizilip aynı altı başlıkta ayrıca onaylanacak. Ekranların kabulü maskot kabulünü beklemez; ürün dosyalarındaki Filiz yer tutucu sayılır.</span>
+    </div>
+  </section>
+
+  <section id="r7" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">7. MVP dışında bırakılan tasarımlar</h2>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px">
+      <sc-for list="{{ out }}" as="o" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px;padding:11px 0;border-top:1px solid {{ o.line }};font-size:14px;line-height:1.45"><span style="font-weight:600">{{ o.k }}</span><span style="color:#4A5370">{{ o.v }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <section id="r8" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">8. Kanonik tasarım dosyaları</h2>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px">
+      <sc-for list="{{ canon }}" as="c" hint-placeholder-count="9"><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);gap:16px;padding:11px 0;border-top:1px solid {{ c.line }};font-size:14px;line-height:1.45"><span style="font-weight:600">{{ c.k }}</span><span>{{ c.f }}</span><span style="color:#5D6680">{{ c.n }}</span></div></sc-for>
+    </div>
+    <span style="font-size:15px;font-weight:600;margin-top:6px">Çelişkiler ve esas alınan karar</span>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px">
+      <sc-for list="{{ conflicts }}" as="c" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:150px minmax(0,1.3fr) minmax(0,1fr);gap:16px;padding:11px 0;border-top:1px solid {{ c.line }};font-size:14px;line-height:1.45"><span style="font-weight:600">{{ c.k }}</span><span style="color:#4A5370">{{ c.v }}</span><span><b>Esas:</b> {{ c.r }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <section id="r9" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">9. Claude Code'a devredilmeye hazır çıktılar</h2>
+    <p style="margin:0;font-size:14px;color:#4A5370">Hazır ama devredilmedi. Devir sizin onayınızdan sonra yapılacak. Paket: <span style="font-family:ui-monospace,Menlo,monospace">design_handoff_kindora/</span></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+      <sc-for list="{{ ready }}" as="g" hint-placeholder-count="3"><div style="background:#FFFFFF;border:1px solid #E4E8F1;border-top:3px solid {{ g.c }};border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px"><span style="font-size:15px;font-weight:600">{{ g.t }}</span><sc-for list="{{ g.items }}" as="i" hint-placeholder-count="5"><span style="font-size:14px;line-height:1.45;color:#4A5370">• {{ i }}</span></sc-for></div></sc-for>
+    </div>
+  </section>
+
+  <section id="r10" style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font-size:22px;font-weight:600">10. Kullanıcı onayı bekleyen kararlar</h2>
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:4px 20px">
+      <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="9"><div style="display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1fr);gap:16px;padding:12px 0;border-top:1px solid {{ d.line }};font-size:14px;line-height:1.45"><span style="width:24px;height:24px;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ d.n }}</span><span style="font-weight:600">{{ d.q }}</span><span style="color:#4A5370">Öneri: {{ d.r }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <h2 style="margin:0;font-size:18px;font-weight:600">Bu turda değiştirilen dosyalar</h2>
+    <sc-for list="{{ changed }}" as="c" hint-placeholder-count="12"><span style="font-size:14px;line-height:1.45;color:#4A5370"><b style="color:#1A2033">{{ c.f }}</b> · {{ c.d }}</span></sc-for>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const P5 = 'Phase 5 - Management', P3 = 'Phase 3 - Child', P4 = 'Phase 4 - Desktop Companion', ON = 'Onboarding';
+const TAG = { fix: ['Bu turda düzeltildi', '#E3F7F3', '#127A6A'], prev: ['Önceden çözülmüş', '#EEF0F5', '#4A5370'], part: ['Kısmen', '#FDF4E3', '#8A5A0C'] };
+const SEV = { high: ['Yüksek', '#FCEBED', '#A8364A'], mid: ['Orta', '#FDF4E3', '#8A5A0C'], low: ['Düşük', '#EEF0F5', '#4A5370'] };
+const L = (arr, map) => arr.map((x, i) => Object.assign(map(x), { line: i ? '#E4E8F1' : 'transparent' }));
+class Component extends DCLogic {
+  renderVals() {
+    const NV = 'Doğrulanmadı · ';
+    return {
+      toc: ['İncelenen dosyalar', 'Onaylı kararlar', 'Düzeltilenler', 'Açık sorunlar', 'Kabul matrisi', 'Maskot', 'MVP dışı', 'Kanonik dosyalar', 'Devre hazır', 'Onay bekleyenler'].map((t, i) => ({ n: i + 1, t })),
+      files: L([
+        ['Phase 1 - Visual Foundation', 'Marka, palet, tipografi, maskot konsepti, ilk dashboard ve widget konsepti', 'Kanonik (marka)'],
+        ['Phase 2 - Parent Experience', 'İlk ebeveyn paneli, cihazlar, eşleştirme', 'Arşiv'],
+        ['Phase 3 - Child Experience', 'Çocuk uygulaması, talepler, rozetler, Filiz ayarları', 'Kanonik'],
+        ['Phase 4 - Desktop Companion', 'Widget görünümleri, mola akışı, animasyon tablosu', 'Kanonik'],
+        ['Phase 5 - Management', 'Ebeveyn panelinin tamamı (light)', 'Kanonik'],
+        ['Phase 6 - Design Review', '17 Ekim bulguları, bileşen durumları, kontrast tablosu', 'Arşiv'],
+        ['Parent Panel - Dark', 'Phase 5\'in dark karşılığı', 'Kanonik (dark)'],
+        ['Onboarding', 'Ebeveyn 6 adım, çocuk 7 adım', 'Kanonik'],
+        ['Mascot Brief', 'İllüstratör brifi', 'Konsept'],
+        ['README.md', 'Devir belgesi', 'Güncellendi'],
+        ['components.md', 'Bileşen envanteri', 'Güncellendi'],
+        ['_kindora-tokens.scss', 'Bootstrap ve CSS değişkenleri, light/dark', 'Güncellendi'],
+        ['Mobile Parent (2 dosya), kindora_theme.dart', 'Mobil prototip, ekran panosu, Flutter tema', 'MVP dışı']
+      ], ([n, d, s]) => { const k = /Kanonik|Güncellendi/.test(s) ? ['#E3F7F3', '#127A6A'] : s === 'Arşiv' ? ['#EEF0F5', '#4A5370'] : ['#FDF4E3', '#8A5A0C']; return { n: 'Kindora ' + n, d, s, bg: k[0], c: k[1] }; }).map((f, i) => (i >= 9 && i <= 11 ? Object.assign(f, { n: f.n.replace('Kindora ', '') }) : f)).map((f, i) => (i === 12 ? Object.assign(f, { n: f.n.replace('Kindora ', '') }) : f)),
+      approved: [
+        { t: 'Ürün ve kapsam', items: ['Ürün adı Kindora', 'İlk MVP: Windows masaüstü (ebeveyn paneli + çocuk uygulaması + widget)', 'Hibrit kontrol: manuel komutlar, otomatik kurallar, izin talepleri', 'Web erişimi başlangıçta alan adı düzeyinde', 'Tüm arayüz metinleri Türkçe'] },
+        { t: 'Teknoloji', items: ['Tauri 2 + Vue 3 + TypeScript + Vite', 'Bootstrap 6 (kararlılık durumu devirde kontrol edilecek)', 'Pinia, Vue Router', 'Supabase (backend), SQLite (yerel veri)'] },
+        { t: 'Görsel ve davranış', items: ['Mevcut renk paleti ve Onest + Fredoka tipografi', 'Phosphor ikon seti', 'Ebeveyn paneli sade, varsayılan Light', 'Çocuk deneyimi sıcak, destekleyici, hafif oyunlaştırılmış', 'Widget: Compact, Expanded, Mascot Only', 'Maskot adı varsayılan Filiz, çocuk değiştirebilir', 'Ek süre isterken neden zorunlu', 'Birden fazla çocuk: üstteki seçici'] }
+      ],
+      fixed: [
+        ['Windows oturumu', 'Kilit metinleri Windows oturum kilidi ile Kindora kısıtlamasını ayırıyor. "Kilidi aç" yerine "Kısıtlamayı kaldır"; onay metni Windows oturumunun otomatik açılmadığını söylüyor.', P5 + ', Dark, Phase 1', 'fix'],
+        ['Komut durumları', '7 durum: Hazır, Gönderiliyor, Sırada, Cihaz yanıtı bekleniyor, Uygulandı, Başarısız, Doğrulanamadı. Zaman aşımı artık Doğrulanamadı. Demo seçeneği Tweaks\'te.', P5 + ', Dark', 'fix'],
+        ['Tekrarlanan işlem', 'Komut kimliği, işlenirken tekrar tıklamada yeni komut yok, durum sorgulama, aynı kimlikle yeniden gönderme onayı.', P5 + ', Dark', 'fix'],
+        ['Kalıcı kritik bildirim', 'Hata bildirimleri zaten kapatılana kadar kalıyordu (doğrulandı). Doğrulanamadı uyarısı da artık kalıcı ve kapatma düğmeli.', P5 + ', Dark', 'fix'],
+        ['Disabled kontrast', 'Opaklık yok; #F4F6FA zemin + #5D6680 metin + neden satırı. Kaynakta opacity ile soluklaştırma kalmadı.', P5 + ', Dark', 'prev'],
+        ['Yardımcı metin', '#7A829C metin rengi Phase 1 ve Phase 4\'ten kaldırıldı (#5D6680). Diğer kanonik dosyalarda zaten yoktu.', 'Phase 1, ' + P4, 'fix'],
+        ['Minimum metin', '10–11 px metinler 12 px\'e çıkarıldı.', P3 + ', ' + P4 + ', ' + P5 + ', Dark, ' + ON, 'fix'],
+        ['Azaltılmış hareket', 'Sistem tercihi (prefers-reduced-motion) artık tüm CSS animasyonlarını durduruyor. Önceden yalnızca uygulama içi ayar vardı.', 'Phase 1, ' + P3 + ', ' + P4 + ', ' + P5 + ', Dark, ' + ON, 'fix'],
+        ['Widget klavye', 'Widget odaklanabilir: ok tuşları köşe değiştirir, Enter genişletir, Esc küçültür. Davranış listesine eklendi.', P4, 'fix'],
+        ['Grafik alternatifi', 'Günlük kullanım grafiğinde "Tablo olarak göster" ve ekran okuyucu etiketi.', P5 + ' › Raporlar, Dark', 'fix'],
+        ['Dar ekran / ölçekleme', '1240 px altında sidebar 72 px ikon rayına iner, içerik minimumu 900 px. 1366×768 ve 1280×800 için %125\'te (1093 / 1024 px) yatay taşma yok.', P5 + ', Dark', 'part'],
+        ['Light/Dark token', 'Dark yardımcı metin #8D96AE, #1A2233 üzerinde ≈5,3:1. Tokenlar iki dosyada aynı.', '_kindora-tokens.scss', 'prev'],
+        ['Kapsam', 'Mobil dosyalar "sonraki sürüm adayı" bandıyla işaretlendi; README ve sunumdaki Flutter ifadeleri öneri olarak düzeltildi.', 'Mobile ×2, README, Presentation', 'fix']
+      ].map(([a, d, f, s]) => ({ a, d, f, s: TAG[s][0], bg: TAG[s][1], c: TAG[s][2] })),
+      cmd: [
+        ['Hazır', 'ph-lock-simple', 'Gönderilebilir', '#FFFFFF', '#D5DAE6', '#1A2033', 'solid'],
+        ['Gönderiliyor', 'ph-paper-plane-tilt', 'Sunucuya iletiliyor', '#FDF4E3', '#F1D49C', '#8A5A0C', 'solid'],
+        ['Sırada', 'ph-clock-countdown', 'Cihaz çevrimdışı; bağlanınca iletilir', '#FDF4E3', '#F1D49C', '#8A5A0C', 'dashed'],
+        ['Cihaz yanıtı bekleniyor', 'ph-hourglass-medium', 'Cihaza ulaştı, onay bekleniyor', '#FDF4E3', '#F1D49C', '#8A5A0C', 'solid'],
+        ['Uygulandı', 'ph-check-circle', 'Cihaz uyguladığını bildirdi', '#E3F7F3', '#A9E4D9', '#127A6A', 'solid'],
+        ['Başarısız', 'ph-warning-circle', 'Cihaz hata bildirdi', '#FCEBED', '#F2C0C7', '#A8364A', 'solid'],
+        ['Doğrulanamadı', 'ph-question', 'Yanıt yok; sonuç bilinmiyor', '#FDF4E3', '#F1D49C', '#8A5A0C', 'dashed']
+      ].map(([t, i, d, bg, bd, c, style]) => ({ t, i, d, bg, bd, c, style })),
+      open: L([
+        ['high', '1280×800 · %150', 'Etkin genişlik 853 px. Panelin dar düzeni 972 px istiyor; yatay kaydırma kalır. Bu ölçeğin desteklenip desteklenmeyeceği kararı gerekli (karar 3).'],
+        ['high', 'Ölçekleme testi', '%125 ve %150 yalnızca CSS genişlik hesabıyla kontrol edildi. Tauri / WebView2 içinde gerçek Windows ölçeklemesiyle test edilmedi.'],
+        ['mid', 'Diğer komutlar', 'Mola, ek süre, mod ve kural kaydı henüz yalnızca "cihaz yanıtı bekleniyor → uygulandı" gösteriyor. 7 durumlu model kilitte uygulandı; diğerleri aynı modeli devirde tek komut deposundan kullanmalı.'],
+        ['mid', 'Çocuk ve widget dark', 'Phase 3 ve 4 yalnızca light. Çocuk tarafı için dark gerekip gerekmediği kararlaştırılmadı.'],
+        ['mid', 'Ekran okuyucu', 'ARIA rolleri ve etiketler tasarımda var; NVDA / Narrator ile test yapılmadı.'],
+        ['mid', 'Widget klavye odağı', 'Always-on-top, çerçevesiz pencereye klavye odağının nasıl geçeceği (kısayol tuşu?) teknik olarak doğrulanmadı.'],
+        ['low', 'Phase 2 arşivi', 'Eski kilit metinleri içeriyor; bilerek düzeltilmedi, arşiv bandıyla işaretlendi.'],
+        ['low', 'Mobil kilit metinleri', 'Mobil prototip eski kilit metinlerini kullanıyor; MVP dışı olduğu için düzeltilmedi.'],
+        ['low', 'Maskot', 'Konsept çizim; nihai illüstrasyon ayrı onay kapısında.']
+      ], ([s, a, d]) => ({ sev: SEV[s][0], bg: SEV[s][1], c: SEV[s][2], a, d })),
+      matrix: [
+        ['Ebeveyn karşılama', ON + ' › Ebeveyn', 'Gerek yok · yalnızca arayüz'],
+        ['Güvenli cihaz eşleştirme', P5 + ' › Cihazlar › eşleştirme; ' + ON, NV + 'kod üretimi, süre sınırı, Supabase eşleştirme'],
+        ['Dashboard', P5 + ' › Genel Bakış', NV + 'kilit, mola, mod komutları ve cihaz ACK'],
+        ['Çocuk profili', P5 + ' › Ayarlar › Çocuk profilleri', 'Gerek yok · yalnızca arayüz'],
+        ['Cihaz yönetimi', P5 + ' › Cihazlar', NV + 'son bağlantı, eşleştirme kaldırma'],
+        ['Ekran süresi', P5 + ' › Ekran Süresi', NV + 'limitin cihazda uygulanması'],
+        ['Haftalık program', P5 + ' › Ekran Süresi', NV + 'programın cihaz saatine göre uygulanması'],
+        ['Web sitesi kuralları', P5 + ' › Web Kuralları', NV + 'tarayıcıdan bağımsız alan adı engelleme yöntemi'],
+        ['Site kuralı oluşturma', P5 + ' › Web Kuralları › kural editörü', 'Gerek yok · doğrulama kuralları tanımlı'],
+        ['İzin talepleri', P5 + ' › İzin Talepleri', NV + 'gerçek zamanlı iletim'],
+        ['Kullanım raporları', P5 + ' › Raporlar', NV + 'uygulama kategorisi tespiti'],
+        ['Etkinlik geçmişi', P5 + ' › Etkinlik', 'Gerek yok · yalnızca arayüz'],
+        ['Ayarlar', P5 + ' › Ayarlar', NV + 'ebeveyn PIN\'i ile ayar koruması'],
+        ['Çocuk karşılama', ON + ' › Çocuk', 'Gerek yok · yalnızca arayüz'],
+        ['Çocuk ana ekranı', P3 + ' › Ana Sayfa', NV + 'yeniden başlatmada süre SQLite\'tan yüklenir'],
+        ['Kalan süre ve hedefler', P3 + ' › Hedefler', 'Gerek yok · yalnızca arayüz'],
+        ['Ek süre talebi', P3 + ', ' + P4, NV + 'onaysız talebin limiti uzatmaması'],
+        ['Site erişim talebi', P3, NV + 'engellenen siteden talebe geçiş'],
+        ['Mola ekranı', P4 + ' › mola akışı', NV + 'tam ekran mola penceresi, çalışma kaybı olmaması'],
+        ['Başarılar ve rozetler', P3 + ' › Rozetler', 'Gerek yok · yalnızca arayüz'],
+        ['Maskot kişiselleştirme', P3 + ' › Filiz', 'Gerek yok · maskot ayrı kapıda'],
+        ['Mini widget', P4 + ' › Compact', NV + 'çerçevesiz, always-on-top, şeffaflık'],
+        ['Expanded widget', P4 + ' › Expanded', NV + 'sürükle, köşeye yapış, klavye odağı'],
+        ['Mascot only', P4 + ' › Mascot', NV + 'şeffaf pencere ve tıklama geçirgenliği'],
+        ['Konuşma balonu', P4 + ' › balon türleri', NV + 'tam ekran uygulamada gizlenme'],
+        ['Bildirim / uyarı', P4 + ', ' + P5 + ' › bildirimler', NV + 'Windows bildirim entegrasyonu']
+      ].map(([s, f, t], i) => ({ n: i + 1, s, f: 'Kindora ' + f, t, tc: t.startsWith('Doğ') ? '#8A5A0C' : '#4A5370' })),
+      out: L([
+        ['Mobil ebeveyn prototipi', 'Kindora Mobile Parent - Prototype · korunuyor, sonraki sürüm adayı'],
+        ['Mobil ekran panosu', 'Kindora Mobile Parent - Flutter · korunuyor, sonraki sürüm adayı'],
+        ['Flutter ThemeData', 'flutter/kindora_theme.dart · öneri; mobil teknoloji onaylanmadı'],
+        ['Kategori, tam URL, video düzeyi filtre', 'Web Kuralları\'nda "Planlanıyor" olarak işaretli'],
+        ['Fiyatlandırma, abonelik, pazarlama', 'Bu aşamada tasarlanmadı']
+      ], ([k, v]) => ({ k, v })),
+      canon: L([
+        ['Marka, palet, tipografi', 'Kindora Phase 1 - Visual Foundation', 'Dashboard/widget bölümü ilk konsept'],
+        ['Ebeveyn paneli (light)', 'Kindora Phase 5 - Management', 'Phase 2\'yi geçersiz kılar'],
+        ['Ebeveyn paneli (dark)', 'Kindora Parent Panel - Dark', 'Phase 5 ile aynı davranış'],
+        ['Onboarding', 'Kindora Onboarding', 'Ebeveyn + çocuk'],
+        ['Çocuk uygulaması', 'Kindora Phase 3 - Child Experience', ''],
+        ['Widget ve mola', 'Kindora Phase 4 - Desktop Companion', 'Mola ekranı burada'],
+        ['Maskot', 'Kindora Mascot Review + Mascot Brief', 'Konsept'],
+        ['Tokenlar ve bileşenler', '_kindora-tokens.scss, components.md', 'Kod kaynağı'],
+        ['Bu rapor', 'Kindora Acceptance Report', 'Phase 6\'yı geçersiz kılar']
+      ], ([k, f, n]) => ({ k, f, n })),
+      conflicts: L([
+        ['Kilit metni', 'Phase 1, 2 ve mobil "Kilitli / Kilidi aç" diyordu; Windows oturumunun açılacağını ima ediyordu.', 'Phase 5: "Kilit uygulandı / Kısıtlamayı kaldır". Phase 1 güncellendi; Phase 2 ve mobil işaretlendi.'],
+        ['Zaman aşımı', 'README ve Phase 5: 30 sn yanıt yoksa "Başarısız".', 'Doğrulanamadı (amber). README güncellendi.'],
+        ['Dashboard', 'Phase 1 konsepti, Phase 2 ve Phase 5 üç farklı sürüm.', 'Phase 5.'],
+        ['Onboarding uzunluğu', 'Phase 6 ebeveyn 4 / çocuk 3 adım önermişti; Onboarding dosyası 6 / 7 adım.', 'Onboarding dosyası; ancak adım sayısı onaylanmadı (karar 6).'],
+        ['Mobil teknoloji', 'README ve sunum Flutter\'ı kesin yüzey olarak sunuyordu.', 'Sonraki sürüm adayı; teknoloji onaysız.'],
+        ['Reduced motion', 'Tokenlar yalnızca maskotu durduruyordu; prototipler sistem tercihini okumuyordu.', 'Tüm animasyonlar durur. Tokenlar güncellendi.']
+      ], ([k, v, r]) => ({ k, v, r })),
+      ready: [
+        { t: 'Teknoloji kararı (onaylı)', c: '#5265D8', items: ['Tauri 2, Vue 3, TypeScript, Vite', 'Bootstrap 6, Pinia, Vue Router', 'Supabase, SQLite', 'Bileşen adları İngilizce (Kd*), arayüz Türkçe'] },
+        { t: 'Görsel karar (onaylı)', c: '#2BBFA7', items: ['_kindora-tokens.scss (light + dark, durum renkleri)', 'components.md (bileşenler ve durumları)', 'Kanonik prototipler (madde 8)', 'Komut durum modeli ve metinleri'] },
+        { t: 'Teknik doğrulama bekleyen', c: '#E7A83E', items: ['Windows oturum kilidi (LockWorkStation) ve Kindora kısıtlamasının birlikte çalışması', 'Tarayıcıdan bağımsız alan adı engelleme yöntemi', 'Widget: çerçevesiz, always-on-top, şeffaf, tam ekranda gizlenme', 'Komut ACK, zaman aşımı ve kimlikle tekrar güvenliği', 'Yeniden başlatmada sürenin korunması', 'Bootstrap 6 kararlılığı; değilse 5.3 + aynı tokenlar'] }
+      ],
+      decisions: L([
+        ['26 ekranın kabul matrisini onaylıyor musunuz?', 'Ekran ekran onay veya geri bildirim.'],
+        ['Maskot konseptinin 6 inceleme kapısı', 'Konsept yönünü onaylayıp illüstratör sürecini başlatmak.'],
+        ['1280×800 · %150 ölçek destekleniyor mu?', 'MVP için minimum etkin genişlik 1024 px; altı yatay kaydırma.'],
+        ['"Bilgisayarı kilitle" Windows oturumunu kilitlesin mi?', 'Evet, 1 dk uyarıdan sonra Windows oturumu + Kindora kısıtlaması. Alternatif: yalnızca Kindora tam ekran perdesi.'],
+        ['Komut zaman aşımı süresi', '30 sn, sonra Doğrulanamadı.'],
+        ['Onboarding adım sayısı', 'Mevcut 6 / 7 adım; isteğe bağlı adımlar atlanabilir.'],
+        ['Çocuk uygulaması ve widget için dark tema', 'MVP\'de yok; çocuk tarafı light.'],
+        ['Bootstrap 6 kararlı değilse', '5.3 ile başla, tokenlar aynı kalsın.'],
+        ['Mobil uygulamanın sürümü ve teknolojisi', 'MVP sonrası ayrı karar.'],
+        ['Tasarım aşamasını kapatma ve Claude Code\'a devir', 'Yukarıdaki kararlardan sonra.']
+      ], ([q, r]) => ({ q, r })).map((d, i) => Object.assign(d, { n: i + 1 })),
+      changed: [
+        ['Kindora Phase 5 - Management', 'kilit metinleri, 7 durumlu komut modeli, tekrar güvenliği, kalıcı uyarı, dar düzen, grafik tablosu, 12 px, reduced motion'],
+        ['Kindora Parent Panel - Dark', 'Phase 5 ile aynı değişiklikler'],
+        ['Kindora Phase 4 - Desktop Companion', 'widget klavye, yardımcı metin rengi, 12 px, reduced motion'],
+        ['Kindora Phase 3 - Child Experience', '12 px, reduced motion'],
+        ['Kindora Onboarding', '12 px, reduced motion'],
+        ['Kindora Phase 1 - Visual Foundation', 'kilit metni, yardımcı metin rengi, kapsam bandı, reduced motion'],
+        ['Kindora Phase 2 · Phase 6', 'arşiv bandı'],
+        ['Kindora Mobile Parent ×2', 'sonraki sürüm adayı bandı'],
+        ['Kindora Mascot Brief', 'konsept durumu'],
+        ['Kindora Presentation', 'mobil ifadeleri, komut ilkesi'],
+        ['Yeni: Kindora Mascot Review · Kindora Acceptance Report', 'maskot kabul kapısı ve bu rapor'],
+        ['README.md · components.md · _kindora-tokens.scss', 'kapsam, Windows ayrımı, komut durumları, kanonik dosyalar, reduced motion']
+      ].map(([f, d]) => ({ f, d }))
+    };
+  }
+}
+</script>
+</body>
+</html>

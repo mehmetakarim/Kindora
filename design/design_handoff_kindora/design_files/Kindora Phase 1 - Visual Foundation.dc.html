@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#F7F9FC;color:#1A2033;font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3F50B8}a:hover{color:#5265D8}
+*{box-sizing:border-box}
+button:focus-visible{outline:3px solid #8C80E8;outline-offset:2px}
+@keyframes kd-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes kd-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div role="note" style="display:flex;align-items:center;gap:10px;padding:10px 20px;background:#EEF0FC;border-bottom:1px solid #D5DAE6;color:#2A3580;font-family:Onest,system-ui,sans-serif;font-size:13px;line-height:1.45"><i class="ph ph-info" style="font-size:16px"></i><span>Bu dosya marka, renk, tipografi ve maskot konsepti için güncel referanstır. İçindeki dashboard ve widget bölümü ilk konsepttir; güncel referanslar Phase 5 (ebeveyn paneli) ve Phase 4 (widget).</span></div>
+
+<div style="max-width:1360px;margin:0 auto;padding:56px 40px 96px;display:flex;flex-direction:column;gap:88px">
+
+<header style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px;align-items:center">
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5D6680">
+      <span style="padding:4px 10px;border-radius:999px;background:#EEF0FC;color:#3F50B8">Design Phase 1</span>
+      <span>Visual Foundation</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:16px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoMark }}</div>
+      <div style="font-size:44px;font-weight:700;letter-spacing:-.02em">kindora</div>
+    </div>
+    <h1 style="margin:0;font-size:40px;line-height:1.15;font-weight:600;letter-spacing:-.02em;text-wrap:pretty;max-width:620px">Kontrol etmek için değil, güvenle büyümelerine yardımcı olmak için.</h1>
+    <p style="margin:0;font-size:17px;line-height:1.6;color:#4A5370;max-width:580px;text-wrap:pretty">Kindora iki yüzlü tek bir ürün: ebeveyn için sakin ve net bir yönetim paneli, çocuk için masaüstünde yaşayan sıcak bir yol arkadaşı. İkisi aynı renkleri, aynı ikon dilini ve aynı karakteri paylaşıyor.</p>
+  </div>
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:24px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 1px 2px rgba(26,32,51,.04),0 12px 32px rgba(26,32,51,.06)">
+    <div style="align-self:stretch;display:flex;justify-content:center">
+      <div style="position:relative;background:#FFFFFF;border:1px solid #E4E8F1;border-radius:18px;padding:14px 18px;font-family:Fredoka,Onest,sans-serif;font-size:19px;font-weight:500;line-height:1.35;max-width:320px;text-align:center;box-shadow:0 6px 18px rgba(26,32,51,.08)">{{ heroMessage }}</div>
+    </div>
+    {{ heroMascot }}
+    <div style="font-size:13px;color:#5D6680;display:flex;gap:8px;align-items:center"><i class="ph ph-cursor-click"></i><span>Aşağıdaki durumlara tıklayarak Filiz'i deneyin</span></div>
+  </div>
+</header>
+
+<section style="display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">01 · Renk sistemi</div>
+    <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.01em">Önerilen palet korundu, kullanım rolleri netleştirildi</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;max-width:760px;text-wrap:pretty">Yarı ton renkler (teal, amber, mercan) beyaz üzerinde metin için yeterli kontrast vermiyor. Bu yüzden her durum renginin bir dolgu tonu, bir de koyulaştırılmış metin tonu var. Durum asla yalnızca renkle anlatılmıyor: her etiket ikon ve kelime taşıyor.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px">
+    <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="7">
+      <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:88px;background:{{ s.hex }};display:flex;align-items:flex-end;padding:10px 12px;color:{{ s.on }};font-size:12px;font-weight:600">{{ s.onLabel }}</div>
+        <div style="display:flex;height:22px">
+          <div style="flex:1;background:{{ s.tint }}"></div>
+          <div style="flex:1;background:{{ s.text }}"></div>
+        </div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:15px;font-weight:600">{{ s.name }}</div>
+          <div style="font-size:12px;color:#5D6680;font-family:ui-monospace,Menlo,monospace">{{ s.hex }} · tint {{ s.tint }} · text {{ s.text }}</div>
+          <div style="font-size:13px;color:#4A5370;line-height:1.45">{{ s.role }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-size:14px;font-weight:600">Light nötrler</div>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ neutralsLight }}" as="n" hint-placeholder-count="6">
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="height:48px;border-radius:10px;background:{{ n.hex }};border:1px solid #E4E8F1"></div><div style="font-size:11px;color:#4A5370;line-height:1.3">{{ n.name }}<br>{{ n.hex }}</div></div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#111827;border:1px solid #2E3850;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;color:#E9ECF5">
+      <div style="font-size:14px;font-weight:600">Dark nötrler</div>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ neutralsDark }}" as="n" hint-placeholder-count="6">
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="height:48px;border-radius:10px;background:{{ n.hex }};border:1px solid #2E3850"></div><div style="font-size:11px;color:#A9B1C7;line-height:1.3">{{ n.name }}<br>{{ n.hex }}</div></div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+    <span style="font-size:13px;color:#5D6680;margin-right:6px">Durum etiketleri:</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#E3F7F3;color:#127A6A;font-size:13px;font-weight:600"><i class="ph-fill ph-circle" style="font-size:9px"></i>Çevrimiçi</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#EEF0F5;color:#4A5370;font-size:13px;font-weight:600"><i class="ph ph-wifi-slash"></i>Çevrimdışı</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#FDF4E3;color:#8A5A0C;font-size:13px;font-weight:600"><i class="ph ph-hourglass-medium"></i>Yanıt bekleniyor</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#FCEBED;color:#A8364A;font-size:13px;font-weight:600"><i class="ph ph-warning-circle"></i>Kilitleme başarısız</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#EEF0FC;color:#3F50B8;font-size:13px;font-weight:600"><i class="ph ph-book-open"></i>Ders modu</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#F1EFFD;color:#5B4FC0;font-size:13px;font-weight:600"><i class="ph ph-coffee"></i>Mola</span>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">02 · Tipografi</div>
+    <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.01em">Bir arayüz fontu, bir karakter fontu</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;max-width:760px;text-wrap:pretty">Onest tüm arayüzün omurgası: Türkçe karakterlerde (ğ, ş, İ, ı) sağlam, küçük boyutta okunaklı, rakamları tablolar için düzgün. Fredoka yalnızca çocuk tarafında başlıklarda, maskot balonlarında ve sayaçlarda kullanılıyor. Ebeveyn panelinde Fredoka yok.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:14px;font-weight:600">Onest</div><div style="font-size:12px;color:#5D6680">Ebeveyn + çocuk gövde metni</div></div>
+      <div style="font-size:64px;font-weight:600;letter-spacing:-.02em;line-height:1">Ağ Şı İç</div>
+      <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid #E4E8F1;padding-top:18px">
+        <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:baseline">
+            <div style="font-size:12px;color:#5D6680;font-family:ui-monospace,Menlo,monospace">{{ t.spec }}</div>
+            <div style="font-size:{{ t.size }};font-weight:{{ t.weight }};line-height:1.3">{{ t.sample }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#F1EFFD;border:1px solid #E2DEFA;border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:14px;font-weight:600">Fredoka</div><div style="font-size:12px;color:#5B4FC0">Çocuk başlıkları, balonlar, sayaçlar</div></div>
+      <div style="font-family:Fredoka,sans-serif;font-size:64px;font-weight:600;line-height:1;color:#2A2370">48 dk kaldı</div>
+      <div style="font-family:Fredoka,sans-serif;font-size:28px;font-weight:600;color:#2A2370">Merhaba Ela! Bugün neler keşfediyoruz?</div>
+      <div style="font-family:Fredoka,sans-serif;font-size:19px;font-weight:500;line-height:1.4;color:#2A2370">Biraz daha zamana mı ihtiyacın var? Birlikte soralım.</div>
+      <div style="font-size:15px;line-height:1.55;color:#4A5370">Açıklama metinleri çocuk tarafında da Onest. Yuvarlak font yalnızca sıcaklık gereken yerde kullanılıyor; böylece arayüz bebeksi görünmüyor.</div>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">03 · Maskot</div>
+    <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.01em">Filiz — masaüstündeki dijital yol arkadaşı</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;max-width:760px;text-wrap:pretty">Yuvarlak bir çakıl gövde, yüzün durduğu açık renkli bir "ekran" ve başında iki yapraklı bir filiz. Filiz büyümeyi anlatıyor; ürün felsefesiyle aynı şeyi söylüyor. Silüet 24 px'de bile tanınıyor: yuvarlak gövde + üstte V şeklinde iki yaprak. Duygu yalnızca göz, ağız, kollar ve küçük bir rozetle değişiyor; gövde hep aynı kalıyor.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(260px,1fr) minmax(0,2.2fr);gap:16px">
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px">
+      <div style="font-size:14px;font-weight:600">Ölçek testi</div>
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px">{{ scale96 }}{{ scale48 }}{{ scale32 }}{{ scale24 }}</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;line-height:1.5;color:#4A5370;border-top:1px solid #E4E8F1;padding-top:16px">
+        <div style="display:flex;gap:10px"><i class="ph ph-check-circle" style="color:#127A6A;font-size:17px"></i><span>Kısa cümleler, sen diliyle, yargılamadan konuşur.</span></div>
+        <div style="display:flex;gap:10px"><i class="ph ph-check-circle" style="color:#127A6A;font-size:17px"></i><span>Hareketleri yavaş ve kısa; sessiz modda tamamen durur.</span></div>
+        <div style="display:flex;gap:10px"><i class="ph ph-x-circle" style="color:#A8364A;font-size:17px"></i><span>Kızmaz, üzgün yüz yapmaz, suçlamaz. Ret durumunda bile sakin kalır.</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px">
+      <sc-for list="{{ states }}" as="st" hint-placeholder-count="10">
+        <button onClick="{{ st.pick }}" style="font:inherit;color:inherit;cursor:pointer;background:{{ st.bg }};border:1.5px solid {{ st.border }};border-radius:16px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .15s,transform .15s" style-hover="transform:translateY(-2px)">
+          {{ st.el }}
+          <div style="font-size:13px;font-weight:600">{{ st.tr }}</div>
+          <div style="font-size:11px;color:#5D6680;font-family:ui-monospace,Menlo,monospace">{{ st.id }}</div>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">04 · Ebeveyn ve çocuk arasındaki ilişki</div>
+    <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.01em">Aynı marka, iki farklı ses tonu</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr) minmax(0,1fr);gap:16px">
+    <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600"><i class="ph ph-briefcase" style="font-size:20px;color:#5265D8"></i>Ebeveyn paneli</div>
+      <sc-for list="{{ parentTraits }}" as="t" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;font-size:14px;line-height:1.45"><span style="color:#5D6680">{{ t.k }}</span><span>{{ t.v }}</span></div></sc-for>
+    </div>
+    <div style="background:#EEF0FC;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#3F50B8"><i class="ph ph-link-simple" style="font-size:20px"></i>Ortak olan</div>
+      <sc-for list="{{ sharedTraits }}" as="t" hint-placeholder-count="5"><div style="display:flex;gap:10px;font-size:14px;line-height:1.45;color:#2A3580"><i class="ph ph-check" style="margin-top:3px"></i><span>{{ t }}</span></div></sc-for>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E2DEFA;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px;font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;color:#5B4FC0"><i class="ph ph-smiley" style="font-size:20px"></i>Çocuk uygulaması</div>
+      <sc-for list="{{ childTraits }}" as="t" hint-placeholder-count="5"><div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;font-size:14px;line-height:1.45"><span style="color:#5D6680">{{ t.k }}</span><span>{{ t.v }}</span></div></sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">05 · İlk ebeveyn dashboard konsepti</div>
+    <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.01em">Genel Bakış · 1280 × 800</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;max-width:760px;text-wrap:pretty">Etkileşimli demo: "Bilgisayarı kilitle" onay ister, ardından komutu "bekliyor" olarak gösterir; cihaz yanıt verene kadar başarı göstermez. Talepler onaylanıp reddedilebilir.</p>
+  </div>
+  <div style="overflow-x:auto;padding-bottom:8px">
+  <div data-screen-label="Parent Dashboard" style="width:1280px;height:800px;background:#F7F9FC;border:1px solid #DDE2EC;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:240px minmax(0,1fr);position:relative;box-shadow:0 24px 64px rgba(26,32,51,.12)">
+    <aside style="background:#FFFFFF;border-right:1px solid #E4E8F1;padding:22px 14px;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;align-items:center;gap:10px;padding:0 10px 22px">
+        <div style="width:32px;height:32px;border-radius:10px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoMarkSm }}</div>
+        <div style="font-size:20px;font-weight:700;letter-spacing:-.02em">kindora</div>
+      </div>
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:{{ n.weight }};color:{{ n.color }};background:{{ n.bg }};cursor:pointer" style-hover="background:#F1F3F9">
+          <i class="ph {{ n.icon }}" style="font-size:19px"></i><span style="flex:1">{{ n.label }}</span>
+          <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#5265D8;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ n.badge }}</span></sc-if>
+        </div>
+      </sc-for>
+      <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px;border-top:1px solid #E4E8F1">
+        <div style="width:34px;height:34px;border-radius:999px;background:#EEF0F5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#4A5370">SY</div>
+        <div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:13px;font-weight:600">Selin Yılmaz</span><span style="font-size:12px;color:#5D6680">Ebeveyn hesabı</span></div>
+        <i class="ph ph-gear-six" style="font-size:18px;color:#5D6680"></i>
+      </div>
+    </aside>
+    <main style="display:flex;flex-direction:column;min-width:0">
+      <div style="height:72px;padding:0 28px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #E4E8F1;background:#FFFFFF">
+        <div style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="font-size:20px;font-weight:600">Günaydın, Selin</span><span style="font-size:13px;color:#5D6680">Cumartesi, 17 Ekim · Hafta sonu planı aktif</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border:1px solid #E4E8F1;border-radius:999px;cursor:pointer">
+          <div style="width:28px;height:28px;border-radius:999px;background:#F1EFFD;color:#5B4FC0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">E</div>
+          <span style="font-size:14px;font-weight:600">Ela</span><i class="ph ph-caret-down" style="color:#5D6680"></i>
+        </div>
+        <div style="width:40px;height:40px;border-radius:10px;border:1px solid #E4E8F1;display:flex;align-items:center;justify-content:center;position:relative"><i class="ph ph-bell" style="font-size:19px"></i><span style="position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:999px;background:#D95B68"></span></div>
+        <div style="width:40px;height:40px;border-radius:10px;border:1px solid #E4E8F1;display:flex;align-items:center;justify-content:center"><i class="ph ph-moon" style="font-size:19px"></i></div>
+      </div>
+      <div style="flex:1;padding:24px 28px;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);gap:18px">
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:48px;height:48px;border-radius:14px;background:#F1EFFD;color:#5B4FC0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700">E</div>
+            <div style="display:flex;flex-direction:column;gap:3px;flex:1"><span style="font-size:16px;font-weight:600">Ela · 10 yaş</span><span style="font-size:13px;color:#5D6680;display:flex;align-items:center;gap:6px"><i class="ph ph-desktop"></i>ELA-PC · Windows 11</span></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#E3F7F3;color:#127A6A;font-size:12px;font-weight:600"><i class="ph-fill ph-circle" style="font-size:8px"></i>Çevrimiçi</span>
+              <span style="font-size:11px;color:#5D6680">Son bağlantı: şimdi</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:12px;color:#5D6680;font-weight:500">Aktif mod</span>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#F1F3F9;border-radius:10px;padding:4px">
+              <sc-for list="{{ modes }}" as="m" hint-placeholder-count="4">
+                <button onClick="{{ m.pick }}" style="font:inherit;font-size:13px;font-weight:600;border:0;cursor:pointer;padding:8px 0;border-radius:7px;background:{{ m.bg }};color:{{ m.color }};box-shadow:{{ m.shadow }};display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph {{ m.icon }}"></i>{{ m.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#5D6680;font-weight:500">Bugünkü ekran süresi</span><i class="ph ph-clock" style="color:#5D6680;font-size:18px"></i></div>
+          <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:32px;font-weight:700;letter-spacing:-.02em">1 sa 42 dk</span></div>
+          <div style="height:8px;border-radius:999px;background:#EEF0F5;overflow:hidden"><div style="width:68%;height:100%;border-radius:999px;background:#5265D8"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#4A5370"><span>Limit 2 sa 30 dk</span><span style="font-weight:600;color:#3F50B8">48 dk kaldı</span></div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:#5D6680;font-weight:500">Sonraki mola</span><i class="ph ph-coffee" style="color:#5D6680;font-size:18px"></i></div>
+          <span style="font-size:32px;font-weight:700;letter-spacing:-.02em">18 dk</span>
+          <div style="display:flex;gap:6px"><div style="flex:1;height:8px;border-radius:999px;background:#8C80E8"></div><div style="flex:1;height:8px;border-radius:999px;background:#8C80E8"></div><div style="flex:1;height:8px;border-radius:999px;background:#EEF0F5"></div></div>
+          <div style="font-size:12px;color:#4A5370">Her 45 dk'da 10 dk · Bugün 2 / 3 mola</div>
+        </div>
+
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px">
+          <span style="font-size:15px;font-weight:600">Hızlı işlemler</span>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+            <button onClick="{{ askLock }}" style="font:inherit;text-align:left;cursor:pointer;border:1px solid {{ lockBorder }};background:{{ lockBg }};border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;color:#1A2033" style-hover="border-color:#B9C2EE">
+              <i class="ph {{ lockIcon }}" style="font-size:20px;color:{{ lockIconColor }}"></i>
+              <span style="font-size:13px;font-weight:600">{{ lockLabel }}</span>
+              <span style="font-size:11px;color:{{ lockSubColor }}">{{ lockSub }}</span>
+            </button>
+            <sc-for list="{{ actions }}" as="a" hint-placeholder-count="5">
+              <button onClick="{{ a.run }}" style="font:inherit;text-align:left;cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;color:#1A2033" style-hover="border-color:#B9C2EE;background:#FAFBFF">
+                <i class="ph {{ a.icon }}" style="font-size:20px;color:#5265D8"></i>
+                <span style="font-size:13px;font-weight:600">{{ a.label }}</span>
+                <span style="font-size:11px;color:#5D6680">{{ a.sub }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="grid-column:span 2;grid-row:span 2;background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:0">
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:15px;font-weight:600">Bekleyen izin talepleri</span><span style="font-size:13px;color:#3F50B8;font-weight:600">Tümü</span></div>
+          <sc-for list="{{ requests }}" as="r" hint-placeholder-count="2">
+            <div style="border:1px solid #E4E8F1;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:flex-start;gap:12px">
+                <div style="width:36px;height:36px;border-radius:10px;background:{{ r.iconBg }};color:{{ r.iconColor }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph {{ r.icon }}" style="font-size:18px"></i></div>
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0"><span style="font-size:14px;font-weight:600">{{ r.title }}</span><span style="font-size:13px;color:#4A5370;line-height:1.4">“{{ r.reason }}”</span></div>
+                <span style="font-size:11px;color:#5D6680;white-space:nowrap">{{ r.time }}</span>
+              </div>
+              <sc-if value="{{ r.open }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <button onClick="{{ r.approve }}" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:0;background:#5265D8;color:#FFFFFF;padding:8px 14px;border-radius:8px;display:flex;align-items:center;gap:6px" style-hover="background:#3F50B8"><i class="ph ph-check"></i>{{ r.approveLabel }}</button>
+                  <button onClick="{{ r.reject }}" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;color:#1A2033;padding:8px 14px;border-radius:8px" style-hover="background:#F7F9FC">Reddet</button>
+                  <span style="font-size:12px;color:#5D6680;margin-left:auto">{{ r.meta }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ r.closed }}" hint-placeholder-val="{{ false }}">
+                <div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:{{ r.doneBg }};color:{{ r.doneColor }};font-size:12px;font-weight:600"><i class="ph {{ r.doneIcon }}"></i>{{ r.doneText }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div style="border-top:1px solid #E4E8F1;padding-top:12px;display:flex;flex-direction:column;gap:10px;min-height:0">
+            <span style="font-size:15px;font-weight:600">Son etkinlikler</span>
+            <sc-for list="{{ activity }}" as="ev" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:44px 20px minmax(0,1fr);gap:8px;align-items:center;font-size:13px">
+                <span style="color:#5D6680;font-variant-numeric:tabular-nums">{{ ev.t }}</span>
+                <i class="ph {{ ev.icon }}" style="font-size:16px;color:{{ ev.c }}"></i>
+                <span style="color:#1A2033">{{ ev.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:15px;font-weight:600">Bugün nasıl geçti</span><span style="font-size:12px;color:#5D6680">Uygulama kategorisi</span></div>
+          <div style="display:flex;height:10px;border-radius:999px;overflow:hidden;gap:3px"><div style="width:46%;background:#2BBFA7"></div><div style="width:32%;background:#8C80E8"></div><div style="width:22%;background:#C9CFDD"></div></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#5D6680;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#2BBFA7"></span>Eğitim</span><span style="font-size:15px;font-weight:600">47 dk</span></div>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#5D6680;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#8C80E8"></span>Oyun</span><span style="font-size:15px;font-weight:600">33 dk</span></div>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:#5D6680;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:2px;background:#C9CFDD"></span>Diğer</span><span style="font-size:15px;font-weight:600">22 dk</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <sc-if value="{{ showConfirm }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(17,24,39,.38);display:flex;align-items:center;justify-content:center">
+        <div role="dialog" style="width:420px;background:#FFFFFF;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 64px rgba(17,24,39,.25)">
+          <div style="width:44px;height:44px;border-radius:12px;background:#FCEBED;color:#A8364A;display:flex;align-items:center;justify-content:center"><i class="ph ph-lock-simple" style="font-size:22px"></i></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:18px;font-weight:600">ELA-PC kilitlensin mi?</span><span style="font-size:14px;line-height:1.5;color:#4A5370">Ela'ya kaydetmesi için 1 dakika süre tanınır, sonra ekran kilitlenir. Kilidi istediğiniz zaman buradan açabilirsiniz.</span></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button onClick="{{ cancelLock }}" style="font:inherit;font-size:14px;font-weight:600;cursor:pointer;border:1px solid #E4E8F1;background:#FFFFFF;padding:10px 16px;border-radius:8px;color:#1A2033">Vazgeç</button>
+            <button onClick="{{ confirmLock }}" style="font:inherit;font-size:14px;font-weight:600;cursor:pointer;border:0;background:#C9475A;color:#FFFFFF;padding:10px 16px;border-radius:8px">1 dk sonra kilitle</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;right:24px;bottom:24px;background:#1A2033;color:#FFFFFF;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:14px;box-shadow:0 12px 32px rgba(17,24,39,.25)"><i class="ph ph-info" style="font-size:18px;color:#8C9BFF"></i>{{ toast }}</div>
+    </sc-if>
+    <div style="position:absolute;left:252px;bottom:10px;font-size:11px;color:#5D6680;background:#FFFFFF;border:1px dashed #C9CFDD;border-radius:6px;padding:3px 8px">Demo verisi · cihaz yanıtları simüle ediliyor</div>
+  </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">06 · Çocuk widget konsepti</div>
+    <h2 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-.01em">Masaüstünde, diğer pencerelerin üzerinde</h2>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#4A5370;max-width:760px;text-wrap:pretty">Üç görünüm aynı bilgiyi farklı yoğunlukta taşıyor. Compact varsayılan; Expanded tıklayınca açılıyor; Mascot Only en az yer kaplayan seçenek. Hepsi çerçevesiz, sürüklenebilir ve seçilen köşeye yapışıyor.</p>
+  </div>
+  <div style="background:#2A3145;border-radius:20px;padding:40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,.8fr);gap:32px;align-items:end;min-height:460px">
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+      <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#A9B1C7">Compact · 220 × 56</span>
+      <div style="width:220px;height:56px;background:#FFFFFF;border-radius:999px;padding:4px 6px 4px 4px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28)">
+        <div style="width:48px;height:48px;border-radius:999px;background:#EEF0FC;display:flex;align-items:center;justify-content:center">{{ wCompact }}</div>
+        <div style="display:flex;flex-direction:column;gap:1px;flex:1"><span style="font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;color:#1A2033;line-height:1.1">48 dk</span><span style="font-size:11px;color:#4A5370;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:999px;background:#2BBFA7"></span>Serbest zaman</span></div>
+        <button style="width:36px;height:36px;border:0;border-radius:999px;background:#F1F3F9;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4A5370" aria-label="Genişlet"><i class="ph ph-caret-up" style="font-size:16px"></i></button>
+      </div>
+      <div style="width:220px;height:56px;background:#FFFFFF;border-radius:999px;padding:4px 6px 4px 4px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,.28);outline:2px solid #E7A83E;outline-offset:2px">
+        <div style="width:48px;height:48px;border-radius:999px;background:#FDF4E3;display:flex;align-items:center;justify-content:center">{{ wCompactWarn }}</div>
+        <div style="display:flex;flex-direction:column;gap:1px;flex:1"><span style="font-family:Fredoka,sans-serif;font-size:18px;font-weight:600;color:#1A2033;line-height:1.1">5 dk</span><span style="font-size:11px;color:#8A5A0C;display:flex;align-items:center;gap:5px"><i class="ph ph-coffee"></i>Mola yaklaşıyor</span></div>
+        <button style="width:36px;height:36px;border:0;border-radius:999px;background:#F1F3F9;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4A5370" aria-label="Genişlet"><i class="ph ph-caret-up" style="font-size:16px"></i></button>
+      </div>
+      <span style="font-size:12px;color:#A9B1C7">Uyarı durumu: kenarlık + ikon + metin</span>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+      <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#A9B1C7">Expanded · 300 × 380</span>
+      <div style="width:300px;background:#FFFFFF;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 16px 40px rgba(0,0,0,.32)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:22px;height:22px;border-radius:7px;background:#5265D8;display:flex;align-items:center;justify-content:center">{{ logoMarkXs }}</div><span style="font-size:13px;font-weight:600;color:#1A2033">kindora</span></div>
+          <div style="display:flex;gap:4px"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#5D6680"><i class="ph ph-dots-six"></i></span><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#5D6680;background:#F1F3F9"><i class="ph ph-minus"></i></span></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          {{ wExpanded }}
+          <div style="flex:1;background:#F1EFFD;border-radius:16px 16px 16px 4px;padding:10px 12px;font-family:Fredoka,sans-serif;font-size:15px;font-weight:500;line-height:1.3;color:#2A2370">5 dakika sonra küçük bir mola vereceğiz.</div>
+        </div>
+        <div style="background:#F7F9FC;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:12px;color:#4A5370">Bugün kalan</span><span style="font-family:Fredoka,sans-serif;font-size:24px;font-weight:600;color:#1A2033">48 dk</span></div>
+          <div style="height:8px;border-radius:999px;background:#E4E8F1;overflow:hidden"><div style="width:32%;height:100%;border-radius:999px;background:#2BBFA7"></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:4px">
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;color:#5D6680">Sonraki mola</span><span style="font-size:13px;font-weight:600;color:#1A2033;display:flex;align-items:center;gap:5px"><i class="ph ph-coffee" style="color:#8A5A0C"></i>5 dk sonra</span></div>
+            <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;color:#5D6680">Mod</span><span style="font-size:13px;font-weight:600;color:#1A2033;display:flex;align-items:center;gap:5px"><i class="ph ph-sun" style="color:#127A6A"></i>Serbest</span></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button style="font:inherit;font-size:13px;font-weight:600;border:0;cursor:pointer;background:#5265D8;color:#FFFFFF;padding:10px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph ph-hand-waving"></i>Ek süre iste</button>
+          <button style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;background:#FFFFFF;border:1px solid #E4E8F1;color:#1A2033;padding:10px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ph ph-arrow-square-out"></i>Uygulama</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+      <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#A9B1C7">Mascot Only · 88 × 104</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="background:#FFFFFF;border-radius:14px;padding:8px 12px;font-family:Fredoka,sans-serif;font-size:14px;font-weight:500;color:#1A2033;max-width:180px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.25);margin-bottom:6px">Harika! Bugünkü mola hedefini tamamladın.</div>
+        {{ wOnly }}
+        <span style="background:#FFFFFF;border-radius:999px;padding:3px 10px;font-family:Fredoka,sans-serif;font-size:13px;font-weight:600;color:#1A2033;box-shadow:0 4px 12px rgba(0,0,0,.25)">48 dk</span>
+      </div>
+      <span style="font-size:12px;color:#A9B1C7;line-height:1.5">Şeffaf arka plan. Balon yalnızca bir olay olduğunda 6 sn görünür.</span>
+    </div>
+  </div>
+</section>
+
+<section style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#5265D8">Tasarım kararları</div>
+    <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="5"><div style="display:flex;gap:10px;font-size:14px;line-height:1.55;color:#1A2033"><i class="ph ph-check" style="color:#127A6A;margin-top:4px"></i><span>{{ d }}</span></div></sc-for>
+  </div>
+  <div style="background:#FFFFFF;border:1px solid #E4E8F1;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#127A6A">Onaylanan kararlar · 20 Ekim</div>
+    <sc-for list="{{ questions }}" as="q" hint-placeholder-count="5"><div style="display:flex;gap:10px;font-size:14px;line-height:1.55;color:#1A2033"><span style="color:#5D6680;font-variant-numeric:tabular-nums;min-width:18px">{{ q.n }}</span><span>{{ q.t }}</span></div></sc-for>
+  </div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;reducedMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;mascotColor&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Primary&quot;,&quot;Secondary&quot;],&quot;default&quot;:&quot;Primary&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const MSG = {
+  idle: 'Buradayım. Bir şeye ihtiyacın olursa tıkla.',
+  greeting: 'Merhaba Ela! Bugün neler keşfediyoruz?',
+  reminder: 'Hey! Bugün 45 dakikadır bilgisayar başındasın.',
+  break: 'Mola zamanı! Biraz esneyelim mi?',
+  happy: 'Harika! Bugünkü mola hedefini tamamladın.',
+  thinking: 'Bir saniye, kontrol ediyorum…',
+  sleeping: 'Sessiz moddayım. Sadece önemli bir şey olursa konuşurum.',
+  permission: 'Biraz daha zamana mı ihtiyacın var? Birlikte soralım.',
+  approved: 'Annen 15 dakika ek süre verdi. İyi eğlenceler!',
+  encourage: 'Ders zamanı başladı. Hazırsan odaklanalım!'
+};
+const STATES = [
+  ['idle','Bekleme'],['greeting','Karşılama'],['reminder','Hatırlatma'],['break','Mola'],['happy','Mutlu'],
+  ['thinking','Düşünüyor'],['sleeping','Sessiz mod'],['permission','İzin bekliyor'],['approved','Onaylandı'],['encourage','Cesaretlendirme']
+];
+
+function mascot(state, size, o) {
+  const h = React.createElement;
+  const body = o.alt ? '#8C80E8' : '#5265D8';
+  const ink = '#1B2150';
+  const k = [];
+  const P = (d, a) => k.push(h('path', Object.assign({ d }, a)));
+  const S = (d, w) => P(d, { stroke: w || ink, strokeWidth: 3, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' });
+  k.push(h('ellipse', { cx: 60, cy: 112, rx: 26, ry: 4, fill: 'rgba(26,32,51,.14)' }));
+  const sleepy = state === 'sleeping';
+  if (sleepy) {
+    S('M60 37 Q60 30 65 27', '#21A08B');
+    P('M65 27 C71 22 78 25 79 27 C75 33 68 32 65 27Z', { fill: '#2BBFA7' });
+  } else {
+    S('M60 37 L60 26', '#21A08B');
+    P('M60 28 C53 18 44 20 41 21 C43 30 53 32 60 28Z', { fill: '#2BBFA7' });
+    P('M60 26 C66 15 76 15 79 16 C78 26 68 30 60 26Z', { fill: '#3ED0B8' });
+  }
+  const arm = d => P(d, { stroke: body, strokeWidth: 8, fill: 'none', strokeLinecap: 'round' });
+  if (state === 'greeting') { arm('M27 80 Q19 86 21 93'); arm('M93 70 Q106 60 104 46'); }
+  else if (state === 'break' || state === 'happy') { arm('M29 64 Q17 52 21 40'); arm('M91 64 Q103 52 99 40'); }
+  else if (state === 'permission') { arm('M30 86 Q38 96 48 96'); arm('M90 86 Q82 96 72 96'); }
+  else { arm('M27 80 Q19 86 21 93'); arm('M93 80 Q101 86 99 93'); }
+  P('M60 36 C85 36 97 55 97 74 C97 95 81 105 60 105 C39 105 23 95 23 74 C23 55 35 36 60 36Z', { fill: body });
+  P('M42 46 C48 41 54 40 58 40', { stroke: 'rgba(255,255,255,.35)', strokeWidth: 3, fill: 'none', strokeLinecap: 'round' });
+  k.push(h('rect', { x: 34, y: 56, width: 52, height: 36, rx: 18, fill: '#EEF0FC' }));
+  const joy = ['happy', 'approved', 'greeting'].includes(state);
+  const closed = sleepy || state === 'break';
+  const eyesOpen = (dx, dy, ry) => {
+    const g = h('g', { style: o.motion && !closed ? { transformOrigin: '60px 72px', animation: 'kd-blink 5s infinite' } : null },
+      h('ellipse', { cx: 50 + dx, cy: 72 + dy, rx: 3.6, ry: ry, fill: ink }),
+      h('ellipse', { cx: 70 + dx, cy: 72 + dy, rx: 3.6, ry: ry, fill: ink }));
+    k.push(g);
+  };
+  if (joy) { S('M46 74 Q50 68 54 74'); S('M66 74 Q70 68 74 74'); }
+  else if (closed) { S('M46 72 Q50 76 54 72'); S('M66 72 Q70 76 74 72'); }
+  else if (state === 'thinking') eyesOpen(2, -3, 4);
+  else if (state === 'encourage') { k.push(h('ellipse', { cx: 50, cy: 72, rx: 3.6, ry: 4.8, fill: ink })); S('M66 73 Q70 69 74 73'); }
+  else eyesOpen(0, 0, 4.8);
+  if (state !== 'sleeping') { k.push(h('circle', { cx: 42, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); k.push(h('circle', { cx: 78, cy: 81, r: 3.5, fill: '#F4A6B6', opacity: .8 })); }
+  if (joy || state === 'encourage') P('M53 80 Q60 89 67 80 Z', { fill: ink });
+  else if (state === 'permission') k.push(h('ellipse', { cx: 60, cy: 83, rx: 2.6, ry: 3, fill: ink }));
+  else if (sleepy) S('M57 83 L63 83');
+  else if (state === 'thinking') S('M56 83 Q60 81 64 83');
+  else S('M55 81 Q60 85 65 81');
+  const badge = (fill, kids) => k.push(h('g', null, h('circle', { cx: 99, cy: 40, r: 11, fill, stroke: '#FFFFFF', strokeWidth: 2.5 }), kids));
+  if (state === 'reminder') badge('#E7A83E', h('path', { d: 'M99 34 L99 40 L103 43', stroke: '#FFFFFF', strokeWidth: 2.5, fill: 'none', strokeLinecap: 'round' }));
+  if (state === 'approved') badge('#2BBFA7', h('path', { d: 'M94 40 L98 44 L104 36', stroke: '#FFFFFF', strokeWidth: 2.8, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }));
+  if (state === 'permission') badge('#8C80E8', h('path', { d: 'M95.5 34 L102.5 34 L95.5 46 L102.5 46 Z', stroke: '#FFFFFF', strokeWidth: 2, fill: 'none', strokeLinejoin: 'round' }));
+  if (state === 'encourage') P('M99 28 L102 36 L110 36 L104 41 L106 49 L99 44 L92 49 L94 41 L88 36 L96 36 Z', { fill: '#E7A83E' });
+  if (state === 'thinking') { k.push(h('circle', { cx: 93, cy: 46, r: 2.5, fill: '#B6AEF2' })); k.push(h('circle', { cx: 100, cy: 38, r: 3.3, fill: '#B6AEF2' })); k.push(h('circle', { cx: 108, cy: 29, r: 4.2, fill: '#B6AEF2' })); }
+  if (sleepy) { k.push(h('text', { x: 90, y: 44, fontSize: 15, fontWeight: 700, fill: '#8C80E8', fontFamily: 'Fredoka,sans-serif' }, 'z')); k.push(h('text', { x: 101, y: 32, fontSize: 11, fontWeight: 700, fill: '#B6AEF2', fontFamily: 'Fredoka,sans-serif' }, 'z')); }
+  if (state === 'happy') { P('M18 30 L20 36 L26 38 L20 40 L18 46 L16 40 L10 38 L16 36 Z', { fill: '#E7A83E' }); P('M104 22 L105.5 26 L109.5 27.5 L105.5 29 L104 33 L102.5 29 L98.5 27.5 L102.5 26 Z', { fill: '#2BBFA7' }); }
+  const anim = o.motion && !sleepy ? 'kd-bob 3.4s ease-in-out infinite' : 'none';
+  return h('div', { style: { width: size, height: size, animation: anim, flexShrink: 0 } }, h('svg', { viewBox: '0 0 120 120', width: size, height: size, 'aria-hidden': true }, ...k));
+}
+
+function logo(size) {
+  const h = React.createElement;
+  return h('svg', { viewBox: '0 0 32 32', width: size, height: size, 'aria-hidden': true },
+    h('path', { d: 'M16 12 C24 12 27 18 27 22 C27 27 22 29 16 29 C10 29 5 27 5 22 C5 18 8 12 16 12Z', fill: '#FFFFFF' }),
+    h('path', { d: 'M16 12 L16 8', stroke: '#BFF2E9', strokeWidth: 1.8, strokeLinecap: 'round' }),
+    h('path', { d: 'M16 9 C13 5 9 5.5 8 6 C8.5 9.5 13 10.5 16 9Z', fill: '#7FE3D2' }),
+    h('path', { d: 'M16 8.5 C18.5 4 23 4 24 4.5 C23.5 8.5 19 10 16 8.5Z', fill: '#BFF2E9' }));
+}
+
+class Component extends DCLogic {
+  state = { sel: 'greeting', mode: 'Serbest', lock: 'idle', confirm: false, toast: '', req: { a: 'open', b: 'open' } };
+  showToast(t) { clearTimeout(this._t); this.setState({ toast: t }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._l); }
+  renderVals() {
+    const motion = !(this.props.reducedMotion ?? false);
+    const alt = (this.props.mascotColor ?? 'Primary') === 'Secondary';
+    const o = { motion, alt };
+    const m = (s, z) => mascot(s, z, o);
+    const s = this.state;
+    const swatches = [
+      { name: 'Primary · İndigo', hex: '#5265D8', tint: '#EEF0FC', text: '#3F50B8', on: '#FFFFFF', onLabel: 'Aa beyaz 4.6:1', role: 'Ana eylemler, seçili durum, marka.' },
+      { name: 'Secondary · Lavanta', hex: '#8C80E8', tint: '#F1EFFD', text: '#5B4FC0', on: '#1A2033', onLabel: 'Aa koyu', role: 'Çocuk tarafı vurgular, mola, maskot alt rengi.' },
+      { name: 'Accent · Teal', hex: '#2BBFA7', tint: '#E3F7F3', text: '#127A6A', on: '#1A2033', onLabel: 'Aa koyu', role: 'Çevrimiçi, kalan süre, onay, filiz yaprakları.' },
+      { name: 'Warning · Amber', hex: '#E7A83E', tint: '#FDF4E3', text: '#8A5A0C', on: '#1A2033', onLabel: 'Aa koyu', role: 'Yaklaşan mola, bekleyen komut, yanıt bekleniyor.' },
+      { name: 'Danger · Mercan', hex: '#D95B68', tint: '#FCEBED', text: '#A8364A', on: '#1A2033', onLabel: 'Aa koyu', role: 'Yalnızca ebeveynde: başarısız komut, kritik eylem. Çocuk tarafında kullanılmaz.' }
+    ];
+    return {
+      logoMark: logo(36), logoMarkSm: logo(24), logoMarkXs: logo(16),
+      heroMascot: m(s.sel, 200), heroMessage: MSG[s.sel],
+      swatches,
+      neutralsLight: [{ name: 'Bg', hex: '#F7F9FC' }, { name: 'Surface', hex: '#FFFFFF' }, { name: 'Line', hex: '#E4E8F1' }, { name: 'Ink 3', hex: '#7A829C' }, { name: 'Ink 2', hex: '#4A5370' }, { name: 'Ink', hex: '#1A2033' }],
+      neutralsDark: [{ name: 'Bg', hex: '#111827' }, { name: 'Surface', hex: '#1A2233' }, { name: 'Raised', hex: '#232D42' }, { name: 'Line', hex: '#2E3850' }, { name: 'Ink 2', hex: '#A9B1C7' }, { name: 'Ink', hex: '#E9ECF5' }],
+      typeScale: [
+        { spec: '32 / 700', size: '32px', weight: 700, sample: '1 sa 42 dk' },
+        { spec: '24 / 600', size: '24px', weight: 600, sample: 'Ekran süresi' },
+        { spec: '20 / 600', size: '20px', weight: 600, sample: 'Günaydın, Selin' },
+        { spec: '16 / 600', size: '16px', weight: 600, sample: 'Bekleyen izin talepleri' },
+        { spec: '14 / 400', size: '14px', weight: 400, sample: 'Ela\'ya kaydetmesi için 1 dakika süre tanınır.' },
+        { spec: '12 / 500', size: '12px', weight: 500, sample: 'Son bağlantı: şimdi' }
+      ],
+      scale96: m('idle', 96), scale48: m('idle', 48), scale32: m('idle', 32), scale24: m('idle', 24),
+      states: STATES.map(([id, tr]) => ({ id, tr, el: m(id, 84), pick: () => this.setState({ sel: id }), bg: s.sel === id ? '#EEF0FC' : '#FFFFFF', border: s.sel === id ? '#5265D8' : '#E4E8F1' })),
+      parentTraits: [{ k: 'Ton', v: 'Sakin, bilgilendirici, kısa' }, { k: 'Yüzey', v: 'Beyaz kartlar, ince çizgiler, 12 px köşe' }, { k: 'Renk', v: 'Nötr ağırlıklı; renk yalnızca durum ve eylem için' }, { k: 'Font', v: 'Onest, 12–32 px' }, { k: 'Maskot', v: 'Yok; sadece logo işareti' }],
+      sharedTraits: ['Aynı palet ve durum renkleri', 'Onest gövde fontu', 'Phosphor ikon seti, aynı çizgi kalınlığı', '4 px tabanlı boşluk ölçeği', 'Aynı durum dili: ikon + kelime + renk'],
+      childTraits: [{ k: 'Ton', v: 'Sıcak, sen dili, yargısız' }, { k: 'Yüzey', v: 'Renkli tint zeminler, 20–24 px köşe' }, { k: 'Renk', v: 'Lavanta ve teal daha çok; mercan hiç yok' }, { k: 'Font', v: 'Fredoka başlık + Onest metin' }, { k: 'Maskot', v: 'Filiz, her ekranda rehber' }],
+      nav: [['ph-squares-four', 'Genel Bakış', 1], ['ph-desktop', 'Cihazlar'], ['ph-hourglass-medium', 'Ekran Süresi'], ['ph-globe-simple', 'Web Kuralları'], ['ph-hand-waving', 'İzin Talepleri', 0, 2], ['ph-chart-bar', 'Raporlar'], ['ph-clock-counter-clockwise', 'Etkinlik Geçmişi'], ['ph-gear-six', 'Ayarlar']].map(([icon, label, act, badge]) => ({ icon, label, badge: badge || null, weight: act ? 600 : 500, color: act ? '#3F50B8' : '#4A5370', bg: act ? '#EEF0FC' : 'transparent' })),
+      modes: [['Serbest', 'ph-sun'], ['Ders', 'ph-book-open'], ['Mola', 'ph-coffee'], ['Kısıtlı', 'ph-shield']].map(([label, icon]) => ({ label, icon, bg: s.mode === label ? '#FFFFFF' : 'transparent', color: s.mode === label ? '#1A2033' : '#7A829C', shadow: s.mode === label ? '0 1px 3px rgba(26,32,51,.12)' : 'none', pick: () => { this.setState({ mode: label }); this.showToast(`${label} modu isteği gönderildi · cihaz onayı bekleniyor`); } })),
+      askLock: () => { if (s.lock === 'idle' || s.lock === 'done') this.setState({ confirm: true }); },
+      cancelLock: () => this.setState({ confirm: false }),
+      confirmLock: () => { this.setState({ confirm: false, lock: 'pending' }); this._l = setTimeout(() => this.setState({ lock: 'done' }), 3000); },
+      showConfirm: s.confirm,
+      lockLabel: { idle: 'Bilgisayarı kilitle', pending: 'Cihaz yanıtı bekleniyor', done: 'Kilit uygulandı' }[s.lock],
+      lockSub: { idle: 'Onay ister', pending: 'Cihaz yanıtı bekleniyor…', done: 'Windows oturumu kilitlendi · ELA-PC doğruladı' }[s.lock],
+      lockIcon: { idle: 'ph-lock-simple', pending: 'ph-hourglass-medium', done: 'ph-lock-key' }[s.lock],
+      lockIconColor: { idle: '#5265D8', pending: '#8A5A0C', done: '#127A6A' }[s.lock],
+      lockSubColor: { idle: '#7A829C', pending: '#8A5A0C', done: '#127A6A' }[s.lock],
+      lockBg: { idle: '#FFFFFF', pending: '#FDF4E3', done: '#E3F7F3' }[s.lock],
+      lockBorder: { idle: '#E4E8F1', pending: '#F1D49C', done: '#A9E4D9' }[s.lock],
+      actions: [
+        { icon: 'ph-coffee', label: 'Mola başlat', sub: '10 dk', run: () => this.showToast('Mola isteği gönderildi · cihaz onayı bekleniyor') },
+        { icon: 'ph-plus-circle', label: '15 dk ek süre', sub: 'Yalnızca bugün', run: () => this.showToast('15 dk ek süre gönderildi · cihaz onayı bekleniyor') },
+        { icon: 'ph-book-open', label: 'Ders modu', sub: '45 dk odak', run: () => this.showToast('Ders modu isteği gönderildi') },
+        { icon: 'ph-globe-simple', label: 'Web kuralları', sub: '12 kural', run: () => this.showToast('Web Kuralları — Faz 5\'te') },
+        { icon: 'ph-chart-bar', label: 'Raporlar', sub: 'Bu hafta', run: () => this.showToast('Raporlar — Faz 5\'te') }
+      ],
+      requests: [
+        { key: 'a', icon: 'ph-hourglass-medium', iconBg: '#F1EFFD', iconColor: '#5B4FC0', title: '20 dakika ek süre', reason: 'Minecraft\'ta yaptığım evi bitirmek istiyorum.', time: '4 dk önce', approveLabel: '20 dk onayla', meta: 'Bugünkü limite eklenir', ok: 'Onaylandı · 20 dk eklendi' },
+        { key: 'b', icon: 'ph-globe-simple', iconBg: '#EEF0FC', iconColor: '#3F50B8', title: 'scratch.mit.edu erişimi', reason: 'Okul ödevi için oyun yapacağız.', time: '12 dk önce', approveLabel: '1 saat izin ver', meta: 'Alan adı düzeyinde', ok: 'Geçici izin · 1 saat' }
+      ].map(r => { const st = s.req[r.key]; return Object.assign(r, {
+        open: st === 'open', closed: st !== 'open',
+        approve: () => this.setState(p => ({ req: Object.assign({}, p.req, { [r.key]: 'ok' }) })),
+        reject: () => this.setState(p => ({ req: Object.assign({}, p.req, { [r.key]: 'no' }) })),
+        doneBg: st === 'ok' ? '#E3F7F3' : '#EEF0F5', doneColor: st === 'ok' ? '#127A6A' : '#4A5370', doneIcon: st === 'ok' ? 'ph-check-circle' : 'ph-minus-circle',
+        doneText: st === 'ok' ? r.ok : 'Reddedildi · Ela\'ya nazik bir mesajla bildirildi' }); }),
+      activity: [
+        { t: '10:31', icon: 'ph-coffee', c: '#5B4FC0', text: 'Mola tamamlandı · 10 dk' },
+        { t: '10:05', icon: 'ph-globe-simple', c: '#8A5A0C', text: 'youtube.com kullanım planında değildi' },
+        { t: '09:40', icon: 'ph-book-open', c: '#3F50B8', text: 'Ders modu bitti · 45 dk' },
+        { t: '08:55', icon: 'ph-power', c: '#127A6A', text: 'ELA-PC açıldı' }
+      ],
+      toast: s.toast,
+      wCompact: m('idle', 42), wCompactWarn: m('reminder', 42), wExpanded: m('break', 72), wOnly: m('happy', 88),
+      decisions: [
+        'Önerilen 7 renk korundu; her birine bir tint ve bir erişilebilir metin tonu eklendi.',
+        'Mercan (danger) yalnızca ebeveyn tarafında. Çocuk hiçbir zaman "kırmızı hata" görmüyor.',
+        'Belirsiz komutlar (kilitle, mod değiştir) cihaz onaylayana kadar amber "bekliyor" durumunda kalır.',
+        'Maskot Filiz özgün bir silüet: çakıl gövde + yüz ekranı + filiz. Ataç veya göz benzerliği yok.',
+        'Hareket: yalnızca yavaş süzülme ve göz kırpma. Azaltılmış hareket tercihinde ikisi de durur (Tweaks).'
+      ],
+      questions: [
+        { n: '1', t: 'Maskot adı varsayılan "Filiz"; çocuk Maskot Kişiselleştirme ekranından değiştirebilir.' },
+        { n: '2', t: 'Ebeveyn paneli varsayılan olarak Light açılır; Dark ayarlardan seçilir.' },
+        { n: '3', t: 'İkon seti: Phosphor (regular + fill).' },
+        { n: '4', t: 'Ek süre talebinde neden yazmak zorunlu.' },
+        { n: '5', t: 'Birden fazla çocuk: üst bardaki çocuk seçici yeterli.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
