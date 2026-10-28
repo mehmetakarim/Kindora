@@ -108,22 +108,26 @@ sc.exe delete KindoraAgentDev
 | 9 | Tekrarlanan mesaj kimliği | PASS (Unix dev) | `DUPLICATE_MESSAGE_ID` |
 | 10 | Kontrollü yeniden başlatma | PASS (Unix dev): agent yeniden başlayınca helper **236–243 ms** içinde yeniden bağlandı; helper SIGINT ile 0 koduyla çıktı | aynı test |
 
-### Windows'a özgü — çalıştırılamadı
+### Windows'a özgü — durum (2026-10-28)
 
-| ID | Test | Sonuç |
-|---|---|---|
-| W-01 | MSVC ile bağlama ve `.exe` üretimi | BLOCKED (Windows/MSVC yok) |
-| W-02 | Konsol agent + helper, named pipe üzerinden PING | NOT RUN |
-| W-03 | Standart kullanıcı helper'ı `0x0012008B` DACL ile bağlanabiliyor mu | NOT RUN |
-| W-04 | Farklı ad/dizindeki exe → `UNAUTHORIZED` | NOT RUN |
-| W-05 | Uzak istemci reddi (`PIPE_REJECT_REMOTE_CLIENTS`) | NOT RUN |
-| W-06 | Pipe adı önceden alınmışsa agent başlamıyor | NOT RUN |
-| W-07 | `sc create/start/query/stop/delete` yaşam döngüsü, LocalService | NOT RUN |
-| W-08 | Standart kullanıcı `sc stop` → erişim reddi | NOT RUN |
-| W-09 | Görev Yöneticisi ile helper sonlandırma → tespit süresi | NOT RUN |
-| W-10 | **LocalService agent, çocuk sürecini `PROCESS_QUERY_LIMITED_INFORMATION` ile açabiliyor mu** (açamazsa tüm helper'lar reddedilir) | NOT RUN — ADR-0006 için kritik |
-| W-11 | Servis durdurulurken bağlı helper'ın kaybı ve yeniden bağlanma | NOT RUN |
-| W-12 | Session 0'dan gelen istemci reddi | NOT RUN |
+"CI" sütunu GitHub-hosted Windows Server 2022 runner'ı ([çalıştırma 40667562920](https://github.com/mehmetakarim/Kindora/actions/runs/40667562920), yönetici hesap, oturum 2); "Cihaz" sütunu kullanıcının Windows 11 Home/Pro bilgisayarıdır. Cihaz sütunu doldurulmadan Windows kabulü verilmez.
+
+| ID | Test | CI | Cihaz |
+|---|---|---|---|
+| W-01 | MSVC ile bağlama ve `.exe` üretimi | PASS (release EXE'ler, PE32+ x86-64) | NOT RUN (EXE'lerin cihazda çalışması) |
+| W-02 | Konsol agent + helper, named pipe üzerinden PING/STATUS/HEALTH | PASS (yönetici, aynı kullanıcı) | NOT RUN |
+| W-03 | Standart kullanıcı helper'ı `0x0012008B` DACL ile bağlanabiliyor mu | Sınanamaz (runner yönetici → BA girişi) | NOT RUN |
+| W-04 | Farklı ad/dizindeki exe → `UNAUTHORIZED` | Kısmen PASS (test ikilisi `ExeNameMismatch` ile reddedildi; dizin farkı sınanmadı) | NOT RUN |
+| W-05 | Uzak istemci reddi (`PIPE_REJECT_REMOTE_CLIENTS`) | Sınanamaz | NOT RUN |
+| W-06 | Pipe adı önceden alınmışsa agent başlamıyor | PASS (`ERROR_ACCESS_DENIED` 5; ikinci agent `agent_failed`) | NOT RUN |
+| W-07 | `sc create/start/query/stop/delete` yaşam döngüsü, LocalService | Sınanmadı (servis kurulmaz) | NOT RUN |
+| W-08 | Standart kullanıcı `sc stop` → erişim reddi | Sınanamaz | NOT RUN |
+| W-09 | Helper sonlandırma → tespit süresi | PASS (`TerminateProcess`, ≤ 3–5 ms) | NOT RUN (Görev Yöneticisi) |
+| W-10 | **LocalService agent, çocuk sürecini `PROCESS_QUERY_LIMITED_INFORMATION` ile açabiliyor mu** | Sınanamaz (aynı kullanıcı) | NOT RUN — ADR-0006 için kritik |
+| W-11 | Servis durdurulurken bağlı helper'ın kaybı ve yeniden bağlanma | Sınanmadı | NOT RUN |
+| W-12 | Session 0'dan gelen istemci reddi | Sınanmadı (runner oturumu 2) | NOT RUN (kapsam dışı) |
+
+Prerelease: [`p1a-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.1) (commit `17195b5`). Paket SHA-256 değerleri release notlarında ve paketteki `SHA256SUMS.txt` dosyasındadır.
 
 Unix geliştirme taşımasındaki PASS sonuçları **Windows davranışının kanıtı değildir**; yalnız platformdan bağımsız protokol/bağlantı mantığının ve süreç ayrımının kanıtıdır.
 

@@ -26,7 +26,7 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 ### TASK-005 — P1.A.1: Windows CI derlemesi, test paketi, prerelease hazırlığı
 
 - **Öncelik:** Yüksek
-- **Durum:** Devam ediyor — workflow, Windows testleri ve test rehberi hazır; CI sonucu ve prerelease bu belgeden sonra doğrulanır (bkz. [brain.md](../brain.md)).
+- **Durum:** Tamamlandı (2026-10-28) — Windows CI ve prerelease başarılı. **Gerçek cihaz testleri (W-01…W-12) kullanıcıda bekliyor**; bu görev Windows kabulü anlamına gelmez.
 - **Amaç ve kapsam:** macOS'ta yerel Windows VM kurmadan GitHub-hosted `windows-2022` üzerinde derleme/test, taşınabilir test paketi, kontrollü prerelease. P1.B (kullanım kilidi) kapsam dışı.
 - **Kabul kriterleri:**
   - [x] [`.github/workflows/windows-p1a.yml`](../.github/workflows/windows-p1a.yml): push(main) + workflow_dispatch, `contents: read`, resmi eylemler commit SHA ile sabit, `--locked`.
@@ -34,13 +34,13 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - [x] Windows'a özgü güvenli smoke testleri (yönetici/servis gerektirmez) ve CI'ın neyi doğrulayamadığı belgelendi.
   - [x] Test paketi rehberi: [packaging/p1a/README-TEST-TR.md](../packaging/p1a/README-TEST-TR.md).
   - [x] Prerelease yalnız elle tetiklenir, aynı çalıştırmanın artifact'ını kullanır, `--latest=false`, `contents: write` yalnız o işte.
-  - [ ] Gerçek CI çalıştırması başarılı (push sonrası doğrulanacak).
-  - [ ] `p1a-windows-test.1` prerelease yayımlandı.
-  - [ ] Kullanıcının gerçek Windows cihazında W-01…W-12.
+  - [x] Gerçek CI çalıştırması başarılı: push [40667341733](https://github.com/mehmetakarim/Kindora/actions/runs/40667341733) ve elle tetiklenen [40667562920](https://github.com/mehmetakarim/Kindora/actions/runs/40667562920) (commit `17195b5`). Önceki iki başarısız çalıştırma gerçek hatalarla düzeltildi: [BUG-001](solutions.md#bug-001--süreç-düzeyi-testler-kindora-helper-ikilisini-bulamıyor-temiz-derleme), [BUG-002](solutions.md#bug-002--ci-hash-dosyaları-crlf-ile-yazılıyor-linuxmacos-sha256sum--c-başarısız).
+  - [x] Prerelease [`p1a-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.1) — prerelease, `latest` değil, hedef `17195b5`; dosyalar macOS'ta indirilip SHA-256 ile doğrulandı.
+  - [ ] Kullanıcının gerçek Windows cihazında W-01…W-12 — **bekliyor**.
 - **Bağımlılıklar:** TASK-004
 - **İlgili dosyalar:** workflow, `packaging/p1a/`, `crates/windows-agent/tests/windows_*.rs`, [agent/p1a-windows-agent.md §5a](agent/p1a-windows-agent.md)
-- **Doğrulama sonucu:** macOS: fmt/test/clippy PASS; Windows hedefi clippy `-D warnings` (tüm hedefler, Windows testleri dahil) PASS — yalnız derleme denetimi. Windows CI: bu commit'ten sonra.
-- **Yayın durumu:** Henüz yok.
+- **Doğrulama sonucu:** Windows Server 2022 runner (`runneradmin`, oturum 2): fmt, check, **32 test** (agent-core 11, ipc-protocol 13, pipe smoke 7, süreç e2e 1), clippy `-D warnings`, release derleme, paket doğrulaması — PASS. Ölçümler: pipe kopma tespiti 0 ms, boşta kapanma 441–445 ms (400 ms ayar), `TerminateProcess` sonrası tespit ≤ 3–5 ms, ad gaspı/ikinci agent → `ERROR_ACCESS_DENIED (5)`. **CI, Windows 11 Home/Pro etkileşimli cihaz kabulünün yerine geçmez.**
+- **Yayın durumu:** Prerelease — Not for Production. ZIP SHA-256 `8432f367adf62c62aa35a0cf2974e652bad122fe4f1abdf08e1d2fa0a84bcb66`.
 
 ### TASK-004 — P1.A: Windows Agent & Session Helper ilk prototipi
 

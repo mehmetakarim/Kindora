@@ -9,30 +9,30 @@
 
 ## Git durumu (son kontrol)
 
-- **Branch:** `main` · **HEAD:** `00764ee` (T0) = `origin/main`.
-- **Çalışma ağacı:** P1.A + P1.A.1, kullanıcı onayıyla `feat(agent): add P1A Windows IPC prototype and CI build` commit'inde (bu dosya o commit'in parçası; SHA için `git log`). `target/` ignore'da.
+- **Branch:** `main` · Prerelease commit'i: `17195b5` (etiket `p1a-windows-test.1`). Bu belge onu izleyen `docs(p1a)` commit'indedir; güncel HEAD için `git log -1`.
+- **Commit'ler:** `3c60d42` P1.A + CI · `36e657c` BUG-001 düzeltmesi · `17195b5` BUG-002 düzeltmesi · ardından sonuç belgeleri. `target/` ignore'da.
 - **Kimlik (depo-yerel):** `Mehmet Akar <11380904+mehmetakarim@users.noreply.github.com>`; AI attribution kapalı.
 
 ## Aktif hedef
 
-**TASK-005 — P1.A.1**: Windows derleme/testleri GitHub-hosted `windows-2022` üzerinde ([workflow](.github/workflows/windows-p1a.yml)); test paketi rehberi [packaging/p1a/README-TEST-TR.md](packaging/p1a/README-TEST-TR.md); prerelease `p1a-windows-test.1` yalnız elle tetiklenir. CI sonucu: GitHub Actions'da kontrol et (`gh run list --workflow windows-p1a.yml`).
+**Aktif görev yok — kullanıcının gerçek Windows cihaz testi bekleniyor.** TASK-005 (P1.A.1) tamamlandı: Windows CI ([workflow](.github/workflows/windows-p1a.yml)) PASS (32 test); prerelease [`p1a-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.1) yayımlandı (Not for Production); rehber [packaging/p1a/README-TEST-TR.md](packaging/p1a/README-TEST-TR.md).
 **Politika:** yerel Windows VM kurulmayacak; gerçek Windows kabulü kullanıcının kendi Windows bilgisayarında yapılır. CI ≠ Windows 11 Home/Pro kabulü. TASK-004 (P1.A) Windows kabulü bekliyor. P1.B başlamadı.
 
 ## Gerçek durum (kısa)
 
 - Rust workspace: `ipc-protocol`, `agent-core`, `windows-agent` (`kindora-agent`), `windows-session` (`kindora-helper`). Yalnız `PING`/`GET_STATUS`/`HEALTH_CHECK`. Kilit, politika, SQLite, Supabase, UI yok.
 - Ayrıntı ve komutlar: [docs/agent/p1a-windows-agent.md](docs/agent/p1a-windows-agent.md).
-- Ortam: macOS 27 arm64, Rust 1.94; `x86_64-pc-windows-msvc` std hedefi eklendi (yalnız check/clippy). Windows cihaz/VM yok.
+- Ortam: macOS 27 arm64, Rust 1.94; `x86_64-pc-windows-msvc` std hedefi (yalnız check/clippy). Yerel Windows VM **kurulmayacak**; Windows derleme/test GitHub-hosted runner'da, kabul testi kullanıcının Windows bilgisayarında.
 
 ## Son doğrulamalar (2026-10-28)
 
-- macOS: `cargo build`, `cargo test --workspace` (32 birim + 6 e2e, e2e 5 tekrar), `clippy` — PASS.
-- Windows hedefi: `cargo check` + `clippy --all-targets` — PASS (**yalnız derleme**).
-- Ölçümler (Unix dev taşıması, Windows değil): helper SIGKILL tespiti ~12 ms; agent düzgün kapanma 12–202 ms; helper yeniden bağlanma ~240 ms.
+- macOS: `cargo build` + `cargo test --workspace` (32 birim + 6 Unix-dev e2e), `clippy -D warnings` — PASS.
+- **Windows CI** (Windows Server 2022 runner, yönetici, oturum 2): 32 test (pipe smoke 7, süreç e2e 1 dahil), clippy `-D warnings`, release EXE, paket/hash doğrulaması — PASS. Release dosyaları macOS'ta indirilip SHA-256 ile doğrulandı.
+- Ölçümler (CI): pipe kopma tespiti 0 ms; `TerminateProcess` sonrası ≤ 3–5 ms; ikinci agent / ad gaspı → hata 5.
 
 ## Çalıştırılmamış testler
 
-Windows W-01 (MSVC bağlama) BLOCKED; W-02…W-12 (named pipe, DACL, yetkisiz exe/oturum, SCM yaşam döngüsü, standart kullanıcı `sc stop`, Görev Yöneticisi, LocalService süreç sorgusu) NOT RUN. Önceki T0 testleri (PoC-A A-01…A-12, Supabase, SQLite, Flutter) NOT RUN.
+**Gerçek cihazda W-01…W-12 NOT RUN** (CI ile kısmen sınananlar: W-01, W-02, W-04 kısmen, W-06, W-09 — ayrıntı [P1.A raporu](docs/agent/p1a-windows-agent.md)). CI'ın sınayamadıkları: W-03 standart kullanıcı DACL, W-05, W-07/W-08/W-11 servis, **W-10 LocalService süreç sorgusu**, W-12. Önceki T0 testleri (PoC-A, Supabase, SQLite, Flutter) NOT RUN.
 
 ## Açık kararlar
 
@@ -43,9 +43,8 @@ Windows W-01 (MSVC bağlama) BLOCKED; W-02…W-12 (named pipe, DACL, yetkisiz ex
 
 ## Sonraki somut adım (öneri — otomatik başlatma yetkisi değildir)
 
-1. Son CI çalıştırmasının ve prerelease'in durumunu doğrula; SHA/URL'leri `docs/tasks.md` TASK-005'e işle.
-2. Kullanıcı, prerelease paketini kendi Windows bilgisayarında [README-TEST-TR.md](packaging/p1a/README-TEST-TR.md) ile test eder; **W-10 sonucu** ADR-0006'ya girdi olur. Sonuç tablosunu `docs/tasks.md`'ye işle.
-3. Ancak bundan sonra P1.B (kısıtlama yüzeyi / PoC-A) kullanıcı onayıyla.
+1. Kullanıcı, prerelease paketini kendi Windows bilgisayarında [README-TEST-TR.md](packaging/p1a/README-TEST-TR.md) ile test eder; **W-10 sonucu** ADR-0006'ya girdi olur. Sonuç tablosunu `docs/tasks.md`'ye işle.
+2. Ancak bundan sonra P1.B (kısıtlama yüzeyi / PoC-A) kullanıcı onayıyla.
 
 ## İlgili belgeler
 
