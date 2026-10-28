@@ -93,6 +93,11 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          # Metin dosyaları LF ile yazılır: CRLF, Linux/macOS `sha256sum -c` ile
+          # dosya adını "<ad>\r" olarak okutur ve doğrulama başarısız olur (BUG-002).
+          function Write-Lf([string]$path, [string[]]$lines) {
+            [IO.File]::WriteAllText((Join-Path (Get-Location) $path), (($lines -join "`n") + "`n"), [Text.Encoding]::ASCII)
+          }
           $pkg = "dist/$env:PACKAGE_NAME"
           New-Item -ItemType Directory -Force $pkg | Out-Null
           foreach ($exe in 'kindora-agent.exe', 'kindora-helper.exe') {
@@ -101,7 +106,7 @@ jobs:
             Copy-Item $src $pkg
           }
           Copy-Item packaging/p1a/README-TEST-TR.md $pkg
-          @(
+          $info = @(
             "Kindora P1A Windows test paketi - NOT FOR PRODUCTION"
             "commit=$env:GITHUB_SHA"
             "ref=$env:GITHUB_REF"
@@ -109,15 +114,16 @@ jobs:
             "target=x86_64-pc-windows-msvc"
             "rust=$env:RUST_TOOLCHAIN"
             "runner=windows-2022"
-          ) | Set-Content -Path "$pkg/BUILD-INFO.txt" -Encoding ascii
+          )
+          Write-Lf "$pkg/BUILD-INFO.txt" $info
           $sums = Get-ChildItem $pkg -File | Sort-Object Name | ForEach-Object {
             "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name
           }
-          Set-Content -Path "$pkg/SHA256SUMS.txt" -Value $sums -Encoding ascii
+          Write-Lf "$pkg/SHA256SUMS.txt" $sums
           $zip = "dist/$env:PACKAGE_NAME.zip"
           Compress-Archive -Path "$pkg/*" -DestinationPath $zip -Force
           $zipHash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
-          "$zipHash  $env:PACKAGE_NAME.zip" | Set-Content -Path "$zip.sha256" -Encoding ascii
+          Write-Lf "$zip.sha256" @("$zipHash  $env:PACKAGE_NAME.zip")
           Get-ChildItem $pkg -File | Format-Table Name, Length
           Get-Content "$pkg/SHA256SUMS.txt"
           Get-Content "$zip.sha256"
@@ -131,6 +137,8 @@ jobs:
           $expected = @('BUILD-INFO.txt', 'README-TEST-TR.md', 'SHA256SUMS.txt', 'kindora-agent.exe', 'kindora-helper.exe')
           $actual = (Get-ChildItem $check -File | Sort-Object Name).Name
           if (Compare-Object $expected $actual) { throw "Beklenmeyen paket içeriği: $($actual -join ', ')" }
+          if ((Get-Content -Raw "$check/SHA256SUMS.txt") -match "`r") { throw "SHA256SUMS.txt CRLF içeriyor" }
+          if ((Get-Content -Raw "dist/$env:PACKAGE_NAME.zip.sha256") -match "`r") { throw ".sha256 CRLF içeriyor" }
           foreach ($line in Get-Content "$check/SHA256SUMS.txt") {
             $hash, $name = $line -split '  ', 2
             $got = (Get-FileHash "$check/$name" -Algorithm SHA256).Hash.ToLower()

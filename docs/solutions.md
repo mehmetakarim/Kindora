@@ -27,3 +27,13 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
 - **Doğrulama yöntemi:** macOS'ta `target/debug/kindora-helper` silinip `cargo test` → aynı panik yeniden üretildi; `cargo build` sonrası 38/38 test geçti. Windows doğrulaması: düzeltme commit'inin CI çalıştırması.
 - **İlgili görev, dosya veya commit:** TASK-005; `.github/workflows/windows-p1a.yml`, `crates/windows-agent/tests/{dev_transport_e2e,windows_process_e2e}.rs`; hata commit'i `3c60d42`.
 - **Not:** İleride `windows-agent` testlerinin helper'ı Cargo'nun artifact dependency özelliğiyle (kararlı hâle gelirse) derletmesi değerlendirilebilir.
+
+### BUG-002 — CI hash dosyaları CRLF ile yazılıyor; Linux/macOS `sha256sum -c` başarısız
+
+- **Belirti:** Başarılı CI çalıştırması [40667002377](https://github.com/mehmetakarim/Kindora/actions/runs/40667002377) artifact'ında `shasum -a 256 -c Kindora-P1A-Windows-x64.zip.sha256` → `No such file or directory`. `od -c` dosya adının `...zip\r\n` ile bittiğini gösterdi. Aynı sorun `SHA256SUMS.txt` için de geçerliydi.
+- **Ortaya çıktığı koşul:** Hash dosyaları Windows runner'da PowerShell `Set-Content` ile üretilip Linux/macOS'ta doğrulandığında (ör. prerelease işinin `sha256sum -c` adımı).
+- **Kök neden:** Windows'ta `Set-Content` satır sonu olarak CRLF yazar; GNU/BSD `sha256sum -c` `\r`'yi dosya adının parçası sayar.
+- **İşe yaramayan önemli denemeler:** Yok.
+- **Uygulanan çözüm:** Paketleme adımında metin dosyaları `[IO.File]::WriteAllText` ile LF satır sonuyla yazılır; doğrulama adımı CR içeren hash dosyasında CI'ı başarısız kılar.
+- **Doğrulama yöntemi:** Hatalı artifact macOS'ta `tr -d '\r'` ile doğrulandığında tüm hash'ler eşleşti (içerik sağlam, yalnız biçim hatalı). Düzeltme sonrası CI artifact'ı macOS'ta doğrudan `shasum -a 256 -c` ile doğrulanacak.
+- **İlgili görev, dosya veya commit:** TASK-005; `.github/workflows/windows-p1a.yml`; hata commit'i `36e657c`.
