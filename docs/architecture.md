@@ -1,6 +1,6 @@
 # Kindora — Mimari
 
-> Son güncelleme: 2026-10-28 (Europe/Istanbul) · TASK-003 (Phase T0)
+> Son güncelleme: 2026-10-28 (Europe/Istanbul) · TASK-004 (P1.A)
 > Ürün gereksinimlerinin ayrıntılı kaynağı: [KINDORA_PROJECT_CONTEXT.md](../design/KINDORA_PROJECT_CONTEXT.md) (§4–§12). Bu belge içeriği kopyalamaz; özetler ve gerçek durumu kaydeder.
 
 Bu belge iki bölümdür: **A. Onaylanmış hedef mimari** (plan; uygulanmadı) ve **B. Mevcut uygulama durumu** (proje dosyalarından doğrulanan gerçek).
@@ -95,12 +95,13 @@ Ayrıntı ve kaynaklar: [docs/feasibility/](feasibility/README.md). Hiçbiri Win
 | Uzak depo | `origin` → `https://github.com/mehmetakarim/Kindora.git` (**public**); `main` = `64a05ac` push edildi |
 | `.gitignore` | Mevcut — Node/Vue, Rust/Tauri, Flutter, Supabase sırları, SQLite, IDE/OS, log/cache kuralları |
 | `.claude/settings.json` | Mevcut — yalnızca AI attribution kapatma ayarları (uygulama yapılandırması değil) |
-| Kod dizinleri (`apps/`, `crates/`, `packages/`, `supabase/`) | Henüz uygulanmadı |
-| Paket/bağımlılık dosyaları (`package.json`, `Cargo.toml`, `pubspec.yaml`, lock dosyaları) | Henüz uygulanmadı |
-| Uygulama giriş noktaları | Henüz uygulanmadı |
+| `crates/` (Rust workspace) | **Kodlandı — P1.A prototipi** (2026-10-28): `ipc-protocol`, `agent-core`, `windows-agent` (`kindora-agent`), `windows-session` (`kindora-helper`). Yalnız `PING`/`GET_STATUS`/`HEALTH_CHECK`; kilit/politika/bulut yok. macOS'ta test edildi; **Windows'ta çalıştırılmadı**. Ayrıntı: [p1a-windows-agent.md](agent/p1a-windows-agent.md) |
+| `apps/`, `packages/`, `supabase/` | Henüz uygulanmadı |
+| Paket/bağımlılık dosyaları | `Cargo.toml` + `Cargo.lock` mevcut (serde, serde_json, ctrlc, libc[unix], windows-sys/windows-service[windows]). `package.json`, `pubspec.yaml`: henüz yok |
+| Uygulama giriş noktaları | `crates/windows-agent/src/main.rs` (`console`/`service`), `crates/windows-session/src/main.rs` (`run`/`ping`/`status`/`health`). Tauri/Flutter: henüz yok |
 | Veritabanı şemaları / migration'lar | Henüz uygulanmadı |
-| Test altyapısı / CI | Henüz uygulanmadı |
-| Build / geliştirme / test komutları | Yok — doğrulanabilir komut bulunmuyor |
+| Test altyapısı / CI | `cargo test --workspace` (32 birim + 6 Unix-dev e2e + Windows'a özgü 8 test yalnız Windows'ta). CI: [windows-p1a.yml](../.github/workflows/windows-p1a.yml) (GitHub-hosted `windows-2022`; gerçek Windows 11 kabul testi değildir) |
+| Build / geliştirme / test komutları | Rust: [p1a-windows-agent.md §4](agent/p1a-windows-agent.md) (macOS'ta doğrulandı; Windows komutları doğrulanmadı) |
 | README.md (kök) | Yok |
 
 **Gerçekte mevcut olanlar:**
@@ -111,4 +112,15 @@ Ayrıntı ve kaynaklar: [docs/feasibility/](feasibility/README.md). Hiçbiri Win
 - Depo altyapısı: `.gitignore`, `.claude/settings.json`.
 - Phase T0 planlama belgeleri: [docs/feasibility/](feasibility/README.md) (yalnız doküman; uygulama kodu değil).
 
-Proje şu anda **yalnızca tasarım ve dokümantasyondan** oluşur. Kod oluşturulduğunda bu bölüm gerçek dizin, komut ve test bilgileriyle güncellenmelidir.
+Proje 2026-10-28 itibarıyla tasarım, dokümantasyon ve **P1.A Rust prototipinden** oluşur. Prototipin gerçek yapısı:
+
+```text
+kindora-helper (kullanıcı oturumu) ──IPC v1──► kindora-agent (konsol / Windows servisi)
+   windows-session crate                         windows-agent crate
+          │                                          │
+          └──────── ipc-protocol (mesaj, çerçeve, taşıma) ───┘
+                                                     agent-core (yetkilendirme, işleyici, bağlantı döngüsü)
+Taşıma: Windows → named pipe (kodlandı, çalıştırılmadı) · Unix → yalnız geliştirme socket'i (test edildi)
+```
+
+Planlanan Policy Engine, Command Processor, Usage Monitor, Persistence (SQLite), Sync Client ve kısıtlama yüzeyi **henüz uygulanmadı**.

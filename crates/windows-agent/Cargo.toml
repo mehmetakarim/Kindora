@@ -1,0 +1,30 @@
+[package]
+name = "windows-agent"
+description = "Kindora Windows Agent (P1.A prototype): service lifecycle + IPC server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "kindora-agent"
+path = "src/main.rs"
+
+[dependencies]
+ipc-protocol.workspace = true
+agent-core.workspace = true
+ctrlc.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-service.workspace = true
+
+[dev-dependencies]
+ipc-protocol.workspace = true
+serde_json.workspace = true
+
+[target.'cfg(unix)'.dev-dependencies]
+libc.workspace = true
+
+[target.'cfg(windows)'.dev-dependencies]
+windows-sys.workspace = true

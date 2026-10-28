@@ -23,6 +23,45 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 
 ## Aktif / son görevler
 
+### TASK-005 — P1.A.1: Windows CI derlemesi, test paketi, prerelease hazırlığı
+
+- **Öncelik:** Yüksek
+- **Durum:** Devam ediyor — workflow, Windows testleri ve test rehberi hazır; CI sonucu ve prerelease bu belgeden sonra doğrulanır (bkz. [brain.md](../brain.md)).
+- **Amaç ve kapsam:** macOS'ta yerel Windows VM kurmadan GitHub-hosted `windows-2022` üzerinde derleme/test, taşınabilir test paketi, kontrollü prerelease. P1.B (kullanım kilidi) kapsam dışı.
+- **Kabul kriterleri:**
+  - [x] [`.github/workflows/windows-p1a.yml`](../.github/workflows/windows-p1a.yml): push(main) + workflow_dispatch, `contents: read`, resmi eylemler commit SHA ile sabit, `--locked`.
+  - [x] fmt / check / test / clippy `-D warnings` / release build / EXE varlığı / paket ve SHA-256 doğrulaması.
+  - [x] Windows'a özgü güvenli smoke testleri (yönetici/servis gerektirmez) ve CI'ın neyi doğrulayamadığı belgelendi.
+  - [x] Test paketi rehberi: [packaging/p1a/README-TEST-TR.md](../packaging/p1a/README-TEST-TR.md).
+  - [x] Prerelease yalnız elle tetiklenir, aynı çalıştırmanın artifact'ını kullanır, `--latest=false`, `contents: write` yalnız o işte.
+  - [ ] Gerçek CI çalıştırması başarılı (push sonrası doğrulanacak).
+  - [ ] `p1a-windows-test.1` prerelease yayımlandı.
+  - [ ] Kullanıcının gerçek Windows cihazında W-01…W-12.
+- **Bağımlılıklar:** TASK-004
+- **İlgili dosyalar:** workflow, `packaging/p1a/`, `crates/windows-agent/tests/windows_*.rs`, [agent/p1a-windows-agent.md §5a](agent/p1a-windows-agent.md)
+- **Doğrulama sonucu:** macOS: fmt/test/clippy PASS; Windows hedefi clippy `-D warnings` (tüm hedefler, Windows testleri dahil) PASS — yalnız derleme denetimi. Windows CI: bu commit'ten sonra.
+- **Yayın durumu:** Henüz yok.
+
+### TASK-004 — P1.A: Windows Agent & Session Helper ilk prototipi
+
+- **Öncelik:** Yüksek
+- **Durum:** Devam ediyor — kod, macOS testleri ve Windows CI hazırlığı (TASK-005) tamam; **gerçek Windows cihaz kabulü yapılmadı**.
+- **Amaç ve kapsam:** Rust workspace; servis yaşam döngüsü olan agent; kullanıcı oturumunda helper; erişim kısıtlı yerel IPC; yalnız `PING`/`GET_STATUS`/`HEALTH_CHECK`. Kullanım kilidi, politika motoru, Supabase/Flutter/Tauri, otomatik kurulum kapsam dışı.
+- **Kabul kriterleri:**
+  - [x] Rust workspace (`Cargo.toml`, `crates/` altında 4 crate).
+  - [x] Agent (`kindora-agent`) ve helper (`kindora-helper`) ayrı çalıştırılabilir ikililer (macOS'ta çalıştırıldı).
+  - [x] IPC sözleşmesi tanımlı ([P1.A raporu §3](agent/p1a-windows-agent.md)).
+  - [x] Güvenli komut sınırı: yalnız 3 komut; `LOCK`/`UNLOCK`/`PROCESS_KILL` → `UNKNOWN_COMMAND` (test edildi).
+  - [x] Mevcut ortamda mümkün testler çalıştırıldı: 32 birim + 6 süreç düzeyi e2e (Unix dev taşıması, 5 tekrar), clippy macOS + Windows hedefi.
+  - [x] Windows'a özgü doğrulanmayan davranışlar W-01…W-12 olarak listelendi.
+  - [x] Kullanıcı dosyaları korundu (tasarım dosyaları değişmedi).
+  - [x] Hafıza belgeleri güncellendi.
+  - [ ] Windows kabulü (W-01…W-12) — **NOT RUN / BLOCKED**.
+- **Bağımlılıklar:** TASK-003; Windows test ortamı.
+- **İlgili dosyalar:** [Cargo.toml](../Cargo.toml), `crates/`, [agent/p1a-windows-agent.md](agent/p1a-windows-agent.md), [ADR-0011](decisions/0011-p1a-crate-yapisi-ve-gelistirme-tasimasi.md)
+- **Doğrulama sonucu:** macOS: build/test/clippy PASS; Windows hedefi: `cargo check`/`clippy` PASS (yalnız derleme). Windows çalıştırma testleri: NOT RUN; MSVC bağlama: BLOCKED. Ayrıntı: [P1.A raporu §5](agent/p1a-windows-agent.md).
+- **Yayın durumu:** Kod `feat(agent): add P1A Windows IPC prototype and CI build` commit'iyle `origin/main`'e gönderilir; Windows kabulü bekliyor.
+
 ### TASK-003 — Phase T0: teknik uygulanabilirlik ve uygulama planı
 
 - **Öncelik:** Yüksek

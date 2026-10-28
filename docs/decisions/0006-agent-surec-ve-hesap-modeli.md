@@ -37,6 +37,10 @@ PoC-A/B'de M1 ve M2 (veya bölünmüş model) **ölçülerek** karşılaştırı
 - Her modelde yeniden uygulama süresi (A-03).
 - Servisten oturum kilitleme/bağlantı kesme yönteminin çalışıp çalışmadığı.
 
+## P1.A notu (2026-10-28)
+
+Prototip kodu servis hesabı seçmez; `sc.exe create ... obj=` ile verilir (ilk deneme önerisi LocalService). Yeni açık soru: LocalService altındaki agent, helper sürecinin yolunu `PROCESS_QUERY_LIMITED_INFORMATION` ile sorgulayabiliyor mu? Sorgulayamazsa yetkilendirme fail-closed reddeder (W-10, [P1.A raporu](../agent/p1a-windows-agent.md)). Bu ölçüm hesap modeli kararına girdi olacak.
+
 ## İlişkili kararlar
 
 [ADR-0001](0001-kindora-kullanim-kilidi-ana-kontrol.md), [ADR-0007](0007-servis-helper-ipc-named-pipe.md).

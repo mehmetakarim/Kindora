@@ -35,6 +35,10 @@ Windows'un yerleşik erişim denetimi; oturumlar arası ayrım; Microsoft'un ön
 - Başka oturum / başka kullanıcı / sahte süreçten bağlantı denemesi reddedilmeli (PoC-B).
 - Rust'ta DACL ve istemci PID doğrulamasının uygulanabilirliği.
 
+## P1.A uygulama notu (2026-10-28)
+
+İlk prototip tek pipe adı (`\\.\pipe\kindora-agent-v1`) + Interactive Users okuma/yazma + işletim sisteminden oturum/exe denetimi kullanır; oturum başına ad + logon SID, servis LocalSystem olmadan uygulanamadığı için ertelendi. Gerekçe ve riskler: [ADR-0011](0011-p1a-crate-yapisi-ve-gelistirme-tasimasi.md). Windows'ta doğrulanmadı.
+
 ## İlişkili kararlar
 
 [ADR-0006](0006-agent-surec-ve-hesap-modeli.md), [ADR-0010](0010-paylasilan-sozlesme-json-schema.md).
