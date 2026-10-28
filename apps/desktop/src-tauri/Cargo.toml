@@ -1,0 +1,34 @@
+[package]
+name = "kindora-desktop"
+description = "Kindora Desktop (P1.B): Tauri shell showing the real agent state via the session helper bridge"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.90"
+publish = false
+license = "LicenseRef-Proprietary"
+
+# Kök Rust workspace'inden ayrı tutulur: Tauri bağımlılıkları ve ön yüz derlemesi
+# agent/helper CI'ını yavaşlatmasın, `cargo test --workspace` ön yüze bağımlı olmasın.
+# Paylaşılan sözleşme `ipc-protocol` yol bağımlılığıyla kullanılır.
+[workspace]
+
+[lib]
+name = "kindora_desktop_lib"
+crate-type = ["rlib"]
+
+[[bin]]
+name = "kindora-desktop"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2.7.4", features = [] }
+
+[dependencies]
+tauri = { version = "2.12.5", features = [] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+ipc-protocol = { path = "../../../crates/ipc-protocol" }
+
+[profile.release]
+codegen-units = 1
+lto = true

@@ -3,7 +3,9 @@ use std::process::ExitCode;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
-use windows_session::{log_event, run_helper, Client, HelperConfig};
+use windows_session::{
+    log_event, run_bridge, run_helper, write_bridge_event, Client, HelperConfig,
+};
 
 const USAGE: &str = "\
 Kindora Session Helper (P1.A prototip — kısıtlama arayüzü yok)
@@ -11,6 +13,10 @@ Kindora Session Helper (P1.A prototip — kısıtlama arayüzü yok)
 Kullanım:
   kindora-helper run [--heartbeat-ms N] [--socket PATH]
       Agent'a bağlanır, kalp atışı gönderir; Ctrl+C ile kapanır.
+  kindora-helper bridge [--socket PATH]
+      Masaüstü uygulamasının alt süreci: stdin'den JSON istek satırları
+      (yalnız op=refresh) okur, stdout'a agent durumunu JSON satırları olarak yazar; stdin
+      kapanınca çıkar. Elle kullanım için değildir.
   kindora-helper ping|status|health [--socket PATH]
       Tek istek gönderir, yanıtı JSON olarak yazar.
       Çıkış kodu: 0 OK, 1 agent hata yanıtı, 3 bağlantı/iletişim hatası.
@@ -53,6 +59,58 @@ fn one_shot(cfg: &HelperConfig, command: CommandType) -> ExitCode {
     }
 }
 
+/// Masaüstü köprüsü: stdin satırları → istek kanalı; olaylar → stdout.
+fn bridge(cfg: &HelperConfig) -> ExitCode {
+    use ipc_protocol::bridge::{decode_bridge_request, BridgeEvent, MAX_BRIDGE_LINE_BYTES};
+    use std::io::{BufRead, Read};
+    use std::sync::mpsc;
+
+    let shutdown = Arc::new(AtomicBool::new(false));
+    let (tx, rx) = mpsc::channel();
+    let (reject_tx, reject_rx) = mpsc::channel::<String>();
+    // Okuyucu iş parçacığı stdin EOF'unda kanalı bırakır → köprü kapanır.
+    std::thread::spawn(move || {
+        let mut input = std::io::stdin().lock();
+        let mut line = String::new();
+        loop {
+            line.clear();
+            // Satır sınırı: sınırsız bellek kullanımı yok.
+            let mut limited = (&mut input).take(MAX_BRIDGE_LINE_BYTES as u64 + 1);
+            match limited.read_line(&mut line) {
+                Ok(0) | Err(_) => break,
+                Ok(_) => {}
+            }
+            if !line.ends_with('\n') && line.len() > MAX_BRIDGE_LINE_BYTES {
+                let _ = reject_tx.send("line too long".into());
+                break;
+            }
+            match decode_bridge_request(&line) {
+                Ok(req) => {
+                    if tx.send(req).is_err() {
+                        break;
+                    }
+                }
+                Err(e) => {
+                    let _ = reject_tx.send(e.to_string());
+                }
+            }
+        }
+    });
+
+    let stdout = std::io::stdout();
+    let mut emit = |e: &BridgeEvent| {
+        let mut out = stdout.lock();
+        while let Ok(reason) = reject_rx.try_recv() {
+            if !write_bridge_event(&mut out, &BridgeEvent::RequestRejected { reason }) {
+                return false;
+            }
+        }
+        write_bridge_event(&mut out, e)
+    };
+    run_bridge(cfg, &rx, &shutdown, &mut emit);
+    ExitCode::SUCCESS
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let Some(cmd) = args.first().map(String::as_str) else {
@@ -86,6 +144,7 @@ fn main() -> ExitCode {
             run_helper(&cfg, &shutdown);
             ExitCode::SUCCESS
         }
+        "bridge" => bridge(&cfg),
         "ping" => one_shot(&cfg, CommandType::Ping),
         "status" => one_shot(&cfg, CommandType::GetStatus),
         "health" => one_shot(&cfg, CommandType::HealthCheck),

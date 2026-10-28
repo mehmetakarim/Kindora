@@ -1,4 +1,4 @@
-# Kindora P1A - LocalService service end-to-end check (CI, BUG-003).
+# Kindora P1A/P1B - LocalService service end-to-end check (CI, BUG-003, P1.B).
 #
 # Installs KindoraAgentDev as NT AUTHORITY\LocalService with the SAME commands
 # as packaging/p1a/README-TEST-TR.md, then checks:
@@ -6,6 +6,10 @@
 #      with os_errors=OpenProcess=5 / Unauthorized(ExePathUnknown)  -> BUG-003 reproduction.
 #   2. kindora-helper.exe (adds the ACE) is identified: exe path read, PING/STATUS/HEALTH OK.
 #   3. The same helper copied to another directory is rejected (ExeDirMismatch).
+#   3b. P1.B desktop bridge: `kindora-helper bridge` reports SERVICE snapshots,
+#       answers a refresh and exits when stdin closes.
+#   3c. (-DesktopExe) The real Tauri desktop app connects through its helper,
+#       sees the service stop/start, and closes without leaving a helper behind.
 #   4. Service stops cleanly; it is always deleted afterwards.
 #
 # Runs under Windows PowerShell 5.1 on purpose (README compatibility).
@@ -15,7 +19,8 @@
 
 param(
     [Parameter(Mandatory = $true)][string]$BinDir,
-    [string]$SummaryFile = ''
+    [string]$SummaryFile = '',
+    [string]$DesktopExe = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -120,6 +125,95 @@ try {
     $line = Wait-LogLine 'event=client_disconnected .*os_errors=- outcome=Unauthorized\((ExeDirMismatch|NonInteractiveSession)\)'
     Write-Host $line
     $summary.Add("LOCALSERVICE helper copy in other dir: exit=3, Unauthorized(ExeDirMismatch)")
+
+    Write-Host '== 3b. Desktop bridge against the service (P1.B) =='
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = $helper
+    $psi.Arguments = 'bridge'
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardInput = $true
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.CreateNoWindow = $true
+    $bp = [System.Diagnostics.Process]::Start($psi)
+    function Read-BridgeUntil([string]$regex, [int]$ms) {
+        $sw = [Diagnostics.Stopwatch]::StartNew()
+        while ($true) {
+            $left = $ms - [int]$sw.ElapsedMilliseconds
+            if ($left -le 0) { throw "TIMEOUT: bridge line /$regex/" }
+            $task = $bp.StandardOutput.ReadLineAsync()
+            if (-not $task.Wait($left)) { throw "TIMEOUT: bridge line /$regex/" }
+            $l = $task.Result
+            if ($null -eq $l) { throw "bridge stdout closed before /$regex/" }
+            Write-Host "bridge> $l"
+            if ($l -match $regex) { return $l }
+        }
+    }
+    $null = Read-BridgeUntil '"type":"hello"' 5000
+    if ($session -ne 0) {
+        $null = Read-BridgeUntil '"type":"link","state":"connected"' 10000
+        $null = Read-BridgeUntil '"type":"snapshot".*"run_mode":"SERVICE".*"healthy":true' 10000
+        $sw = [Diagnostics.Stopwatch]::StartNew()
+        $bp.StandardInput.WriteLine('{"op":"refresh"}')
+        $bp.StandardInput.Flush()
+        $null = Read-BridgeUntil '"type":"snapshot"' 3000
+        Write-Host "bridge refresh took $($sw.ElapsedMilliseconds) ms"
+        $bp.StandardInput.WriteLine('{"op":"LOCK"}')
+        $bp.StandardInput.Flush()
+        $null = Read-BridgeUntil '"type":"request_rejected"' 8000
+    } else {
+        $null = Read-BridgeUntil '"state":"unauthorized"' 10000
+    }
+    $sw = [Diagnostics.Stopwatch]::StartNew()
+    $bp.StandardInput.Close()
+    Assert-True ($bp.WaitForExit(5000)) "bridge exits after stdin close ($($sw.ElapsedMilliseconds) ms)"
+    Assert-True ($bp.ExitCode -eq 0) "bridge exit code 0 (got $($bp.ExitCode))"
+    $summary.Add("LOCALSERVICE desktop bridge: SERVICE snapshot, refresh, LOCK rejected, clean exit on stdin close")
+
+    if ($DesktopExe) {
+        Write-Host '== 3c. Tauri desktop app (P1.B GUI smoke) =='
+        $desk = Join-Path $dir 'kindora-desktop.exe'
+        Copy-Item $DesktopExe $desk
+        $dlog = Join-Path $env:LOCALAPPDATA 'app.kindora.desktop.preview\logs\desktop.log'
+        Remove-Item $dlog -ErrorAction SilentlyContinue
+        function Get-DesktopLog { if (Test-Path $dlog) { return @(Get-Content $dlog) } ; return @() }
+        function Count-Desktop([string]$needle) { return @(Get-DesktopLog | Where-Object { $_.Contains($needle) }).Count }
+        $dp = Start-Process -FilePath $desk -PassThru
+        try {
+            Wait-Until { (Count-Desktop 'event=agent_link state=Connected') -ge 1 } 60000 'desktop connected via helper'
+            Assert-True $true 'desktop app connected to the LocalService agent through kindora-helper'
+            $kids = @(Get-CimInstance Win32_Process -Filter "ParentProcessId=$($dp.Id)" | Where-Object { $_.Name -eq 'kindora-helper.exe' })
+            Assert-True ($kids.Count -eq 1) "exactly one helper child of the desktop (found $($kids.Count))"
+            $helperPid = $kids[0].ProcessId
+
+            $sw = [Diagnostics.Stopwatch]::StartNew()
+            sc.exe stop $svc | Out-Null
+            Wait-Until { (Get-Service $svc).Status -eq 'Stopped' } 15000 'service Stopped (desktop test)'
+            Wait-Until { (Count-Desktop 'event=agent_link state=Disconnected') -ge 1 } 20000 'desktop sees agent stop'
+            Write-Host "desktop detected service stop in $($sw.ElapsedMilliseconds) ms"
+            $sw = [Diagnostics.Stopwatch]::StartNew()
+            sc.exe start $svc | Out-Null
+            Wait-Until { (Get-Service $svc).Status -eq 'Running' } 15000 'service Running again'
+            Wait-Until { (Count-Desktop 'event=agent_link state=Connected') -ge 2 } 30000 'desktop recovers after service restart'
+            Write-Host "desktop recovered after service start in $($sw.ElapsedMilliseconds) ms"
+
+            $dp.Refresh()
+            Assert-True ($dp.MainWindowHandle -ne [IntPtr]::Zero) 'desktop has a normal top-level window'
+            $sw = [Diagnostics.Stopwatch]::StartNew()
+            Assert-True ($dp.CloseMainWindow()) 'WM_CLOSE delivered to desktop window'
+            Assert-True ($dp.WaitForExit(15000)) "desktop exits after window close ($($sw.ElapsedMilliseconds) ms)"
+            Start-Sleep -Milliseconds 500
+            Assert-True ($null -eq (Get-Process -Id $helperPid -ErrorAction SilentlyContinue)) 'helper child exited with the desktop (no leak)'
+            Assert-True ((Count-Desktop 'event=helper_stopped') -ge 1) 'desktop log: helper_stopped'
+            Assert-True ((Get-Service $svc).Status -eq 'Running') 'closing the desktop does not stop the agent service'
+            $summary.Add("LOCALSERVICE desktop GUI: connected via helper, service stop/start detected and recovered, window close -> desktop+helper exit, service keeps running")
+        }
+        finally {
+            Write-Host '== Desktop log =='
+            Get-DesktopLog | ForEach-Object { Write-Host $_ }
+            if (-not $dp.HasExited) { Stop-Process -Id $dp.Id -Force -ErrorAction SilentlyContinue }
+        }
+    }
 
     Write-Host '== 4. Stop (README 4.6) =='
     sc.exe stop $svc | Out-Host

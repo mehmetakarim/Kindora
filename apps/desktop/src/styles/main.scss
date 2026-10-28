@@ -1,0 +1,37 @@
+// Tasarım token'ları depo kökündeki onaylı Claude Design teslimatından
+// DEĞİŞTİRİLMEDEN okunur; ardından Bootstrap 5.3 (ADR-0005 notu, P1.B).
+@import "../../../../design/design_handoff_kindora/tokens/kindora-tokens";
+@import "bootstrap/scss/bootstrap";
+
+html,
+body {
+  background: var(--kd-bg);
+  color: var(--kd-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.kd-card {
+  background: var(--kd-surface);
+  border: 1px solid var(--kd-line);
+  border-radius: $kd-radius-card;
+  box-shadow: $kd-shadow-card;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: $kd-focus-ring;
+}
+
+[data-kd-motion="reduced"] *,
+[data-kd-motion="reduced"] *::before,
+[data-kd-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

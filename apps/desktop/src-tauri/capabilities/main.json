@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-window",
+  "description": "Ana pencere: yalnız agent durumunu okuma, yenileme ve durum olaylarını dinleme. Dosya sistemi, kabuk, ağ veya pencere yönetimi izni yok.",
+  "windows": ["main"],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "allow-get-agent-state",
+    "allow-refresh-agent"
+  ]
+}
