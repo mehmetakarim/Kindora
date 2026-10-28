@@ -1,0 +1,23 @@
+# Kindora — Teknik Risk Kaydı (T0)
+
+> Durum: **Taslak** · P0 Kritik · P1 Yüksek · P2 Orta · P3 Düşük. Hiçbir risk test ile doğrulanmadı.
+
+| ID | Öncelik | Risk | Bileşen | Olası sonuç | Doğrulama | Azaltma | Bilinmeyen | Kabul / ret kriteri |
+|---|---|---|---|---|---|---|---|---|
+| R-01 | P0 | Kullanım kilidinin kısayollar / Görev Yöneticisi ile atlatılması | Helper, Policy Engine | Kural uygulanmaz | PoC-A A-01..A-03 | LL kanca, ön plan izleme, helper watchdog, kurcalama tepkisi ([T0-A](T0-A-kindora-lock.md)) | Exclusive fullscreen, Home'da `DisableTaskMgr` | Atlatma ≤5 sn içinde tespit + yeniden uygulama; aksi FAIL |
+| R-02 | P0 | Servisin / helper'ın beklenmedik kapanması | Agent | Denetim kesilir | PoC-B, A-03, A-10 | SCM kurtarma, watchdog, standart kullanıcıya `SERVICE_STOP` yok | Servis hesabı modeli (ADR-0006) | Standart kullanıcı servisi durduramaz; çökme sonrası ≤10 sn toparlanma |
+| R-03 | P0 | Yetkisiz uzaktan komut | Edge Functions, RLS | Başka aile çocuğunu kilitler/açar | RLS + API negatif testleri | Komutlar yalnız Edge Function, aile/cihaz kontrolü, hız sınırı | Cihaz kimliği modeli (ADR-0008) | Tüm çapraz-aile testleri reddedilmeli |
+| R-04 | P0 | Aileler arası veri sızıntısı | Postgres RLS, Realtime | KVKK ihlali | Otomatik RLS test paketi; Realtime private kanal testleri | Her tabloda RLS, private Broadcast, DELETE olayı kullanılmaz | — | Tek bir sızıntı = FAIL |
+| R-05 | P1 | Yerel politikanın değiştirilmesi | SQLite, ACL | Kurallar gevşer | Standart hesapla DB'ye erişim denemesi | ACL, isteğe bağlı imzalı politika | Yönetici erişimine karşı koruma yok | Standart hesap DB'yi okuyamaz/yazamaz |
+| R-06 | P1 | İnternet kesintisinde komutun ulaşmaması / yanlış "uygulandı" | Komut akışı | Ebeveyn yanlış bilgilenir | PoC-C offline senaryoları | Kalıcı kuyruk, TTL, receipt, Doğrulanamadı durumu | Heartbeat aralığı | Receipt olmadan hiçbir UI "Uygulandı" göstermez |
+| R-07 | P1 | Sistem saati / saat dilimi manipülasyonu | Usage Monitor | Süre/program kayar | PoC-D saat testleri | Monoton sayaç, sunucu zamanı, sapma olayı | Standart hesabın saat dilimi değişimi etkisi | Saat değişimi kullanılan süreyi değiştirmez |
+| R-08 | P1 | Kurulum/eşleştirme kodu brute-force veya ele geçirme | Eşleştirme | Yabancı cihaz aileye bağlanır | API testleri | Hash'li tek kullanımlık kod, 10 dk, deneme sınırı, ebeveyn doğrulama adımı | — | 5 hatalı denemede kilit; tüketilmiş kod tekrar çalışmaz |
+| R-09 | P1 | Supabase Free proje 1 hafta hareketsizlikte duraklar | Backend | Senkron durur | Kota izleme | Yerel kurallar sürer; prod için Pro değerlendirmesi | Gerçek kullanım sıklığı | Duraklamada cihaz kural uygulamaya devam eder |
+| R-10 | P1 | Çocuk verisi gizliliği / KVKK | Tümü | Hukuki risk | Veri envanteri incelemesi | Veri minimizasyonu, URL/içerik yok, saklama süresi | Hukuki değerlendirme, bölge | Ticari yayından önce uzman onayı |
+| R-11 | P1 | Kurtarılamaz kilit (ebeveyn erişimi kaybı, bozuk DB) | Agent | Çocuk/aile cihazı kullanamaz | A-11, DB bozma testi | Yerel yönetici kurtarma, güvenli varsayılan politika | Fail politikası (K-04) | Kurtarma her senaryoda çalışmalı |
+| R-12 | P2 | %125 / %150 ölçeklemede taşma | Vue UI, widget | Kullanılamaz ekran | GATE D gerçek WebView2 testi | Responsive düzen, ikon rayı | 1280×800 @%150 kararı (OBS-01) | Yatay taşma yok veya onaylı istisna |
+| R-13 | P2 | Supabase maliyet artışı (çok cihaz, Edge Function heartbeat) | Backend | Ücretli plana zorunlu geçiş | Kota hesabı | Heartbeat'i doğrudan RLS update ile; Realtime yalnız sinyal | Ticari ölçek | Tek aile Free sınırlarının <%20'si |
+| R-14 | P1 | Bootstrap 6 alfa kararsızlığı (6.0.0-alpha.1, 8 Eki 2026 — [resmi](https://blog.getbootstrap.com/2026/10/08/bootstrap-6-alpha/)); token dosyası v5 `@import`/değişken modeline göre yazılmış | Vue UI, tokenlar | Alfa sürümler arası kırılmalar; token uyarlama işi | Token dosyasını v6 alfa ile derleme PoC'si | Tam sürüm kilitleme (`6.0.0-alpha.N`), token uyarlama katmanı, alfa yükseltmelerini ayrı görev olarak alma; 5.3 yedeği yalnız kullanıcı onayıyla | Beta/kararlı tarihi | Tokenlar v6 alfa ile derlenir ve görsel referansla eşleşir |
+| R-15 | P2 | Kod imzalama olmadan AV/SmartScreen engeli | Kurulum | Kurulum başarısız | Gerçek kurulum testi | Kod imzalama sertifikası | Maliyet | Temiz Windows'ta uyarısız/kabul edilebilir kurulum |
+| R-16 | P2 | Push bildirimlerinin gecikmesi/teslim edilmemesi | Flutter | Talepler geç yanıtlanır | GATE E | FCM/APNs + uygulama açılışında yenileme | Sağlayıcı (K-06) | Arka planda bildirim cihaz testinde ulaşır |
+| R-17 | P3 | Windows 10 desteğinin sona ermesi | Destek matrisi | Güvenlik güncellemesi yok | — | Win11 birincil, Win10 ESU'ya kadar en iyi çaba | — | Belgelenmiş destek politikası |

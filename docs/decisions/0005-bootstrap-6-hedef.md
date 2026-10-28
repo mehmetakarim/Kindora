@@ -28,6 +28,10 @@ Tailwind CSS kullanılmaz (context §3).
 
 - Bootstrap 6'nın güncel yayın durumu (alfa/beta/kararlı), SCSS API'si ve `_kindora-tokens.scss` ile uyumu.
 
+## Güncelleme — 2026-10-28 (Phase T0)
+
+Resmi kaynakla doğrulandı: **Bootstrap 6.0.0-alpha.1, 8 Ekim 2026** ([blog](https://blog.getbootstrap.com/2026/10/08/bootstrap-6-alpha/)). Kararlı sürüm yok; beta öncesi anlamlı değişiklik olabilir. Bootstrap 6 hedef olarak korunur; alfa kararlılık riski [R-14](../feasibility/risk-register.md) olarak kaydedildi. `_kindora-tokens.scss` v5 tarzı `@import`/değişken override'ı kullanır; v6 Sass modülleri ve token haritalarına uyarlanması gerekir. 5.3'e geçiş yine kullanıcı onayı ister.
+
 ## İlişkili kararlar
 
 - [ADR-0004](0004-claude-design-tasarim-yonu-kabulu.md).

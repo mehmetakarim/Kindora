@@ -23,10 +23,33 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 
 ## Aktif / son görevler
 
+### TASK-003 — Phase T0: teknik uygulanabilirlik ve uygulama planı
+
+- **Öncelik:** Yüksek
+- **Durum:** Tamamlandı (2026-10-28) — **yalnızca teknik araştırma ve dokümantasyon**. Uygulama ve prototip başlatılmadı.
+- **Amaç ve kapsam:** Kindora kilidi, Windows Agent, Supabase güvenliği, çevrimdışı politika ve istemci entegrasyonu için araştırma, mimari öneri, risk kaydı ve faz planı. Kod, paket kurulumu ve Supabase projesi kapsam dışı; T0 belgelerinin commit/push'u kullanıcı onayıyla yapıldı.
+- **Kabul kriterleri:**
+  - [x] [docs/feasibility/](feasibility/README.md) altında 8 belge (T0-A…E, risk kaydı, yol haritası, README).
+  - [x] ADR-0006…0010 **Önerildi** durumunda; hiçbiri kabul edilmiş sayılmadı.
+  - [x] Önemli API/kota/sürüm iddiaları resmi kaynak bağlantılı; iddialar [Resmi kaynak]/[Çıkarım]/[PoC gerekli] etiketli.
+  - [x] Belgeler arası bağlantılar geçerli.
+  - [x] Kullanıcı kabulü: T0 dokümantasyon kararı **PASS** (GATE T0-A…E, yalnız plan kabulü; 2026-10-28).
+- **Teknik araştırma (yapıldı):** Microsoft Learn (Session 0, `WTSQueryUserToken`, `LockWorkStation`, servis DACL'leri, named pipe güvenliği, low-level hook, Assigned Access), Supabase (pricing, Realtime authorization, JWT/Auth Hooks), Tauri (WebView2), SQLite (WAL), Bootstrap 6 resmi blog.
+- **Prototip / entegrasyon doğrulaması (yapılmadı):**
+  - Windows prototipleri (kullanım kilidi A-01…A-12, servis/helper, DPI/WebView2): **NOT RUN**
+  - Supabase testleri (eşleştirme, RLS, komut kuyruğu): **NOT RUN**
+  - Flutter entegrasyon testleri: **NOT RUN**
+  - SQLite dayanıklılık testleri: **NOT RUN**
+  - Araştırma macOS üzerinde yapıldı. [Risk kaydındaki](feasibility/risk-register.md) hiçbir risk kapatılmadı.
+- **Bağımlılıklar:** TASK-002
+- **İlgili dosyalar:** [feasibility/](feasibility/README.md), [risk-register.md](feasibility/risk-register.md), [implementation-roadmap.md](feasibility/implementation-roadmap.md), [decisions/](decisions/README.md)
+- **Doğrulama sonucu:** Dokümantasyon PASS (8 feasibility belgesi, 5 ADR önerisi, göreli bağlantılar 0 kırık, tasarım dosyaları değişmedi, gizli bilgi yok). Teknik uygulama: NOT RUN.
+- **Yayın durumu:** `docs: complete Kindora T0 feasibility and architecture assessment` commit'i ile `origin/main`'e gönderilir (SHA sonraki belge güncellemesinde/`git log` ile doğrulanır).
+
 ### TASK-002 — Git depo temeli ve yazar (attribution) politikası (Phase M0.1)
 
 - **Öncelik:** Yüksek
-- **Durum:** Devam ediyor — kullanıcı ilk commit ve push'u onayladı (Phase M0.2, 2026-10-28); push sonrası doğrulama bu commit'te kaydedilemez, sonraki belge güncellemesinde işlenecek
+- **Durum:** Tamamlandı (2026-10-28)
 - **Amaç ve kapsam:** Yerel Git deposu, `origin` remote, depo-yerel Git kimliği, Claude Code attribution ayarları, `.gitignore`, Git katkıcı politikası ve onaylı ürün kararlarının (A–D) belgelere işlenmesi. Commit/push ve uygulama geliştirme kapsam dışı.
 - **Kabul kriterleri:**
   - [x] `git init -b main`; var olan depo yeniden başlatılmadı (önceden depo yoktu).
@@ -36,13 +59,13 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - [x] `.gitignore`: hafıza ve tasarım dosyaları izleniyor, yerel/gizli dosyalar dışlanıyor (`git check-ignore` ile doğrulandı).
   - [x] AGENTS.md §6 Git katkıcı politikası.
   - [x] Kararlar A–D: ADR-0001/0003 güncellendi, ADR-0004/0005 eklendi.
-  - [ ] İlk commit (onaylandı; bu belgeyi içeren commit — SHA sonraki belge güncellemesinde).
-  - [ ] İlk push `origin/main` (onaylandı; sonuç sonraki belge güncellemesinde).
+  - [x] İlk commit `64a05ac251cbe9737d4ec2642dd09ad24c6f1dd7` — `chore: initialize Kindora project memory and design foundation`, 38 dosya.
+  - [x] İlk push `origin/main` — `git push -u origin main` başarılı; yerel `main` = `origin/main` = GitHub API `commits/main` SHA'sı.
   - [x] Depo görünürlüğü: kullanıcı kararıyla **Public** kalır.
 - **Bağımlılıklar:** TASK-001
 - **İlgili dosyalar:** [.gitignore](../.gitignore), [.claude/settings.json](../.claude/settings.json), [AGENTS.md](../AGENTS.md), [decisions/](decisions/README.md), [architecture.md](architecture.md), [brain.md](../brain.md)
-- **Doğrulama sonucu:** CONDITIONAL PASS — commit öncesi denetimler geçti; koşullar: `attribution.sessionUrl` anahtarı Claude Code 2.1.71 şemasında yok (boş `attribution.commit` şemaya göre trailer dahil tüm commit attribution metnini gizler), commit e-postası GitHub noreply adresi (hesap ID'si doğrulandı), push sonrası doğrulama henüz kayıtlı değil.
-- **Yayın durumu:** Yayın yok.
+- **Doğrulama sonucu:** PASS — author/committer `Mehmet Akar <11380904+mehmetakarim@users.noreply.github.com>` (GitHub `mehmetakarim` hesabına bağlı), commit mesajında AI attribution yok, GitHub dosya listesi yerelle aynı (38). Not: commit imzasız (GitHub "Unverified" — imzalama kurulmadı); `attribution.sessionUrl` Claude Code 2.1.71 şemasında yok.
+- **Yayın durumu:** GitHub `origin/main` üzerinde (public).
 
 ### TASK-001 — Kindora proje hafızası ve AI çalışma protokolü kurulumu
 

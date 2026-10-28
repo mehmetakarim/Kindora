@@ -1,6 +1,6 @@
 # Kindora — Mimari
 
-> Son güncelleme: 2026-10-27 (Europe/Istanbul) · TASK-002
+> Son güncelleme: 2026-10-28 (Europe/Istanbul) · TASK-003 (Phase T0)
 > Ürün gereksinimlerinin ayrıntılı kaynağı: [KINDORA_PROJECT_CONTEXT.md](../design/KINDORA_PROJECT_CONTEXT.md) (§4–§12). Bu belge içeriği kopyalamaz; özetler ve gerçek durumu kaydeder.
 
 Bu belge iki bölümdür: **A. Onaylanmış hedef mimari** (plan; uygulanmadı) ve **B. Mevcut uygulama durumu** (proje dosyalarından doğrulanan gerçek).
@@ -71,14 +71,28 @@ Temel ilke: ebeveyn arayüzleri yönetim istemcisidir; kısıtlamalar **çocuğu
 
 Hedef: tarayıcıdan bağımsız **alan adı** düzeyi. Yöntem seçilmedi (hosts / DNS / WFP / eklenti). DNS temelli yaklaşım context'te "aday" olarak geçer. GATE C ile doğrulanacak. Ayrıntı: [context §12](../design/KINDORA_PROJECT_CONTEXT.md#12-tarayıcıdan-bağımsız-web-sitesi-kontrolü).
 
+### A.8 Phase T0 bulguları (T0 dokümantasyonu kabul edildi; ADR-0006…0010 önerileri **kabul edilmedi**, hiçbiri uygulanmadı)
+
+Ayrıntı ve kaynaklar: [docs/feasibility/](feasibility/README.md). Hiçbiri Windows/Supabase üzerinde test edilmedi.
+
+- **Kilit güvenlik sınırı:** Kindora kilidi "caydırıcı kısıtlama + kurcalama tespiti ve tepkisi" olarak konumlanır; Ctrl+Alt+Del, UAC secure desktop, yönetici erişimi kapsam dışıdır ([T0-A](feasibility/T0-A-kindora-lock.md)).
+- **Helper sonlandırılabilir:** Çocuk kimliğiyle çalışan helper aynı kullanıcı tarafından kapatılabilir [Çıkarım]; servisin helper'ı kendisinin başlatması `WTSQueryUserToken` → LocalSystem gerektirir, ancak Run anahtarı / logon görevi gibi yöntemler gerektirmez. Model seçimi PoC sonrası ([ADR-0006](decisions/0006-agent-surec-ve-hesap-modeli.md), Önerildi).
+- **Assigned Access** Windows Home'da yok → ana yöntem olamaz.
+- **IPC:** oturum başına, açık DACL'li named pipe ([ADR-0007](decisions/0007-servis-helper-ipc-named-pipe.md), Önerildi).
+- **Bulut:** cihaz başına kimlik + tek kullanımlık eşleştirme kodu ([ADR-0008](decisions/0008-cihaz-kimligi-ve-eslestirme.md)); kalıcı komut tablosu, Realtime yalnız uyandırma ([ADR-0009](decisions/0009-kalici-komut-kuyrugu-realtime-uyandirma.md)); Free plan 1 hafta hareketsizlikte duraklar ([T0-C](feasibility/T0-C-supabase-architecture.md)).
+- **Çevrimdışı:** monoton saatle kullanım ölçümü, "son ebeveyn kuralı" politikası, kurtarılamaz kilit yok ([T0-D](feasibility/T0-D-offline-policy.md)).
+- **İstemciler:** JSON Schema tek kaynak sözleşme ([ADR-0010](decisions/0010-paylasilan-sozlesme-json-schema.md)); çocuk UI Supabase'e doğrudan bağlanmaz ([T0-E](feasibility/T0-E-client-integration.md)).
+- **Bootstrap 6:** `6.0.0-alpha.1` (8 Eki 2026, resmi); token dosyası v6 Sass modüllerine uyarlanmalı ([ADR-0005](decisions/0005-bootstrap-6-hedef.md)).
+- **Windows destek önerisi:** Windows 11 birincil, Windows 10 22H2 ESU süresince ikincil ([T0-B §6](feasibility/T0-B-windows-agent.md)).
+
 ---
 
 ## B. Mevcut uygulama durumu (2026-10-27 itibarıyla doğrulandı)
 
 | Unsur | Durum |
 |---|---|
-| Git deposu | **Mevcut** (2026-10-27, TASK-002) — yerel `git init`, branch `main`, henüz commit yok |
-| Uzak depo | `origin` → `https://github.com/mehmetakarim/Kindora.git` (GitHub'da boş, **public**) — henüz push yapılmadı |
+| Git deposu | **Mevcut** — branch `main`, ilk commit `64a05ac` (2026-10-28) |
+| Uzak depo | `origin` → `https://github.com/mehmetakarim/Kindora.git` (**public**); `main` = `64a05ac` push edildi |
 | `.gitignore` | Mevcut — Node/Vue, Rust/Tauri, Flutter, Supabase sırları, SQLite, IDE/OS, log/cache kuralları |
 | `.claude/settings.json` | Mevcut — yalnızca AI attribution kapatma ayarları (uygulama yapılandırması değil) |
 | Kod dizinleri (`apps/`, `crates/`, `packages/`, `supabase/`) | Henüz uygulanmadı |
@@ -95,5 +109,6 @@ Hedef: tarayıcıdan bağımsız **alan adı** düzeyi. Yöntem seçilmedi (host
 - [design/design_handoff_kindora/](../design/design_handoff_kindora/README.md) — Claude Design teslimatı: README, components.md, `tokens/_kindora-tokens.scss`, `flutter/kindora_theme.dart` (referans tema kodu, derlenmiş bir uygulamanın parçası değil), `design_files/` altında 13 `.dc.html` prototip + destek JS dosyaları, `mascot_brief/` altında 2 `.dc.html`.
 - Hafıza belgeleri: `AGENTS.md`, `CLAUDE.md`, `brain.md`, `docs/`.
 - Depo altyapısı: `.gitignore`, `.claude/settings.json`.
+- Phase T0 planlama belgeleri: [docs/feasibility/](feasibility/README.md) (yalnız doküman; uygulama kodu değil).
 
 Proje şu anda **yalnızca tasarım ve dokümantasyondan** oluşur. Kod oluşturulduğunda bu bölüm gerçek dizin, komut ve test bilgileriyle güncellenmelidir.

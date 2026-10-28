@@ -45,3 +45,8 @@ Kindora'nın mimari ve teknik kararlarının geçmişi. Ürün gereksinimleri [K
 | [0003](0003-flutter-ebeveyn-mobil-mvp.md) | Ebeveyn mobil uygulaması Flutter ile ve MVP kapsamında (iOS + Android) | Kabul edildi | Ürün/teknoloji tercihi |
 | [0004](0004-claude-design-tasarim-yonu-kabulu.md) | Claude Design genel UI/UX yönünün kabulü (maskot, Windows entegrasyonu, erişilebilirlik hariç) | Kabul edildi (kısmi) | Ürün kararı |
 | [0005](0005-bootstrap-6-hedef.md) | Bootstrap 6 hedef teknolojidir; 5.3'e geçiş kullanıcı onayı ister | Kabul edildi (hedef) | Teknoloji tercihi |
+| [0006](0006-agent-surec-ve-hesap-modeli.md) | Windows Agent süreç ve servis hesabı modeli (LocalSystem varsayılan değil) | **Önerildi** | Teknik uygulama yöntemi |
+| [0007](0007-servis-helper-ipc-named-pipe.md) | Servis ↔ helper IPC: oturum başına named pipe | **Önerildi** | Teknik uygulama yöntemi |
+| [0008](0008-cihaz-kimligi-ve-eslestirme.md) | Cihaz kimliği ve güvenli eşleştirme | **Önerildi** | Teknik uygulama yöntemi |
+| [0009](0009-kalici-komut-kuyrugu-realtime-uyandirma.md) | Kalıcı komut kuyruğu, Realtime yalnız uyandırma | **Önerildi** | Teknik uygulama yöntemi |
+| [0010](0010-paylasilan-sozlesme-json-schema.md) | Paylaşılan sözleşme: JSON Schema → TS/Dart/Rust | **Önerildi** | Teknik uygulama yöntemi |
