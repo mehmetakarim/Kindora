@@ -95,13 +95,13 @@ Ayrıntı ve kaynaklar: [docs/feasibility/](feasibility/README.md). Hiçbiri Win
 | Uzak depo | `origin` → `https://github.com/mehmetakarim/Kindora.git` (**public**); `main` = `64a05ac` push edildi |
 | `.gitignore` | Mevcut — Node/Vue, Rust/Tauri, Flutter, Supabase sırları, SQLite, IDE/OS, log/cache kuralları |
 | `.claude/settings.json` | Mevcut — yalnızca AI attribution kapatma ayarları (uygulama yapılandırması değil) |
-| `crates/` (Rust workspace) | **Kodlandı — P1.A prototipi** (2026-10-28): `ipc-protocol`, `agent-core`, `windows-agent` (`kindora-agent`), `windows-session` (`kindora-helper`). Yalnız `PING`/`GET_STATUS`/`HEALTH_CHECK`; kilit/politika/bulut yok. macOS'ta test edildi; **Windows'ta çalıştırılmadı**. Ayrıntı: [p1a-windows-agent.md](agent/p1a-windows-agent.md) |
+| `crates/` (Rust workspace) | **Kodlandı — P1.A prototipi** (2026-10-28): `ipc-protocol`, `agent-core`, `windows-agent` (`kindora-agent`), `windows-session` (`kindora-helper`). Yalnız `PING`/`GET_STATUS`/`HEALTH_CHECK`; kilit/politika/bulut yok. macOS'ta ve GitHub-hosted Windows Server 2022'de (konsol + gerçek LocalService servisi) test edildi; **gerçek Windows 11 cihaz kabulü bekliyor**. Agent servis hesabı `NT AUTHORITY\LocalService`; helper kendi süreç DACL'ine LocalService için yalnız `PROCESS_QUERY_LIMITED_INFORMATION` ekler, böylece agent exe yolunu işletim sisteminden doğrulayabilir ([BUG-003](solutions.md)). Kindora mevcut Windows hesabında çalışır, ayrı çocuk hesabı zorunlu değildir ([ADR-0012](decisions/0012-mevcut-windows-hesabinda-calisma.md)). Ayrıntı: [p1a-windows-agent.md](agent/p1a-windows-agent.md) |
 | `apps/`, `packages/`, `supabase/` | Henüz uygulanmadı |
 | Paket/bağımlılık dosyaları | `Cargo.toml` + `Cargo.lock` mevcut (serde, serde_json, ctrlc, libc[unix], windows-sys/windows-service[windows]). `package.json`, `pubspec.yaml`: henüz yok |
 | Uygulama giriş noktaları | `crates/windows-agent/src/main.rs` (`console`/`service`), `crates/windows-session/src/main.rs` (`run`/`ping`/`status`/`health`). Tauri/Flutter: henüz yok |
 | Veritabanı şemaları / migration'lar | Henüz uygulanmadı |
-| Test altyapısı / CI | `cargo test --workspace` (32 birim + 6 Unix-dev e2e + Windows'a özgü 8 test yalnız Windows'ta). CI: [windows-p1a.yml](../.github/workflows/windows-p1a.yml) (GitHub-hosted `windows-2022`; gerçek Windows 11 kabul testi değildir) |
-| Build / geliştirme / test komutları | Rust: [p1a-windows-agent.md §4](agent/p1a-windows-agent.md) (macOS'ta doğrulandı; Windows komutları doğrulanmadı) |
+| Test altyapısı / CI | `cargo test --workspace` (32 birim + 6 Unix-dev e2e + Windows'a özgü 9 test yalnız Windows'ta). CI: [windows-p1a.yml](../.github/workflows/windows-p1a.yml) (GitHub-hosted `windows-2022`) + release EXE'lerle LocalService servis uçtan uca betiği [ci/p1a-localservice-e2e.ps1](../ci/p1a-localservice-e2e.ps1) (Windows PowerShell 5.1). Gerçek Windows 11 kabul testi değildir |
+| Build / geliştirme / test komutları | Rust: [p1a-windows-agent.md §4](agent/p1a-windows-agent.md) (macOS'ta doğrulandı; servis kurulum/kaldırma komutları CI'da PowerShell 5.1 ile doğrulandı) |
 | README.md (kök) | Yok |
 
 **Gerçekte mevcut olanlar:**

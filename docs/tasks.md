@@ -23,6 +23,47 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 
 ## Aktif / son görevler
 
+### TASK-006 — P1.A.2: LocalService IPC kimlik doğrulama düzeltmesi (BUG-003)
+
+- **Öncelik:** Yüksek
+- **Durum:** Tamamlandı (2026-10-28). Düzeltme CI'da gerçek LocalService servisiyle doğrulandı ve prerelease yayımlandı. **Gerçek Windows cihazında yeniden test yapılmadı.**
+- **Amaç ve kapsam:**
+  - Kullanıcının cihazında görülen `os_errors=OpenProcess=5` / `Unauthorized(ExePathUnknown)` hatasını, LocalSystem'e geçmeden ve kimlik doğrulamayı gevşetmeden çözmek.
+  - Mevcut Windows hesabı ürün kararını kaydetmek.
+  - Yeni komut eklenmedi; P1.B kapsam dışı.
+- **Kabul kriterleri:**
+  - [x] Kök neden: kullanıcı süreçlerinin varsayılan DACL'i LocalService'e izin vermiyor ([BUG-003](solutions.md)).
+  - [x] En az yetkili düzeltme: helper kendi DACL'ine LocalService için yalnız `PROCESS_QUERY_LIMITED_INFORMATION` ekliyor. Protokol, komutlar ve politika değişmedi.
+  - [x] Ürün kararı: mevcut Windows hesabı, ayrı çocuk hesabı zorunlu değil ([ADR-0012](decisions/0012-mevcut-windows-hesabinda-calisma.md)). AGENTS.md ve ADR-0006/0011 güncellendi.
+  - [x] macOS testleri: 38 test, clippy macOS ve Windows hedefi PASS.
+  - [x] Windows CI [40720517755](https://github.com/mehmetakarim/Kindora/actions/runs/40720517755) (push, `a031ab7`):
+    - 33 test PASS, clippy, release derleme.
+    - LocalService servis uçtan uca testi PASS ([ci/p1a-localservice-e2e.ps1](../ci/p1a-localservice-e2e.ps1)).
+  - [x] PowerShell uyumu: servis kurma/başlatma/durdurma/silme komutları (`sc.exe --%`) CI'da Windows PowerShell 5.1 ile çalıştırıldı.
+  - [x] Prerelease [`p1a-windows-test.2`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.2):
+    - [Çalıştırma 40720830232](https://github.com/mehmetakarim/Kindora/actions/runs/40720830232); hedef `a031ab7`.
+    - `latest` değil. macOS'ta indirilip SHA-256 doğrulandı.
+  - [x] Test rehberi mevcut hesaba göre sadeleştirildi; başına "Hızlı test" bölümü eklendi.
+  - [ ] Kullanıcının cihazında W-10 (ve W-01…W-12) yeniden testi — **bekliyor**.
+- **Bağımlılıklar:** TASK-005; kullanıcının `test.1` sonucu.
+- **İlgili dosyalar:**
+  - `crates/ipc-protocol/src/transport/windows_pipe.rs`
+  - `crates/windows-session/src/main.rs`
+  - `crates/windows-agent/tests/windows_pipe_smoke.rs`
+  - `ci/p1a-localservice-e2e.ps1`
+  - `.github/workflows/windows-p1a.yml`
+  - `packaging/p1a/README-TEST-TR.md`
+- **Doğrulama sonucu:** CI'daki LocalService servis testi (runneradmin, oturum 2, PowerShell 5.1.20348):
+  - ACE'siz istemci: `OpenProcess=5` → `Unauthorized(ExePathUnknown)`. Cihaz hatasının yeniden üretimi.
+  - Helper PING/STATUS/HEALTH: `exit=0`, `os_errors=-`, `run_mode=SERVICE`.
+  - Farklı dizindeki kopya: `ExeDirMismatch`.
+  - Servis durdu ve silindi (1060).
+  - Helper DACL'i önce `D:(A;;0x1fffff;;;LA)(A;;0x1fffff;;;BA)(A;;0x1fffff;;;SY)`, sonra başına `(A;;0x1000;;;LS)` eklendi.
+  - **CI, cihaz kabulü değildir.**
+- **Yayın durumu:**
+  - Prerelease — Not for Production.
+  - ZIP SHA-256 `db0ad4dd8e2ef4cf10b57d1da5aea74aaf9bdce83df20135ea7a8d7ab6c15489`.
+
 ### TASK-005 — P1.A.1: Windows CI derlemesi, test paketi, prerelease hazırlığı
 
 - **Öncelik:** Yüksek

@@ -35,7 +35,7 @@ Pipe erişim modeli için:
 
 - Unix testlerindeki PASS, Windows davranışını kanıtlamaz; yanlış güven riski → belgelerde her sonuç ortamıyla etiketlenir.
 - Interactive Users, logon SID'den geniştir (aynı makinedeki her etkileşimli kullanıcı bağlanmayı deneyebilir); oturum + exe denetimi ve "helper yetkili karar veremez" ilkesiyle sınırlanır.
-- Exe yolu denetimi LocalService altında çalışmayabilir (W-10).
+- Exe yolu denetimi LocalService altında varsayılan DACL nedeniyle çalışmadı (W-10, BUG-003); helper'ın kendi DACL'ine LocalService için yalnız sorgu hakkı eklemesiyle çözüldü (P1.A.2, CI'da doğrulandı).
 
 ## Açık doğrulama gereksinimleri
 

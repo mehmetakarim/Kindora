@@ -41,6 +41,21 @@ PoC-A/B'de M1 ve M2 (veya bölünmüş model) **ölçülerek** karşılaştırı
 
 Prototip kodu servis hesabı seçmez; `sc.exe create ... obj=` ile verilir (ilk deneme önerisi LocalService). Yeni açık soru: LocalService altındaki agent, helper sürecinin yolunu `PROCESS_QUERY_LIMITED_INFORMATION` ile sorgulayabiliyor mu? Sorgulayamazsa yetkilendirme fail-closed reddeder (W-10, [P1.A raporu](../agent/p1a-windows-agent.md)). Bu ölçüm hesap modeli kararına girdi olacak.
 
+## P1.A.2 notu (2026-10-28) — W-10 sonucu ve BUG-003
+
+- **Cihaz sonucu (kullanıcı, `p1a-windows-test.1`):** LocalService agent, helper'ın PID ve oturumunu okudu.
+  - `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` ise `5` ile reddedildi ve yetkilendirme fail-closed reddetti. W-10 FAIL.
+  - Neden: kullanıcı sürecinin varsayılan DACL'i LocalService'e izin vermez ([BUG-003](../solutions.md)).
+- **Düzeltme (düşük yetkili kalarak):**
+  - Helper, kendi süreç DACL'ine yalnız LocalService için `PROCESS_QUERY_LIMITED_INFORMATION` ekler.
+  - LocalSystem'e geçilmedi. Kimlik doğrulama (OS'den exe yolu, oturum, ad, dizin) korundu.
+- **CI kanıtı:** release agent gerçek LocalService servisi olarak çalıştı ve helper'ı yetkilendirdi; ACE'siz istemci yine reddedildi.
+  - Çalıştırma: [40720517755](https://github.com/mehmetakarim/Kindora/actions/runs/40720517755).
+  - Gerçek Windows 11 cihazında yeniden doğrulama bekleniyor (`p1a-windows-test.2`).
+- **Bu ADR için anlamı:** M1 (düşük yetkili servis) için kimlik doğrulama engeli giderildi. Hesap modeli kararı hâlâ **Önerildi**; helper başlatma/yeniden doğurma (M1 vs M2) ölçümü açık.
+- **Daraltma seçeneği:** izin bugün tüm LocalService servislerine açıktır. Servis SID'i (`sc.exe sidtype <ad> restricted` + ACE'de `NT SERVICE\<ad>`) ile yalnız Kindora servisine indirilebilir; kurulum aşamasında değerlendirilecek.
+- **Hesap:** Kindora mevcut Windows hesabında çalışır ([ADR-0012](0012-mevcut-windows-hesabinda-calisma.md)). Yönetici hesapta kurcalama engellenemez, yalnız tespit edilebilir.
+
 ## İlişkili kararlar
 
-[ADR-0001](0001-kindora-kullanim-kilidi-ana-kontrol.md), [ADR-0007](0007-servis-helper-ipc-named-pipe.md).
+[ADR-0001](0001-kindora-kullanim-kilidi-ana-kontrol.md), [ADR-0007](0007-servis-helper-ipc-named-pipe.md), [ADR-0012](0012-mevcut-windows-hesabinda-calisma.md).

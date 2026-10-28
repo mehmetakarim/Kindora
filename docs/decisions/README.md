@@ -51,3 +51,4 @@ Kindora'nın mimari ve teknik kararlarının geçmişi. Ürün gereksinimleri [K
 | [0009](0009-kalici-komut-kuyrugu-realtime-uyandirma.md) | Kalıcı komut kuyruğu, Realtime yalnız uyandırma | **Önerildi** | Teknik uygulama yöntemi |
 | [0010](0010-paylasilan-sozlesme-json-schema.md) | Paylaşılan sözleşme: JSON Schema → TS/Dart/Rust | **Önerildi** | Teknik uygulama yöntemi |
 | [0011](0011-p1a-crate-yapisi-ve-gelistirme-tasimasi.md) | P1.A crate yapısı, pipe erişim modeli, Unix geliştirme taşıması | **Önerildi** | Teknik uygulama yöntemi |
+| [0012](0012-mevcut-windows-hesabinda-calisma.md) | Kindora mevcut Windows hesabında çalışır; çocuk için ayrı hesap zorunlu değil | Kabul edildi | Ürün kararı |

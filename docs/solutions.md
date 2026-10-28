@@ -37,3 +37,34 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
 - **Uygulanan çözüm:** Paketleme adımında metin dosyaları `[IO.File]::WriteAllText` ile LF satır sonuyla yazılır; doğrulama adımı CR içeren hash dosyasında CI'ı başarısız kılar.
 - **Doğrulama yöntemi:** Hatalı artifact macOS'ta `tr -d '\r'` ile doğrulandığında tüm hash'ler eşleşti (içerik sağlam, yalnız biçim hatalı). Düzeltme sonrası CI artifact'ı macOS'ta doğrudan `shasum -a 256 -c` ile doğrulanacak.
 - **İlgili görev, dosya veya commit:** TASK-005; `.github/workflows/windows-p1a.yml`; hata commit'i `36e657c`.
+
+### BUG-003 — LocalService agent helper sürecini açamıyor (`OpenProcess=5`)
+
+- **Belirti:** Kullanıcının gerçek Windows cihazında (mevcut Lenovo hesabı, `p1a-windows-test.1`) servis olarak çalışan agent'ın kaydı: `os_errors=OpenProcess=5` ve `outcome=Unauthorized(ExePathUnknown)`. Helper `hata: unauthorized`, `exit=3`. Agent, pipe üzerinden PID ve oturum kimliğini okuyabiliyordu.
+- **Ortaya çıktığı koşul:** Agent `NT AUTHORITY\LocalService` hesabıyla servis olarak çalışıyor, helper etkileşimli oturumda kullanıcı hesabıyla çalışıyor (W-10). Konsol modunda agent ve helper aynı kullanıcı olduğu için görünmüyordu; P1.A.1 CI'ı servis kurmadığı için yakalayamadı.
+- **Kök neden:** PID ve oturum pipe tanıtıcısından gelir (`GetNamedPipeClientProcessId` / `GetNamedPipeClientSessionId`) ve süreç erişimi gerektirmez. Exe yolu ise `OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION)` ister ve bu çağrı helper sürecinin DACL'iyle denetlenir. Kullanıcı süreçlerinin varsayılan DACL'i (token default DACL) yalnız kullanıcıya/yöneticilere ve SYSTEM'e izin verir. CI'da ölçülen helper DACL'i: `D:(A;;0x1fffff;;;LA)(A;;0x1fffff;;;BA)(A;;0x1fffff;;;SY)`. LocalService (`S-1-5-19`) listede yok, yani `ERROR_ACCESS_DENIED` (5). LocalService'te `SeDebugPrivilege` de yoktur (olmamalıdır). Exe yolu bilinmeyince politika fail-closed reddetti.
+- **Değerlendirilen ve seçilmeyen yöntemler:**
+  - LocalSystem: kullanıcı talimatıyla dışlandı, en az yetki ilkesine aykırı.
+  - `ImpersonateNamedPipeClient` ile kullanıcı adına açma: istemci `SECURITY_IDENTIFICATION` ile bağlanır, bu düzeyde nesne erişimi yapılamaz. Düzeyi yükseltmek sahte sunucunun kullanıcıyı taklit etmesine kapı açar.
+  - `NtQuerySystemInformation(SystemProcessIdInformation)`: süreç açmadan yol verir ama belgelenmemiş bir sınıftır.
+  - Toolhelp anlık görüntüsü: yalnız exe adı verir; yalnız ada güvenmek yasak.
+  - Kimlik denetimini kaldırmak: yasak.
+- **Uygulanan çözüm:**
+  - Helper başlangıçta kendi süreç DACL'ine **yalnız** LocalService için `PROCESS_QUERY_LIMITED_INFORMATION` (0x1000) ACE'si ekler (`GetSecurityInfo` → `SetEntriesInAclW` → `SetSecurityInfo`; `ipc_protocol::transport::windows_pipe::grant_agent_process_query`).
+  - Bu izin bellek erişimi, sonlandırma veya token erişimi vermez.
+  - Kimlik doğrulama değişmedi: exe yolu yine işletim sisteminden okunur; oturum ≠ 0, ad ve dizin politikası uygulanır.
+  - İzni vermeyen istemci yine `OpenProcess=5` ile reddedilir.
+  - İzin başarısız olursa helper `process_query_grant_failed` kaydı yazar ve agent reddeder (fail closed).
+- **Doğrulama yöntemi:**
+  - Birim testi `helper_grants_only_query_limited_to_local_service`: DACL'e tam olarak `(A;;0x1000;;;LS)` eklendiğini, işlemin idempotent olduğunu doğrular.
+  - CI adımı [`ci/p1a-localservice-e2e.ps1`](../ci/p1a-localservice-e2e.ps1), [çalıştırma 40720517755](https://github.com/mehmetakarim/Kindora/actions/runs/40720517755). Release EXE'ler test rehberindeki komutlarla (Windows PowerShell 5.1) gerçek LocalService servisi olarak kuruldu. Sonuçlar:
+    - ACE'siz yabancı istemci (powershell.exe): `os_errors=OpenProcess=5 outcome=Unauthorized(ExePathUnknown)`, cihazdaki hatanın birebir yeniden üretimi.
+    - Helper PING/STATUS/HEALTH: `exit=0`, `exe="C:\\Program Files\\KindoraDev\\kindora-helper.exe" os_errors=- outcome=PeerClosed`.
+    - Farklı dizindeki kopya: `Unauthorized(ExeDirMismatch)`.
+    - Servis durdu ve silindi.
+  - Gerçek cihaz doğrulaması: `p1a-windows-test.2` ile kullanıcı testi bekleniyor.
+- **İlgili görev, dosya veya commit:** TASK-006 (P1.A.2); `crates/ipc-protocol/src/transport/windows_pipe.rs`, `crates/windows-session/src/main.rs`, `crates/windows-agent/tests/windows_pipe_smoke.rs`, `ci/p1a-localservice-e2e.ps1`, `.github/workflows/windows-p1a.yml`; düzeltme commit'i `a031ab7`.
+- **Kalan risk:** Aynı makinedeki diğer LocalService servisleri de helper'ın exe yolunu ve zamanlarını sorgulayabilir. İleride servis SID'i (`NT SERVICE\KindoraAgent`, `sc.exe sidtype ... restricted`) ile daraltılabilir (ADR-0006).
+- **Ek bulgu (aynı faz):**
+  - Önceki rehberdeki `sc.exe create ... binPath= "\"C:\Program Files\...\" service"` satırı PowerShell'de güvenilir değildir; iç tırnaklar PowerShell 5.1'de bozulur.
+  - Rehber ve CI artık `sc.exe --% create ...` kullanıyor; CI'da PowerShell 5.1 ile `sc.exe qc` çıktısı doğrulandı.

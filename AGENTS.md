@@ -103,7 +103,7 @@ Kindora kullanım kilidi ile Windows oturum kilidi **farklı mekanizmalardır**.
 - Supabase Row Level Security kullanılır; aile izolasyonu zorunlu kabul kriteridir.
 - Gizli anahtarlar (`service_role` vb.) istemci uygulamalarına gömülmez.
 - Sistem komutları açıkça izin verilmiş işlem türleriyle (beyaz liste) sınırlıdır; keyfi shell komutu yok.
-- Çocuk standart Windows kullanıcı hesabıyla çalışır.
+- Kindora mevcut Windows kullanıcı hesabında çalışır; çocuk için ayrı (standart) Windows hesabı zorunlu değildir ([ADR-0012](docs/decisions/0012-mevcut-windows-hesabinda-calisma.md)). Hesap yöneticiyse kurcalama engellenemez, yalnız tespit edilebilir — "kapatılamaz" iddiası yazılmaz.
 - Parola, token, API anahtarı ve çocuğa ait kişisel veriler **hafıza dosyalarına yazılmaz**.
 - Gizli ekran izleme, keylogger ve mesaj içeriği takibi geliştirme kapsamına dahil edilmez.
 - Belirsizlikte (bağlantı kaybı, bozuk kural, saat sapması) cihazı geri döndürülemez şekilde kilitleyen tasarım yapılmaz.

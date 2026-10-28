@@ -11,7 +11,7 @@
 | Rust / Cargo | 1.94.0 / 1.94.0 (stable) |
 | Windows hedefi | `x86_64-pc-windows-msvc` std hedefi rustup'a eklendi (yalnız `cargo check`/`clippy`; MSVC linker yok → **bağlama/çalıştırma yok**). Geri almak: `rustup target remove x86_64-pc-windows-msvc` |
 | Windows test cihazı / VM | **Yok** (Parallels/VMware/UTM/VirtualBox bulunamadı) |
-| Windows 11 Home/Pro, standart + yönetici hesap | **Yok** |
+| Windows 11 Home/Pro — kullanıcının mevcut hesabı (Lenovo; [ADR-0012](../decisions/0012-mevcut-windows-hesabinda-calisma.md)) | Kullanıcıda; `p1a-windows-test.1` ile W-10 FAIL (BUG-003), `test.2` bekleniyor |
 | Geri dönüş yöntemi (snapshot) | **Yok** |
 
 ## 2. Workspace yapısı
@@ -63,23 +63,23 @@ target/debug/kindora-helper run
 target/debug/kindora-helper ping
 ```
 
-Windows (yapılmadı — test ortamında elle, yönetici PowerShell):
+Windows servis (yönetici PowerShell; CI'da Windows PowerShell 5.1 ile [ci/p1a-localservice-e2e.ps1](../../ci/p1a-localservice-e2e.ps1) tarafından aynı komutlarla doğrulanır — `--%` iç tırnakların bozulmadan `sc.exe`'ye gitmesi içindir):
 
 ```powershell
 cargo build --release --workspace
-New-Item -ItemType Directory "C:\Program Files\KindoraDev"
+New-Item -ItemType Directory "C:\Program Files\KindoraDev" -Force | Out-Null
 Copy-Item target\release\kindora-agent.exe, target\release\kindora-helper.exe "C:\Program Files\KindoraDev\"
-sc.exe create KindoraAgentDev binPath= "\"C:\Program Files\KindoraDev\kindora-agent.exe\" service" start= demand obj= "NT AUTHORITY\LocalService"
+sc.exe --% create KindoraAgentDev binPath= "\"C:\Program Files\KindoraDev\kindora-agent.exe\" service" start= demand obj= "NT AUTHORITY\LocalService"
 sc.exe start KindoraAgentDev
 sc.exe query KindoraAgentDev
-# Standart çocuk hesabında:
+# Aynı hesapta, yönetici OLMAYAN PowerShell:
 & "C:\Program Files\KindoraDev\kindora-helper.exe" ping
 # Güvenli çıkış (yönetici):
 sc.exe stop KindoraAgentDev
 sc.exe delete KindoraAgentDev
 ```
 
-`start= demand`: açılışta başlamaz. Helper için Run anahtarı/zamanlanmış görev **oluşturulmaz**. Servis kaydı beklenen konum: `C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp\kindora-agent-dev.log` [PoC gerekli].
+`start= demand`: açılışta başlamaz. Helper için Run anahtarı/zamanlanmış görev **oluşturulmaz**. Servis kaydı: `C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp\kindora-agent-dev.log` (CI'da doğrulandı).
 
 ## 5. Test sonuçları (2026-10-28, macOS arm64)
 
@@ -108,26 +108,26 @@ sc.exe delete KindoraAgentDev
 | 9 | Tekrarlanan mesaj kimliği | PASS (Unix dev) | `DUPLICATE_MESSAGE_ID` |
 | 10 | Kontrollü yeniden başlatma | PASS (Unix dev): agent yeniden başlayınca helper **236–243 ms** içinde yeniden bağlandı; helper SIGINT ile 0 koduyla çıktı | aynı test |
 
-### Windows'a özgü — durum (2026-10-28)
+### Windows'a özgü — durum (2026-10-28, P1.A.2 sonrası)
 
-"CI" sütunu GitHub-hosted Windows Server 2022 runner'ı ([çalıştırma 40667562920](https://github.com/mehmetakarim/Kindora/actions/runs/40667562920), yönetici hesap, oturum 2); "Cihaz" sütunu kullanıcının Windows 11 Home/Pro bilgisayarıdır. Cihaz sütunu doldurulmadan Windows kabulü verilmez.
+"CI" sütunu GitHub-hosted Windows Server 2022 runner'ı ([çalıştırma 40720517755](https://github.com/mehmetakarim/Kindora/actions/runs/40720517755), `runneradmin` yönetici hesap, oturum 2, LocalService servis adımı dahil); "Cihaz" sütunu kullanıcının Windows 11 Home/Pro bilgisayarıdır. Cihaz sütunu doldurulmadan Windows kabulü verilmez.
 
 | ID | Test | CI | Cihaz |
 |---|---|---|---|
 | W-01 | MSVC ile bağlama ve `.exe` üretimi | PASS (release EXE'ler, PE32+ x86-64) | NOT RUN (EXE'lerin cihazda çalışması) |
 | W-02 | Konsol agent + helper, named pipe üzerinden PING/STATUS/HEALTH | PASS (yönetici, aynı kullanıcı) | NOT RUN |
-| W-03 | Standart kullanıcı helper'ı `0x0012008B` DACL ile bağlanabiliyor mu | Sınanamaz (runner yönetici → BA girişi) | NOT RUN |
-| W-04 | Farklı ad/dizindeki exe → `UNAUTHORIZED` | Kısmen PASS (test ikilisi `ExeNameMismatch` ile reddedildi; dizin farkı sınanmadı) | NOT RUN |
+| W-03 | Yönetici olmayan helper `0x0012008B` (IU) DACL ile bağlanabiliyor mu | Sınanamaz (runner yükseltilmiş yönetici → BA girişi) | NOT RUN (mevcut hesapta yönetici olmayan PowerShell) |
+| W-04 | Farklı ad/dizindeki exe → `UNAUTHORIZED` | PASS (`ExeNameMismatch`; LocalService serviste farklı dizindeki kopya `ExeDirMismatch`) | NOT RUN |
 | W-05 | Uzak istemci reddi (`PIPE_REJECT_REMOTE_CLIENTS`) | Sınanamaz | NOT RUN |
 | W-06 | Pipe adı önceden alınmışsa agent başlamıyor | PASS (`ERROR_ACCESS_DENIED` 5; ikinci agent `agent_failed`) | NOT RUN |
-| W-07 | `sc create/start/query/stop/delete` yaşam döngüsü, LocalService | Sınanmadı (servis kurulmaz) | NOT RUN |
-| W-08 | Standart kullanıcı `sc stop` → erişim reddi | Sınanamaz | NOT RUN |
+| W-07 | `sc create/start/query/stop/delete` yaşam döngüsü, LocalService | PASS (PowerShell 5.1, `start= demand`, `obj= NT AUTHORITY\LocalService`, `agent_stopped`, silme → 1060) | NOT RUN |
+| W-08 | Yönetici olmayan pencereden `sc stop` → erişim reddi | Sınanamaz (runner yönetici) | NOT RUN |
 | W-09 | Helper sonlandırma → tespit süresi | PASS (`TerminateProcess`, ≤ 3–5 ms) | NOT RUN (Görev Yöneticisi) |
-| W-10 | **LocalService agent, çocuk sürecini `PROCESS_QUERY_LIMITED_INFORMATION` ile açabiliyor mu** | Sınanamaz (aynı kullanıcı) | NOT RUN — ADR-0006 için kritik |
-| W-11 | Servis durdurulurken bağlı helper'ın kaybı ve yeniden bağlanma | Sınanmadı | NOT RUN |
+| W-10 | **LocalService agent, helper sürecini `PROCESS_QUERY_LIMITED_INFORMATION` ile açabiliyor mu** | PASS (BUG-003 düzeltmesiyle; ACE'siz istemci `OpenProcess=5` ile reddedildi, helper `os_errors=-` ile yetkilendirildi) | `test.1`: **FAIL** (`OpenProcess=5`, BUG-003) · `test.2`: NOT RUN |
+| W-11 | Servis durdurulurken bağlı helper'ın kaybı ve yeniden bağlanma | Sınanmadı (yalnız durdurma) | NOT RUN |
 | W-12 | Session 0'dan gelen istemci reddi | Sınanmadı (runner oturumu 2) | NOT RUN (kapsam dışı) |
 
-Prerelease: [`p1a-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.1) (commit `17195b5`). Paket SHA-256 değerleri release notlarında ve paketteki `SHA256SUMS.txt` dosyasındadır.
+Prerelease'ler: [`p1a-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.1) (commit `17195b5`, BUG-003'ü içerir), [`p1a-windows-test.2`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.2) (commit `a031ab7`, BUG-003 düzeltmesi). Paket SHA-256 değerleri release notlarında ve paketteki `SHA256SUMS.txt` dosyasındadır.
 
 Unix geliştirme taşımasındaki PASS sonuçları **Windows davranışının kanıtı değildir**; yalnız platformdan bağımsız protokol/bağlantı mantığının ve süreç ayrımının kanıtıdır.
 
@@ -138,14 +138,16 @@ Unix geliştirme taşımasındaki PASS sonuçları **Windows davranışının ka
 - Windows'a özgü otomatik testler (yalnız Windows'ta derlenir/çalışır):
   - `windows_pipe_smoke.rs` (süreç içi, benzersiz pipe adları): gidiş-dönüş + işletim sisteminden pid/oturum/exe, protokol retleri, overlapped zaman aşımı/iptal, istemci kopması, `accept` kapanması, `FILE_FLAG_FIRST_PIPE_INSTANCE` ile ad gaspının engellenmesi, gerçek `helper_policy()`'nin test ikilisini reddetmesi.
   - `windows_process_e2e.rs` (gerçek EXE'ler, üretim pipe adı): helper CLI PING/STATUS/HEALTH, yetkisiz istemci reddi, `TerminateProcess` sonrası tespit, ikinci agent'ın başlayamaması. Beklenen sonuç runner oturumuna göre (oturum 0 → politika reddi) açıkça doğrulanır.
-- **CI'ın doğrulayamadıkları:** runner hesabı yöneticidir (DACL'deki BA girişiyle bağlanır → standart kullanıcı `IU` maskesi sınanmaz, W-03); sunucu ve istemci aynı kullanıcıdır (W-10 LocalService süreç sorgusu sınanmaz); servis kurulmaz (W-07/W-08/W-11); Windows Server runner etkileşimli Windows 11 oturumu değildir. Gerçek cihaz prosedürü: [README-TEST-TR.md](../../packaging/p1a/README-TEST-TR.md).
+  - `helper_grants_only_query_limited_to_local_service` (P1.A.2): helper DACL'ine tam olarak `(A;;0x1000;;;LS)` eklendiği.
+- LocalService servis uçtan uca (P1.A.2): [`ci/p1a-localservice-e2e.ps1`](../../ci/p1a-localservice-e2e.ps1) release EXE'leri test rehberindeki komutlarla (Windows PowerShell 5.1) `KindoraAgentDev` servisi olarak kurar; ACE'siz istemci reddi (`OpenProcess=5`), helper PING/STATUS/HEALTH, farklı dizin reddi, durdurma ve silme doğrulanır. Özet satırları (`LOCALSERVICE ...`) artifact'taki `ci-test-summary.txt` ve release notlarındadır.
+- **CI'ın doğrulayamadıkları:** runner hesabı yükseltilmiş yöneticidir (DACL'deki BA girişiyle bağlanır → `IU` maskesi sınanmaz, W-03; `sc stop` reddi sınanmaz, W-08); W-11 yeniden bağlanma sınanmaz; Windows Server runner etkileşimli Windows 11 oturumu değildir. Gerçek cihaz prosedürü: [README-TEST-TR.md](../../packaging/p1a/README-TEST-TR.md).
 
 ## 6. Güvenlik bulguları
 
 1. **Varsayılan pipe DACL'i** Everyone'a okuma verir → açık SDDL ile değiştirildi; etkileşimli kullanıcıya `FILE_CREATE_PIPE_INSTANCE` verilmez.
 2. **Interactive Users** grubu, ADR-0007'deki oturum logon SID'inden geniştir. Logon SID'i servis tarafında almak kullanıcı token'ı gerektirir (`WTSQueryUserToken` → LocalSystem). Oturum ve exe denetimleriyle telafi edildi; Windows PoC'de yeniden değerlendirilecek.
 3. **Exe yolu denetimi** yalnız agent dizini yöneticiye özelse anlamlıdır (Program Files). Çocuk kendi helper sürecine (aynı kullanıcı) hata ayıklayıcıyla müdahale edebilir → helper **hiçbir yetkili karar veremez** (protokolde politika değiştiren komut yok).
-4. **LocalService** ile süreç yolu sorgusunun başarısı bilinmiyor (W-10). Başarısızsa politika fail-closed reddeder; bu, ADR-0006 hesap modelini doğrudan etkiler.
+4. **LocalService** süreç yolu sorgusu varsayılan DACL nedeniyle cihazda başarısız oldu (W-10 FAIL, [BUG-003](../solutions.md)). Düzeltme: helper kendi DACL'ine LocalService için yalnız `PROCESS_QUERY_LIMITED_INFORMATION` ekler; kimlik doğrulama gevşetilmedi (ACE'siz istemci yine reddedilir). Kalan risk: izin tüm LocalService servislerine açık; servis SID'iyle daraltma ADR-0006'da.
 5. **Helper sunucuyu doğrulamıyor:** agent çalışmıyorken başka bir süreç aynı pipe adını açabilir. `SECURITY_IDENTIFICATION` taklidi engeller; ancak sahte yanıtlar mümkündür. P1.A'da etkisi düşük (yalnız durum); sonraki fazda helper, sunucu PID'inin Kindora servisi olduğunu doğrulamalı.
 6. **Tekrar tespiti bağlantı başınadır** ve bellekte tutulur; yeniden bağlanınca sıfırlanır. Durum değiştiren komutlar geldiğinde kalıcı (SQLite) idempotency gerekir (ADR-0009).
 7. **Zamanlama ayrıntısı:** boşta kapanma ve kapanma bayrağı yoklama aralığına (500 ms) bağlı; helper agent kaybını bir sonraki kalp atışında fark eder (≤ kalp atışı + yanıt zaman aşımı).

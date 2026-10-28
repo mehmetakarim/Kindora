@@ -5,46 +5,72 @@
 ## Son güncelleme
 
 - **Tarih:** 2026-10-28 (+03, Europe/Istanbul)
-- **Güncelleyen:** Claude Code — TASK-005 (P1.A.1 Windows CI, test paketi)
+- **Güncelleyen:** Claude Code — TASK-006 (P1.A.2 LocalService IPC kimlik doğrulama düzeltmesi)
 
 ## Git durumu (son kontrol)
 
-- **Branch:** `main` · Prerelease commit'i: `17195b5` (etiket `p1a-windows-test.1`). Bu belge onu izleyen `docs(p1a)` commit'indedir; güncel HEAD için `git log -1`.
-- **Commit'ler:** `3c60d42` P1.A + CI · `36e657c` BUG-001 düzeltmesi · `17195b5` BUG-002 düzeltmesi · ardından sonuç belgeleri. `target/` ignore'da.
+- **Branch:** `main`.
+- **Prerelease commit'leri:** `17195b5` → `p1a-windows-test.1` (BUG-003'ü içerir); `a031ab7` → `p1a-windows-test.2` (BUG-003 düzeltmesi). Bu belge onu izleyen `docs(p1a)` commit'indedir; güncel HEAD için `git log -1`.
 - **Kimlik (depo-yerel):** `Mehmet Akar <11380904+mehmetakarim@users.noreply.github.com>`; AI attribution kapalı.
 
 ## Aktif hedef
 
-**Aktif görev yok — kullanıcının gerçek Windows cihaz testi bekleniyor.** TASK-005 (P1.A.1) tamamlandı: Windows CI ([workflow](.github/workflows/windows-p1a.yml)) PASS (32 test); prerelease [`p1a-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.1) yayımlandı (Not for Production); rehber [packaging/p1a/README-TEST-TR.md](packaging/p1a/README-TEST-TR.md).
-**Politika:** yerel Windows VM kurulmayacak; gerçek Windows kabulü kullanıcının kendi Windows bilgisayarında yapılır. CI ≠ Windows 11 Home/Pro kabulü. TASK-004 (P1.A) Windows kabulü bekliyor. P1.B başlamadı.
+**Aktif görev yok — kullanıcının `p1a-windows-test.2` ile gerçek Windows testi bekleniyor.**
+
+- TASK-006 (P1.A.2) tamamlandı. Kullanıcının cihazında görülen `OpenProcess=5` / `Unauthorized(ExePathUnknown)` hatasının nedeni: helper süreç DACL'i LocalService'e izin vermiyordu ([BUG-003](docs/solutions.md)).
+- Düzeltme: helper, kendi DACL'ine LocalService için yalnız `PROCESS_QUERY_LIMITED_INFORMATION` ekler. LocalSystem'e geçilmedi.
+- Doğrulama: CI'da gerçek LocalService servisiyle PASS.
+- Prerelease: [`p1a-windows-test.2`](https://github.com/mehmetakarim/Kindora/releases/tag/p1a-windows-test.2).
+
+**Ürün kararı ([ADR-0012](docs/decisions/0012-mevcut-windows-hesabinda-calisma.md)):**
+
+- Kindora mevcut Windows hesabında çalışır; ayrı çocuk hesabı zorunlu değil.
+- Mevcut Lenovo hesabı gerçek test hesabıdır.
+- Yönetici hesapta kurcalama engellenemez, yalnız tespit edilebilir (açık risk).
+
+**Politika:**
+
+- Yerel Windows VM kurulmayacak.
+- CI ≠ Windows 11 Home/Pro kabulü.
+- TASK-004 (P1.A) Windows kabulü bekliyor. P1.B başlamadı.
 
 ## Gerçek durum (kısa)
 
-- Rust workspace: `ipc-protocol`, `agent-core`, `windows-agent` (`kindora-agent`), `windows-session` (`kindora-helper`). Yalnız `PING`/`GET_STATUS`/`HEALTH_CHECK`. Kilit, politika, SQLite, Supabase, UI yok.
-- Ayrıntı ve komutlar: [docs/agent/p1a-windows-agent.md](docs/agent/p1a-windows-agent.md).
-- Ortam: macOS 27 arm64, Rust 1.94; `x86_64-pc-windows-msvc` std hedefi (yalnız check/clippy). Yerel Windows VM **kurulmayacak**; Windows derleme/test GitHub-hosted runner'da, kabul testi kullanıcının Windows bilgisayarında.
+- Rust workspace: `ipc-protocol`, `agent-core`, `windows-agent` (`kindora-agent`), `windows-session` (`kindora-helper`).
+- Yalnız `PING`/`GET_STATUS`/`HEALTH_CHECK`. Kilit, politika, SQLite, Supabase ve UI yok.
+- Ayrıntı ve komutlar: [docs/agent/p1a-windows-agent.md](docs/agent/p1a-windows-agent.md); test rehberi: [packaging/p1a/README-TEST-TR.md](packaging/p1a/README-TEST-TR.md).
+- Ortam: macOS 27 arm64, Rust 1.94. Windows derleme/test GitHub-hosted runner'da; kabul testi kullanıcının Windows bilgisayarında.
 
 ## Son doğrulamalar (2026-10-28)
 
-- macOS: `cargo build` + `cargo test --workspace` (32 birim + 6 Unix-dev e2e), `clippy -D warnings` — PASS.
-- **Windows CI** (Windows Server 2022 runner, yönetici, oturum 2): 32 test (pipe smoke 7, süreç e2e 1 dahil), clippy `-D warnings`, release EXE, paket/hash doğrulaması — PASS. Release dosyaları macOS'ta indirilip SHA-256 ile doğrulandı.
-- Ölçümler (CI): pipe kopma tespiti 0 ms; `TerminateProcess` sonrası ≤ 3–5 ms; ikinci agent / ad gaspı → hata 5.
+- **macOS:** `cargo build` + `cargo test --workspace` (38 test), `clippy -D warnings` (macOS + Windows hedefi) — PASS.
+- **Windows CI** [40720517755](https://github.com/mehmetakarim/Kindora/actions/runs/40720517755) — PASS:
+  - 33 test, clippy, release EXE, paket/hash doğrulaması.
+  - **LocalService servis uçtan uca testi** ([ci/p1a-localservice-e2e.ps1](ci/p1a-localservice-e2e.ps1), PowerShell 5.1):
+    - ACE'siz istemci → `OpenProcess=5` ile reddedildi (cihaz hatasının yeniden üretimi).
+    - Helper PING/STATUS/HEALTH → `exit=0`.
+    - Farklı dizin → `ExeDirMismatch`.
+    - Servis kuruldu, durduruldu ve silindi.
+- **Prerelease:** [40720830232](https://github.com/mehmetakarim/Kindora/actions/runs/40720830232). Dosyalar macOS'ta SHA-256 ile doğrulandı. ZIP: `db0ad4dd…5489`.
 
 ## Çalıştırılmamış testler
 
-**Gerçek cihazda W-01…W-12 NOT RUN** (CI ile kısmen sınananlar: W-01, W-02, W-04 kısmen, W-06, W-09 — ayrıntı [P1.A raporu](docs/agent/p1a-windows-agent.md)). CI'ın sınayamadıkları: W-03 standart kullanıcı DACL, W-05, W-07/W-08/W-11 servis, **W-10 LocalService süreç sorgusu**, W-12. Önceki T0 testleri (PoC-A, Supabase, SQLite, Flutter) NOT RUN.
+- **Gerçek cihazda `test.2` ile W-01…W-12 NOT RUN.** `test.1` ile W-10 FAIL (BUG-003, kullanıcı raporu).
+- CI'ın sınayamadıkları: W-03 (yönetici olmayan pencereden pipe), W-08 (`sc stop` reddi), W-09 (Görev Yöneticisi), W-11 (yeniden bağlanma), W-05, W-12.
+- T0 PoC'leri NOT RUN.
 
 ## Açık kararlar
 
-- ADR-0006 hesap modeli — yeni girdi: LocalService süreç yolu sorgusu (W-10).
-- ADR-0007/0011 pipe modeli (Interactive Users vs logon SID) — Önerildi.
-- ADR-0008…0010, K-04 fail politikası, K-06 push — açık.
-- Açık P0 riskleri: [R-01…R-04](docs/feasibility/risk-register.md) — kapatılmadı.
+- ADR-0006 hesap modeli — **Önerildi**. W-10 engeli giderildi; M1/M2 helper başlatma kararı açık. LocalService izni servis SID'iyle daraltılabilir.
+- ADR-0007/0011 pipe modeli — Önerildi.
+- ADR-0008…0010, K-04, K-06 — açık.
+- Yönetici hesapta koruma düzeyi ve bildirim akışı (ADR-0012 sonucu) — açık.
+- P0 riskleri: [R-01…R-04](docs/feasibility/risk-register.md) — kapatılmadı.
 
 ## Sonraki somut adım (öneri — otomatik başlatma yetkisi değildir)
 
-1. Kullanıcı, prerelease paketini kendi Windows bilgisayarında [README-TEST-TR.md](packaging/p1a/README-TEST-TR.md) ile test eder; **W-10 sonucu** ADR-0006'ya girdi olur. Sonuç tablosunu `docs/tasks.md`'ye işle.
-2. Ancak bundan sonra P1.B (kısıtlama yüzeyi / PoC-A) kullanıcı onayıyla.
+1. Kullanıcı `p1a-windows-test.2` paketini Lenovo'da README'deki **"Hızlı test"** ile dener. Beklenen kayıt satırı: `os_errors=- outcome=PeerClosed`. Ardından §2–§4 ile tablo doldurulur ve `docs/tasks.md` güncellenir.
+2. W-10 cihazda PASS olursa ADR-0006 güncellenir. P1.B ancak kullanıcı onayıyla başlar.
 
 ## İlgili belgeler
 
