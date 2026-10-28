@@ -269,3 +269,26 @@ fn production_helper_policy_rejects_this_test_executable() {
     );
     assert!(matches!(rep.outcome, ConnectionOutcome::Unauthorized(_)));
 }
+
+/// BUG-003: helper'ın süreç DACL'ine eklediği tek ACE — LocalService (`LS`)
+/// için yalnız `PROCESS_QUERY_LIMITED_INFORMATION` (0x1000). Gerçek LocalService
+/// servisiyle uçtan uca doğrulama CI iş akışının servis adımındadır.
+#[test]
+fn helper_grants_only_query_limited_to_local_service() {
+    use ipc_protocol::transport::windows_pipe::{
+        current_process_dacl_sddl, grant_agent_process_query,
+    };
+    let before = current_process_dacl_sddl().expect("dacl before");
+    assert!(!before.contains(";;;LS)"), "beklenmeyen LS ACE: {before}");
+
+    grant_agent_process_query().expect("grant");
+    grant_agent_process_query().expect("grant is idempotent");
+
+    let after = current_process_dacl_sddl().expect("dacl after");
+    eprintln!("dacl_before={before}\ndacl_after={after}");
+    let ls: Vec<&str> = after
+        .split('(')
+        .filter(|ace| ace.ends_with(";;;LS)"))
+        .collect();
+    assert_eq!(ls, vec!["A;;0x1000;;;LS)"], "DACL: {after}");
+}

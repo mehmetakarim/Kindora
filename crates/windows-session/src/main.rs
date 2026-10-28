@@ -66,6 +66,12 @@ fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
+    // BUG-003: LocalService agent'ın bu sürecin exe yolunu okuyabilmesi için.
+    // Başarısızlık helper'ı durdurmaz; agent yolu okuyamazsa zaten reddeder.
+    #[cfg(windows)]
+    if let Err(e) = ipc_protocol::transport::windows_pipe::grant_agent_process_query() {
+        log_event("process_query_grant_failed", &[("error", e.to_string())]);
+    }
     match cmd {
         "run" => {
             let shutdown = Arc::new(AtomicBool::new(false));

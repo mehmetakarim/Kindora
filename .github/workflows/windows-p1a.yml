@@ -20,7 +20,7 @@ on:
       release_tag:
         description: "Prerelease etiketi (biçim: p1a-windows-test.N)"
         type: string
-        default: "p1a-windows-test.1"
+        default: "p1a-windows-test.2"
 
 permissions:
   contents: read
@@ -88,6 +88,16 @@ jobs:
 
       - name: Release build
         run: cargo build --release --workspace --locked
+
+      # BUG-003: release EXE'leri gerçek bir LocalService servisi olarak, test
+      # rehberindeki komutlarla (Windows PowerShell 5.1) kurulur ve helper kimliği
+      # uçtan uca doğrulanır; servis her durumda silinir. Runner hesabı yönetici
+      # olduğundan standart kullanıcı testlerinin (W-03, W-08) yerine geçmez.
+      - name: LocalService servis uçtan uca (W-07/W-10 CI kapsamı)
+        shell: pwsh
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ci/p1a-localservice-e2e.ps1 -BinDir target/release -SummaryFile dist/ci-test-summary.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Paketle ve SHA-256
         shell: pwsh
@@ -208,19 +218,19 @@ jobs:
             echo
             echo "### Geçen otomatik testler (GitHub-hosted Windows Server runner)"
             echo '```'
-            grep -E "^test result:|MEASURE " dist/ci-test-summary.txt || true
+            grep -E "^test result:|MEASURE |LOCALSERVICE " dist/ci-test-summary.txt | tr -d '\r' || true
             echo '```'
-            echo "Ayrıca: \`cargo fmt --check\`, \`cargo check\`, \`cargo clippy -D warnings\`, release derleme, paket içeriği ve hash doğrulaması."
+            echo "Ayrıca: \`cargo fmt --check\`, \`cargo check\`, \`cargo clippy -D warnings\`, release derleme, release EXE'lerle **LocalService servis uçtan uca testi** (BUG-003), paket içeriği ve hash doğrulaması."
             echo
             echo "### Çalıştırılmayan gerçek cihaz testleri"
-            echo "W-03 standart kullanıcı DACL erişimi, W-07 servis yaşam döngüsü, W-08 standart kullanıcı \`sc stop\`, W-09 Görev Yöneticisi, **W-10 LocalService ile süreç kimliği okuma (ADR-0006 için kritik)**, W-11 servis durdurma/yeniden bağlanma, W-05/W-12. CI, Windows 11 Home/Pro etkileşimli oturum kabul testinin yerine geçmez."
+            echo "Gerçek Windows 11 cihazında W-01…W-12 henüz çalıştırılmadı. CI LocalService servis testini yönetici runner hesabıyla yaptı; yönetici olmayan PowerShell'den bağlantı (W-03), \`sc stop\` reddi (W-08), Görev Yöneticisi (W-09), servis durdurma/yeniden bağlanma (W-11), W-05/W-12 cihazda doğrulanmalı. CI, Windows 11 Home/Pro etkileşimli oturum kabul testinin yerine geçmez."
             echo
             echo "### Bilinen güvenlik sınırlamaları"
             echo "- EXE'ler imzasız; SmartScreen uyarısı beklenir — önce SHA-256 doğrulayın."
             echo "- Pipe erişimi Interactive Users grubuna açık (oturum logon SID'i yerine); oturum + exe adı/dizini denetimiyle sınırlı (ADR-0011)."
             echo "- Helper, pipe sunucusunun Kindora servisi olduğunu henüz doğrulamaz."
             echo "- Tekrar mesaj kimliği tespiti bağlantı başına ve bellekte."
-            echo "- LocalService altında helper exe yolunun okunabilirliği doğrulanmadı (W-10)."
+            echo "- Helper, LocalService hesabına kendi sürecinde yalnız \`PROCESS_QUERY_LIMITED_INFORMATION\` izni verir (BUG-003); bu izin tüm LocalService servislerine açıktır (ADR-0006)."
             echo
             echo "### Test talimatları"
             echo "Paketteki \`README-TEST-TR.md\` dosyasını adım adım izleyin. Hiçbir şey otomatik kurulmaz veya açılışta başlamaz."

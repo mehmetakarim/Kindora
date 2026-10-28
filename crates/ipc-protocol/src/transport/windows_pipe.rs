@@ -1,8 +1,7 @@
 //! Windows named pipe taşıması (ADR-0007, Önerildi).
 //!
-//! DURUM: Yalnızca `cargo check --target x86_64-pc-windows-msvc` ile derleme
-//! denetiminden geçti. **Windows üzerinde çalıştırılmadı** — aşağıdaki
-//! davranışların tamamı [PoC gerekli].
+//! DURUM: GitHub Actions `windows-2022` üzerinde test edildi (P1.A.1);
+//! gerçek Windows 11 Home/Pro kabulü bekleniyor.
 //!
 //! Güvenlik özellikleri:
 //! - Açık DACL (SDDL): SYSTEM, Administrators ve pipe sahibi tam yetki;
@@ -16,6 +15,8 @@
 //!   sahte bir sunucu helper kullanıcısını taklit (impersonate) edemez.
 //! - Eş kimliği: `GetNamedPipeClientProcessId`, `GetNamedPipeClientSessionId`,
 //!   `QueryFullProcessImageNameW` — mesaj alanlarına güvenilmez.
+//! - LocalService agent'ın helper sürecini açabilmesi için helper kendi süreç
+//!   DACL'ine yalnız sorgu hakkı ekler: [`grant_agent_process_query`] (BUG-003).
 //! - Zaman aşımı: overlapped G/Ç + `WaitForSingleObject` + `CancelIoEx`.
 
 use super::PeerIdentity;
@@ -33,9 +34,14 @@ use windows_sys::Win32::Foundation::{
     ERROR_PIPE_NOT_CONNECTED, HANDLE, INVALID_HANDLE_VALUE, WAIT_OBJECT_0, WAIT_TIMEOUT,
 };
 use windows_sys::Win32::Security::Authorization::{
-    ConvertStringSecurityDescriptorToSecurityDescriptorW, SDDL_REVISION_1,
+    ConvertSecurityDescriptorToStringSecurityDescriptorW,
+    ConvertStringSecurityDescriptorToSecurityDescriptorW, ConvertStringSidToSidW, GetSecurityInfo,
+    SetEntriesInAclW, SetSecurityInfo, EXPLICIT_ACCESS_W, GRANT_ACCESS, NO_MULTIPLE_TRUSTEE,
+    SDDL_REVISION_1, SE_KERNEL_OBJECT, TRUSTEE_IS_SID, TRUSTEE_IS_WELL_KNOWN_GROUP, TRUSTEE_W,
 };
-use windows_sys::Win32::Security::{PSECURITY_DESCRIPTOR, SECURITY_ATTRIBUTES};
+use windows_sys::Win32::Security::{
+    ACL, DACL_SECURITY_INFORMATION, NO_INHERITANCE, PSECURITY_DESCRIPTOR, PSID, SECURITY_ATTRIBUTES,
+};
 use windows_sys::Win32::Storage::FileSystem::{
     CreateFileW, ReadFile, WriteFile, FILE_FLAG_FIRST_PIPE_INSTANCE, FILE_FLAG_OVERLAPPED,
     FILE_GENERIC_READ, FILE_WRITE_DATA, OPEN_EXISTING, PIPE_ACCESS_DUPLEX, SECURITY_IDENTIFICATION,
@@ -47,8 +53,8 @@ use windows_sys::Win32::System::Pipes::{
     PIPE_TYPE_BYTE, PIPE_WAIT,
 };
 use windows_sys::Win32::System::Threading::{
-    CreateEventW, OpenProcess, QueryFullProcessImageNameW, ResetEvent, WaitForSingleObject,
-    PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
+    CreateEventW, GetCurrentProcess, OpenProcess, QueryFullProcessImageNameW, ResetEvent,
+    WaitForSingleObject, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
 };
 use windows_sys::Win32::System::IO::{CancelIoEx, GetOverlappedResult, OVERLAPPED};
 
@@ -60,6 +66,9 @@ pub const PIPE_NAME: &str = r"\\.\pipe\kindora-agent-v1";
 ///   FILE_READ_DATA | FILE_WRITE_DATA | FILE_READ_EA | FILE_READ_ATTRIBUTES |
 ///   READ_CONTROL | SYNCHRONIZE  (FILE_CREATE_PIPE_INSTANCE yok)
 pub const PIPE_SDDL: &str = "D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GA;;;OW)(A;;0x0012008B;;;IU)";
+
+/// `NT AUTHORITY\LocalService` — P1.A servisinin hesabı (ADR-0006).
+pub const LOCAL_SERVICE_SID: &str = "S-1-5-19";
 
 const BUFFER_BYTES: u32 = (crate::MAX_MESSAGE_BYTES as u32) + 4;
 const MAX_INSTANCES: u32 = 8;
@@ -199,6 +208,17 @@ impl Write for PipeStream {
 
     fn flush(&mut self) -> io::Result<()> {
         Ok(())
+    }
+}
+
+/// `LocalAlloc` ile ayrılmış bellek (SID, ACL, SDDL dizesi); LocalFree ile bırakılır.
+struct LocalMem(*mut core::ffi::c_void);
+impl Drop for LocalMem {
+    fn drop(&mut self) {
+        if !self.0.is_null() {
+            // SAFETY: Win32 API'sinin LocalAlloc ile döndürdüğü bellek.
+            unsafe { LocalFree(self.0 as _) };
+        }
     }
 }
 
@@ -368,9 +388,9 @@ fn client_identity(pipe: HANDLE) -> PeerIdentity {
     }
 }
 
-/// [PoC gerekli] Agent düşük yetkili bir hesapla (ör. LocalService) çalışırken
-/// başka bir kullanıcının sürecini PROCESS_QUERY_LIMITED_INFORMATION ile
-/// açabilmesi garanti değildir; açılamazsa `None` döner ve politika reddeder.
+/// İstemcinin tam exe yolu. LocalService agent, helper süreci
+/// [`grant_agent_process_query`] ile izin vermemişse `OpenProcess=5` alır;
+/// yol bilinmeyince politika reddeder (fail closed).
 /// Hata durumunda `"<API>=<GetLastError>"` biçiminde teşhis döner.
 fn process_image_path(pid: u32) -> Result<PathBuf, String> {
     // SAFETY: yalnız sorgu hakkı istenir.
@@ -390,6 +410,125 @@ fn process_image_path(pid: u32) -> Result<PathBuf, String> {
     }
     buf.truncate(len as usize);
     Ok(PathBuf::from(OsString::from_wide(&buf)))
+}
+
+/// Helper tarafı (BUG-003): kendi süreç DACL'ine LocalService için **yalnız**
+/// `PROCESS_QUERY_LIMITED_INFORMATION` ekler.
+///
+/// Kullanıcı süreçlerinin varsayılan DACL'i yalnız kullanıcıya, SYSTEM'e ve
+/// oturum SID'ine izin verir; LocalService agent bu yüzden helper'ın exe yolunu
+/// okuyamaz. Bu izin bellek okuma/yazma, sonlandırma veya token erişimi vermez;
+/// kimlik doğrulaması değişmez — exe yolu yine işletim sisteminden okunur ve
+/// agent politikası (oturum, ad, dizin) uygulanır. İzni vermeyen istemci yine
+/// reddedilir.
+pub fn grant_agent_process_query() -> io::Result<()> {
+    let sid_text = wide(LOCAL_SERVICE_SID);
+    let mut sid: PSID = null_mut();
+    // SAFETY: geçerli SID dizesi ve çıktı işaretçisi.
+    if unsafe { ConvertStringSidToSidW(sid_text.as_ptr(), &mut sid) } == 0 {
+        return Err(io::Error::last_os_error());
+    }
+    let sid = LocalMem(sid);
+
+    // SAFETY: sözde tanıtıcı; kapatılmaz.
+    let process = unsafe { GetCurrentProcess() };
+    let mut dacl: *mut ACL = null_mut();
+    let mut sd: PSECURITY_DESCRIPTOR = null_mut();
+    // SAFETY: çıktı işaretçileri geçerli; DACL `sd` içinde yaşar.
+    let err = unsafe {
+        GetSecurityInfo(
+            process,
+            SE_KERNEL_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            null_mut(),
+            null_mut(),
+            &mut dacl,
+            null_mut(),
+            &mut sd,
+        )
+    };
+    if err != 0 {
+        return Err(io::Error::from_raw_os_error(err as i32));
+    }
+    let _sd = LocalMem(sd);
+
+    let access = EXPLICIT_ACCESS_W {
+        grfAccessPermissions: PROCESS_QUERY_LIMITED_INFORMATION,
+        grfAccessMode: GRANT_ACCESS,
+        grfInheritance: NO_INHERITANCE,
+        Trustee: TRUSTEE_W {
+            pMultipleTrustee: null_mut(),
+            MultipleTrusteeOperation: NO_MULTIPLE_TRUSTEE,
+            TrusteeForm: TRUSTEE_IS_SID,
+            TrusteeType: TRUSTEE_IS_WELL_KNOWN_GROUP,
+            ptstrName: sid.0 as _,
+        },
+    };
+    let mut new_dacl: *mut ACL = null_mut();
+    // SAFETY: tek girişli dizi, mevcut DACL ve çıktı işaretçisi.
+    let err = unsafe { SetEntriesInAclW(1, &access, dacl, &mut new_dacl) };
+    if err != 0 {
+        return Err(io::Error::from_raw_os_error(err as i32));
+    }
+    let new_dacl = LocalMem(new_dacl as _);
+    // SAFETY: kendi sürecimiz; yalnız DACL değişir.
+    let err = unsafe {
+        SetSecurityInfo(
+            process,
+            SE_KERNEL_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            null_mut(),
+            null_mut(),
+            new_dacl.0 as *const ACL,
+            null(),
+        )
+    };
+    if err != 0 {
+        return Err(io::Error::from_raw_os_error(err as i32));
+    }
+    Ok(())
+}
+
+/// Geçerli sürecin DACL'i SDDL biçiminde (teşhis ve testler için).
+pub fn current_process_dacl_sddl() -> io::Result<String> {
+    let mut sd: PSECURITY_DESCRIPTOR = null_mut();
+    // SAFETY: sözde tanıtıcı ve çıktı işaretçisi.
+    let err = unsafe {
+        GetSecurityInfo(
+            GetCurrentProcess(),
+            SE_KERNEL_OBJECT,
+            DACL_SECURITY_INFORMATION,
+            null_mut(),
+            null_mut(),
+            null_mut(),
+            null_mut(),
+            &mut sd,
+        )
+    };
+    if err != 0 {
+        return Err(io::Error::from_raw_os_error(err as i32));
+    }
+    let sd = LocalMem(sd);
+    let mut text: *mut u16 = null_mut();
+    let mut len = 0u32;
+    // SAFETY: geçerli güvenlik tanımlayıcısı ve çıktı işaretçileri.
+    let ok = unsafe {
+        ConvertSecurityDescriptorToStringSecurityDescriptorW(
+            sd.0,
+            SDDL_REVISION_1,
+            DACL_SECURITY_INFORMATION,
+            &mut text,
+            &mut len,
+        )
+    };
+    if ok == 0 {
+        return Err(io::Error::last_os_error());
+    }
+    let text = LocalMem(text as _);
+    // SAFETY: API null ile biten `len` uzunluklu dize döndürdü.
+    let units = unsafe { std::slice::from_raw_parts(text.0 as *const u16, len as usize) };
+    let end = units.iter().position(|&c| c == 0).unwrap_or(units.len());
+    Ok(String::from_utf16_lossy(&units[..end]))
 }
 
 /// Helper tarafı: üretim pipe'ına bağlanır; meşgulse `connect_timeout` süresince bekler.
