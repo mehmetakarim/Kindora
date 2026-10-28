@@ -51,7 +51,7 @@ Prototip kodu servis hesabı seçmez; `sc.exe create ... obj=` ile verilir (ilk 
   - LocalSystem'e geçilmedi. Kimlik doğrulama (OS'den exe yolu, oturum, ad, dizin) korundu.
 - **CI kanıtı:** release agent gerçek LocalService servisi olarak çalıştı ve helper'ı yetkilendirdi; ACE'siz istemci yine reddedildi.
   - Çalıştırma: [40720517755](https://github.com/mehmetakarim/Kindora/actions/runs/40720517755).
-  - Gerçek Windows 11 cihazında yeniden doğrulama bekleniyor (`p1a-windows-test.2`).
+  - Kullanıcının Lenovo cihazında `p1a-windows-test.2` ile doğrulandı (2026-10-28, kullanıcı raporu): LocalService başlatma, pipe iletişimi, helper exe yolu doğrulaması, `os_errors=-` — **W-10 PASS**.
 - **Bu ADR için anlamı:** M1 (düşük yetkili servis) için kimlik doğrulama engeli giderildi. Hesap modeli kararı hâlâ **Önerildi**; helper başlatma/yeniden doğurma (M1 vs M2) ölçümü açık.
 - **Daraltma seçeneği:** izin bugün tüm LocalService servislerine açıktır. Servis SID'i (`sc.exe sidtype <ad> restricted` + ACE'de `NT SERVICE\<ad>`) ile yalnız Kindora servisine indirilebilir; kurulum aşamasında değerlendirilecek.
 - **Hesap:** Kindora mevcut Windows hesabında çalışır ([ADR-0012](0012-mevcut-windows-hesabinda-calisma.md)). Yönetici hesapta kurcalama engellenemez, yalnız tespit edilebilir.

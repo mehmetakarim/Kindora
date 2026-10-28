@@ -23,10 +23,42 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 
 ## Aktif / son görevler
 
+### TASK-007 — P1.B: Windows masaüstü kabuğu ve oturum deneyimi
+
+- **Öncelik:** Yüksek
+- **Durum:** Devam ediyor. Kod, macOS ve Windows CI testleri tamam; prerelease yayımlandı. **Kabul: CONDITIONAL PASS — Pending Lenovo Windows GUI Acceptance.**
+- **Amaç ve kapsam:**
+  - Mevcut Windows hesabında çalışan, gerçek agent bağlantısına sahip ilk Kindora masaüstü uygulaması (Tauri 2 + Vue 3).
+  - Kapsam dışı: kilit, engelleme, filtreleme, süre sınırı.
+- **Kabul kriterleri:**
+  - [x] Windows masaüstü uygulaması derleniyor (CI: `kindora-desktop.exe` + NSIS).
+  - [x] Vue arayüzü gerçek Tauri uygulamasında açılıyor (macOS'ta elle; Windows CI'da gerçek pencere, `MainWindowHandle` ≠ 0).
+  - [x] Agent durumu gerçek IPC verisinden geliyor (helper köprüsü; demo yalnız Tauri dışında ve etiketli).
+  - [x] LocalService güvenlik politikası korunuyor. Politika kodu değişmedi; farklı klasördeki helper reddediliyor; `OpenProcess=5` düzeltmesi CI'da yeniden doğrulandı.
+  - [x] Agent kapalıyken arayüz kontrollü davranıyor ("Bağlantı yok", geri çekilme, yoğun döngü yok).
+  - [x] Agent yeniden başlayınca bağlantı kurtarılıyor (CI servis: 438 ms; konsol: 242 ms).
+  - [x] Desktop normal şekilde kapanıyor (CI: `WM_CLOSE` → 880 ms; helper sızıntısı yok; servis çalışmaya devam ediyor).
+  - [x] Engelleyici ekran veya kullanım kilidi yok.
+  - [x] Önceki P1.A testleri bozulmadı (`windows-p1a` PASS).
+  - [x] CI başarılı.
+  - [x] Prerelease ve checksum yayımlandı.
+  - [x] Proje hafızası ve belgeler güncellendi.
+  - [ ] **Lenovo GUI kabulü (B-01…B-11)** — bekliyor.
+- **Bağımlılıklar:** TASK-006.
+- **İlgili dosyalar:** `apps/desktop/`, `crates/ipc-protocol/src/bridge.rs`, `crates/windows-session` (`bridge`), `crates/windows-agent/tests/bridge_lifecycle.rs`, `ci/p1a-localservice-e2e.ps1`, `.github/workflows/windows-p1b.yml`, `packaging/p1b/README-TEST-TR.md`, `.gitattributes`. Rapor: [desktop/p1b-desktop-shell.md](desktop/p1b-desktop-shell.md); karar: [ADR-0013](decisions/0013-masaustu-kabugu-helper-koprusu.md).
+- **Doğrulama sonucu:**
+  - **macOS:** kök 42 test; masaüstü Rust 13 test; Vitest 22 test; lint, typecheck, build, clippy (macOS + Windows hedefi); gerçek Tauri penceresiyle elle yaşam döngüsü — PASS.
+  - **Windows CI** [40754107950](https://github.com/mehmetakarim/Kindora/actions/runs/40754107950): 37 kök + 8 masaüstü + 22 ön yüz testi, Tauri paketi, LocalService + köprü + GUI duman testi — PASS.
+  - **Bulunan ve düzeltilen hatalar:** [BUG-004](solutions.md) (CRLF checkout), [BUG-005](solutions.md) (.NET BOM).
+- **Yayın durumu:**
+  - Prerelease [`p1b-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1b-windows-test.1).
+  - [Çalıştırma 40755951911](https://github.com/mehmetakarim/Kindora/actions/runs/40755951911); hedef `2fb82cf`; `latest` değil.
+  - ZIP SHA-256 `ab55cb4afcb5132ddc921650932263ea6727a184ba70b401d4b9d86eb460beae`.
+
 ### TASK-006 — P1.A.2: LocalService IPC kimlik doğrulama düzeltmesi (BUG-003)
 
 - **Öncelik:** Yüksek
-- **Durum:** Tamamlandı (2026-10-28). Düzeltme CI'da gerçek LocalService servisiyle doğrulandı ve prerelease yayımlandı. **Gerçek Windows cihazında yeniden test yapılmadı.**
+- **Durum:** Tamamlandı (2026-10-28). CI'da ve kullanıcının Lenovo cihazında (W-10) doğrulandı.
 - **Amaç ve kapsam:**
   - Kullanıcının cihazında görülen `os_errors=OpenProcess=5` / `Unauthorized(ExePathUnknown)` hatasını, LocalSystem'e geçmeden ve kimlik doğrulamayı gevşetmeden çözmek.
   - Mevcut Windows hesabı ürün kararını kaydetmek.
@@ -44,7 +76,7 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
     - [Çalıştırma 40720830232](https://github.com/mehmetakarim/Kindora/actions/runs/40720830232); hedef `a031ab7`.
     - `latest` değil. macOS'ta indirilip SHA-256 doğrulandı.
   - [x] Test rehberi mevcut hesaba göre sadeleştirildi; başına "Hızlı test" bölümü eklendi.
-  - [ ] Kullanıcının cihazında W-10 (ve W-01…W-12) yeniden testi — **bekliyor**.
+  - [x] Kullanıcının Lenovo cihazında `p1a-windows-test.2` testi (kullanıcı raporu, P1.B mesajı): ZIP SHA-256, servis kaydı, LocalService başlatma, RUNNING, named pipe iletişimi, helper PING, exe yolu doğrulaması, `os_errors=-`, `outcome=PeerClosed requests=1 errors=0`, servis STOPPED ve silme — **PASS**. **W-10 cihazda PASS.**
 - **Bağımlılıklar:** TASK-005; kullanıcının `test.1` sonucu.
 - **İlgili dosyalar:**
   - `crates/ipc-protocol/src/transport/windows_pipe.rs`

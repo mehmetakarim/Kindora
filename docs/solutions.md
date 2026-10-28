@@ -68,3 +68,32 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
 - **Ek bulgu (aynı faz):**
   - Önceki rehberdeki `sc.exe create ... binPath= "\"C:\Program Files\...\" service"` satırı PowerShell'de güvenilir değildir; iç tırnaklar PowerShell 5.1'de bozulur.
   - Rehber ve CI artık `sc.exe --% create ...` kullanıyor; CI'da PowerShell 5.1 ile `sc.exe qc` çıktısı doğrulandı.
+
+### BUG-004 — Windows CI'da Prettier tüm ön yüz dosyalarını reddediyor (CRLF checkout)
+
+- **Belirti:** [40753324808](https://github.com/mehmetakarim/Kindora/actions/runs/40753324808) çalıştırmasında `npm run format:check` başarısız oldu: "Code style issues found in 30 files". macOS'ta aynı komut geçiyordu.
+- **Ortaya çıktığı koşul:** GitHub-hosted `windows-2022` runner'ında `actions/checkout`. Depoda `.gitattributes` yoktu.
+- **Kök neden:** Windows'ta Git'in `core.autocrlf=true` varsayılanı metin dosyalarını CRLF ile çıkarır. Prettier'ın `endOfLine: "lf"` varsayılanı her satırı fark olarak görür. Aynı risk BUG-002'deki hash dosyası sorununa da yol açar.
+- **Uygulanan çözüm:** Kök `.gitattributes` dosyası: `* text=auto eol=lf`; görsel ve font dosyaları `binary`. Depoda mevcut CRLF dosyası olmadığı `git add --renormalize .` ile doğrulandı.
+- **Doğrulama yöntemi:** Düzeltme commit'inin (`2fb82cf`) `windows-p1b` çalıştırmasında format denetimi.
+- **İlgili görev, dosya veya commit:** TASK-007; `.gitattributes`; hata commit'i `1695264`.
+
+### BUG-005 — .NET `StandardInput` BOM'u köprü isteğini reddettiriyor
+
+- **Belirti:** `windows-p1a` çalıştırması [40753324764](https://github.com/mehmetakarim/Kindora/actions/runs/40753324764), LocalService betiği adım 3b:
+  - Köprü bağlandı ve SERVICE snapshot'ı geldi.
+  - PowerShell'den yazılan `{"op":"refresh"}` sonrasında 3 sn içinde yeni snapshot gelmedi: `TIMEOUT: bridge line /"type":"snapshot"/`.
+- **Ortaya çıktığı koşul:** Helper `System.Diagnostics.Process` ile `RedirectStandardInput` kullanılarak başlatılıyor (Windows PowerShell 5.1 / .NET Framework). Rust testleri (Rust'tan yazılan stdin) geçiyordu.
+- **Kök neden:**
+  - .NET'in `StandardInput` yazıcısı, giriş kodlaması UTF-8 olduğunda akışın başına BOM (`EF BB BF`) yazabilir.
+  - Katı ayrıştırıcı ilk satırı `\u{feff}{"op":"refresh"}` olarak görüp reddetti.
+  - Ayrıca ret olayı yalnız bir sonraki olayla birlikte yazıldığı için hata 3 sn'lik yoklamaya kadar görünmedi.
+  - (Çıkarım: BOM, macOS'ta önekli satırla yeniden üretildi; Windows doğrulaması düzeltme sonrası CI'dadır.)
+- **Uygulanan çözüm:**
+  - `ipc_protocol::bridge` yalnız baştaki BOM'u atar; diğer her şey yine reddedilir.
+  - Helper reddedilen satırı **hemen** `request_rejected` olarak bildirir.
+  - Birim testine BOM'lu satır eklendi.
+- **Doğrulama yöntemi:**
+  - macOS: `printf '\xef\xbb\xbf{"op":"refresh"}\n{"op":"LOCK"}\n' | kindora-helper bridge` komutunda refresh kabul edildi, LOCK anında reddedildi.
+  - Windows: düzeltme commit'inin LocalService betiği.
+- **İlgili görev, dosya veya commit:** TASK-007; `crates/ipc-protocol/src/bridge.rs`, `crates/windows-session/src/main.rs`; hata commit'i `1695264`, düzeltme `2fb82cf`.

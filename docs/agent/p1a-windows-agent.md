@@ -123,7 +123,7 @@ sc.exe delete KindoraAgentDev
 | W-07 | `sc create/start/query/stop/delete` yaşam döngüsü, LocalService | PASS (PowerShell 5.1, `start= demand`, `obj= NT AUTHORITY\LocalService`, `agent_stopped`, silme → 1060) | NOT RUN |
 | W-08 | Yönetici olmayan pencereden `sc stop` → erişim reddi | Sınanamaz (runner yönetici) | NOT RUN |
 | W-09 | Helper sonlandırma → tespit süresi | PASS (`TerminateProcess`, ≤ 3–5 ms) | NOT RUN (Görev Yöneticisi) |
-| W-10 | **LocalService agent, helper sürecini `PROCESS_QUERY_LIMITED_INFORMATION` ile açabiliyor mu** | PASS (BUG-003 düzeltmesiyle; ACE'siz istemci `OpenProcess=5` ile reddedildi, helper `os_errors=-` ile yetkilendirildi) | `test.1`: **FAIL** (`OpenProcess=5`, BUG-003) · `test.2`: NOT RUN |
+| W-10 | **LocalService agent, helper sürecini `PROCESS_QUERY_LIMITED_INFORMATION` ile açabiliyor mu** | PASS (BUG-003 düzeltmesiyle; ACE'siz istemci `OpenProcess=5` ile reddedildi, helper `os_errors=-` ile yetkilendirildi) | `test.1`: **FAIL** (`OpenProcess=5`, BUG-003) · `test.2`: **PASS** (Lenovo, kullanıcı raporu: `os_errors=-`, `outcome=PeerClosed`) |
 | W-11 | Servis durdurulurken bağlı helper'ın kaybı ve yeniden bağlanma | Sınanmadı (yalnız durdurma) | NOT RUN |
 | W-12 | Session 0'dan gelen istemci reddi | Sınanmadı (runner oturumu 2) | NOT RUN (kapsam dışı) |
 

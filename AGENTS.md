@@ -73,6 +73,7 @@ Hafıza güncellemesi kendiliğinden **commit, push, deployment veya üretim ort
 
 - Çocuk ve ebeveyn uygulamaları ayrı sorumluluklara sahiptir.
 - Windows işletim sistemi işlemleri Tauri arayüzüne bağımlı olmamalıdır; UI süreci sonlandırılsa da denetim sürmelidir.
+- Masaüstü uygulaması agent pipe'ına doğrudan bağlanmaz; yanındaki `kindora-helper.exe`'yi `bridge` modunda alt süreç olarak kullanır. Agent'ın helper politikası gevşetilmez ([ADR-0013](docs/decisions/0013-masaustu-kabugu-helper-koprusu.md)).
 - Rust Windows servisi (ve oturum yardımcısı) işletim sistemi düzeyindeki yetkili işlemlerden sorumlu olacak şekilde planlanır.
 - Flutter ve ebeveyn masaüstü uygulaması **aynı** backend yetkilendirme modelini, komut şemasını ve durum makinesini kullanır.
 - Yerel kurallar internet bağlantısı olmadan uygulanabilmelidir (SQLite).
@@ -112,7 +113,7 @@ Kindora kullanım kilidi ile Windows oturum kilidi **farklı mekanizmalardır**.
 
 - Onaylı Claude Design görsel dili korunur (tokenlar: [_kindora-tokens.scss](design/design_handoff_kindora/tokens/_kindora-tokens.scss)).
 - Tailwind CSS kullanılmaz.
-- Bootstrap 6 hedef teknolojidir; kararlılık ve uyumluluk geliştirme başlamadan resmi kaynaktan doğrulanır. Kullanıcı onayı olmadan Bootstrap 5.3'e geçilmez ([ADR-0005](docs/decisions/0005-bootstrap-6-hedef.md)).
+- Bootstrap 6 hedef teknolojidir; kararlılık ve uyumluluk resmi kaynaktan doğrulanır. Bootstrap 6 kararlı değilken kullanıcı onayıyla (P1.B) kararlı 5.3.x kullanılır; sürüm kesin sabitlenir ([ADR-0005](docs/decisions/0005-bootstrap-6-hedef.md)).
 - Kullanıcıya görünen metinler Türkçe; kod sembolleri ve bileşen adları İngilizce olabilir.
 - Ebeveyn paneli sade ve profesyonel olmalıdır.
 - Çocuk deneyimi cezalandırıcı olmamalıdır; çocuk tarafında danger rengi kullanılmaz.

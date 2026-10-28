@@ -32,6 +32,16 @@ Tailwind CSS kullanılmaz (context §3).
 
 Resmi kaynakla doğrulandı: **Bootstrap 6.0.0-alpha.1, 8 Ekim 2026** ([blog](https://blog.getbootstrap.com/2026/10/08/bootstrap-6-alpha/)). Kararlı sürüm yok; beta öncesi anlamlı değişiklik olabilir. Bootstrap 6 hedef olarak korunur; alfa kararlılık riski [R-14](../feasibility/risk-register.md) olarak kaydedildi. `_kindora-tokens.scss` v5 tarzı `@import`/değişken override'ı kullanır; v6 Sass modülleri ve token haritalarına uyarlanması gerekir. 5.3'e geçiş yine kullanıcı onayı ister.
 
+## Güncelleme — 2026-10-28 (P1.B, kullanıcı onayı)
+
+- **Kullanıcı talimatı (P1.B):** "Bootstrap 6 henüz istikrarlı değilse üretim açısından güvenilir kararlı Bootstrap sürümünü kullan; Tailwind CSS'e geçme."
+- **Doğrulama (npm, 2026-10-28):** `latest` = **5.3.8**, `next` = 6.0.0-alpha.1. Bootstrap 6 hâlâ alfa.
+- **Uygulama:**
+  - Masaüstü uygulaması ([apps/desktop](../../apps/desktop/package.json)) **Bootstrap 5.3.8** ile, kesin sürümle sabitlenerek kullanılıyor.
+  - Token'lar `_kindora-tokens.scss` dosyasından değiştirilmeden içe aktarılıyor; dosyanın kendi notu: "5.3+/6 uyumlu".
+  - Yalnız CSS kullanılıyor; Bootstrap JS yok.
+- **Hedef:** Bootstrap 6 hedef olarak korunur. Kararlı sürüm çıkınca geçiş ayrı bir görev olarak değerlendirilir (token'ların v6 Sass modüllerine uyarlanması). R-14 açık kalır.
+
 ## İlişkili kararlar
 
-- [ADR-0004](0004-claude-design-tasarim-yonu-kabulu.md).
+- [ADR-0004](0004-claude-design-tasarim-yonu-kabulu.md), [ADR-0013](0013-masaustu-kabugu-helper-koprusu.md).
