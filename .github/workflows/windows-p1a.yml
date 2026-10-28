@@ -70,6 +70,11 @@ jobs:
       - name: cargo check
         run: cargo check --workspace --all-targets --locked
 
+      # Süreç düzeyi testler diğer paketin ikilisini (kindora-helper.exe) kullanır;
+      # `cargo test` onu derlemez. Bayat/eksik ikiliyle test etmemek için önce derle.
+      - name: cargo build (debug, test ikilileri)
+        run: cargo build --workspace --locked
+
       - name: cargo test
         run: |
           mkdir -p dist

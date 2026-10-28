@@ -53,7 +53,7 @@ Adlandırma: helper crate'i T0-B/context §15'teki kanonik `windows-session` ad�
 macOS/Linux (geliştirme taşıması):
 
 ```bash
-cargo build --workspace
+cargo build --workspace          # önce: süreç testleri kindora-helper ikilisini kullanır (BUG-001)
 cargo test --workspace
 cargo clippy --workspace --all-targets
 cargo check --workspace --all-targets --target x86_64-pc-windows-msvc

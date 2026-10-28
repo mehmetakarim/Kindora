@@ -29,7 +29,7 @@ fn helper_bin() -> PathBuf {
     let p = agent_bin().with_file_name("kindora-helper");
     assert!(
         p.exists(),
-        "kindora-helper bulunamadı ({}); `cargo test --workspace` ile çalıştırın",
+        "kindora-helper yok veya bayat olabilir ({}); önce `cargo build --workspace` çalıştırın",
         p.display()
     );
     p
