@@ -1,0 +1,10 @@
+# Depo satır sonları LF'dir; Windows checkout'unda da LF kalır (BUG-004).
+# Prettier/rustfmt denetimleri ve sha256sum dosyaları platformdan bağımsız olur.
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.icns binary
+*.woff binary
+*.woff2 binary
+*.zip binary

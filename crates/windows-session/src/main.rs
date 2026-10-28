@@ -67,8 +67,8 @@ fn bridge(cfg: &HelperConfig) -> ExitCode {
 
     let shutdown = Arc::new(AtomicBool::new(false));
     let (tx, rx) = mpsc::channel();
-    let (reject_tx, reject_rx) = mpsc::channel::<String>();
     // Okuyucu iş parçacığı stdin EOF'unda kanalı bırakır → köprü kapanır.
+    // Reddedilen satır hemen bildirilir (stdout kilidiyle, olaylar karışmaz).
     std::thread::spawn(move || {
         let mut input = std::io::stdin().lock();
         let mut line = String::new();
@@ -80,33 +80,29 @@ fn bridge(cfg: &HelperConfig) -> ExitCode {
                 Ok(0) | Err(_) => break,
                 Ok(_) => {}
             }
-            if !line.ends_with('\n') && line.len() > MAX_BRIDGE_LINE_BYTES {
-                let _ = reject_tx.send("line too long".into());
-                break;
-            }
-            match decode_bridge_request(&line) {
+            let too_long = !line.ends_with('\n') && line.len() > MAX_BRIDGE_LINE_BYTES;
+            let result = if too_long {
+                Err("line too long".to_string())
+            } else {
+                decode_bridge_request(&line).map_err(|e| e.to_string())
+            };
+            match result {
                 Ok(req) => {
                     if tx.send(req).is_err() {
                         break;
                     }
                 }
-                Err(e) => {
-                    let _ = reject_tx.send(e.to_string());
+                Err(reason) => {
+                    let event = BridgeEvent::RequestRejected { reason };
+                    if !write_bridge_event(&mut std::io::stdout().lock(), &event) || too_long {
+                        break;
+                    }
                 }
             }
         }
     });
 
-    let stdout = std::io::stdout();
-    let mut emit = |e: &BridgeEvent| {
-        let mut out = stdout.lock();
-        while let Ok(reason) = reject_rx.try_recv() {
-            if !write_bridge_event(&mut out, &BridgeEvent::RequestRejected { reason }) {
-                return false;
-            }
-        }
-        write_bridge_event(&mut out, e)
-    };
+    let mut emit = |e: &BridgeEvent| write_bridge_event(&mut std::io::stdout().lock(), e);
     run_bridge(cfg, &rx, &shutdown, &mut emit);
     ExitCode::SUCCESS
 }

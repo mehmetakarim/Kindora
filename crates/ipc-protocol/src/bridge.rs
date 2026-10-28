@@ -97,7 +97,11 @@ fn check_len(line: &str) -> Result<&str, BridgeLineError> {
     if line.len() > MAX_BRIDGE_LINE_BYTES {
         return Err(BridgeLineError::TooLong);
     }
-    Ok(line.trim_end_matches(['\r', '\n']))
+    // Windows'ta .NET `Process.StandardInput` ilk satırın başına UTF-8 BOM
+    // ekleyebilir (BUG-005); yalnız bu görünmez önek atılır.
+    Ok(line
+        .trim_start_matches('\u{feff}')
+        .trim_end_matches(['\r', '\n']))
 }
 
 /// Katı ayrıştırma: yalnız `{"op":"<izinli>"}`. Serde'nin etiketli enum'larında
@@ -140,6 +144,11 @@ mod tests {
         assert_eq!(
             decode_bridge_request("{\"op\":\"refresh\"}\r\n"),
             Ok(BridgeRequest::Refresh)
+        );
+        assert_eq!(
+            decode_bridge_request("\u{feff}{\"op\":\"refresh\"}\r\n"),
+            Ok(BridgeRequest::Refresh),
+            ".NET StandardInput BOM"
         );
         for bad in [
             r#"{"op":"LOCK"}"#,
