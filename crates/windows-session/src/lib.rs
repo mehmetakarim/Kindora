@@ -6,15 +6,22 @@
 //! kendini kalıcılaştırmaz** (otomatik başlatma kaydı oluşturmaz).
 //!
 //! [`run_bridge`] (P1.B, ADR-0013): masaüstü uygulamasının alt süreci olarak
-//! agent durumunu stdio üzerinden JSON satırlarıyla aktarır; agent'a yalnız
-//! salt okunur `GET_STATUS` / `HEALTH_CHECK` gönderir.
+//! agent durumunu stdio üzerinden JSON satırlarıyla aktarır; agent'a salt
+//! okunur `GET_STATUS` / `HEALTH_CHECK` / `GET_SCREEN_TIME` gönderir.
+//!
+//! P1.C (ADR-0014): helper her döngüde kendi oturumundaki "son girdiden bu
+//! yana geçen süre"yi [`activity::idle_ms`] ile ölçüp `REPORT_ACTIVITY` olarak
+//! bildirir. Başka hiçbir kullanıcı verisi okunmaz.
+
+pub mod activity;
 
 use ipc_protocol::bridge::{
     encode_bridge_line, AgentSnapshot, BridgeEvent, BridgeRequest, LinkState, BRIDGE_VERSION,
 };
 use ipc_protocol::frame::{read_frame, write_frame, FrameError};
 use ipc_protocol::{
-    decode_response, now_ms, CommandType, ErrorCode, Payload, Request, Response, MAX_MESSAGE_BYTES,
+    decode_response, now_ms, ActivityReport, CommandType, ErrorCode, Payload, Request, Response,
+    MAX_MESSAGE_BYTES,
 };
 use std::io::{self, Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -46,7 +53,7 @@ impl Default for HelperConfig {
             response_timeout: Duration::from_secs(3),
             reconnect_min: Duration::from_millis(250),
             reconnect_max: Duration::from_secs(5),
-            bridge_poll_interval: Duration::from_secs(3),
+            bridge_poll_interval: Duration::from_secs(2),
             unauthorized_retry: Duration::from_secs(30),
             #[cfg(unix)]
             socket_path: ipc_protocol::transport::unix_dev::default_socket_path(),
@@ -112,6 +119,9 @@ pub struct Client {
     counter: u64,
     /// Windows: pipe sunucusunun PID'i (kayıt için).
     pub server_pid: Option<u32>,
+    /// Agent kullanım süresi komutlarını reddettiyse (eski sürüm / motor yok)
+    /// bu bağlantıda bir daha gönderilmez; hata bütçesi tüketilmez.
+    screen_time_supported: bool,
 }
 
 impl Client {
@@ -122,14 +132,55 @@ impl Client {
             id_prefix: format!("h{}-{}", std::process::id(), now_ms()),
             counter: 0,
             server_pid,
+            screen_time_supported: true,
         })
     }
 
     pub fn request(&mut self, command: CommandType) -> Result<Response, ClientError> {
         self.counter += 1;
         let id = format!("{}-{}", self.id_prefix, self.counter);
-        let body = serde_json::to_vec(&Request::new(id.clone(), command))
-            .map_err(|e| ClientError::Protocol(e.to_string()))?;
+        self.send(Request::new(id, command))
+    }
+
+    /// Bu oturumun etkinlik sinyalini bildirir (yalnız son girdiden bu yana geçen süre).
+    pub fn report_activity(&mut self, idle_ms: Option<u64>) -> Result<Response, ClientError> {
+        self.counter += 1;
+        let id = format!("{}-{}", self.id_prefix, self.counter);
+        self.send(Request::report_activity(id, ActivityReport { idle_ms }))
+    }
+
+    pub fn screen_time_supported(&self) -> bool {
+        self.screen_time_supported
+    }
+
+    /// Etkinlik raporu + kullanım süresi durumu. Agent desteklemiyorsa `None`.
+    pub fn screen_time_cycle(
+        &mut self,
+    ) -> Result<Option<Box<ipc_protocol::ScreenTimeStatus>>, ClientError> {
+        if !self.screen_time_supported {
+            return Ok(None);
+        }
+        if self
+            .report_activity(activity::idle_ms())?
+            .error_code
+            .is_some()
+        {
+            self.screen_time_supported = false;
+            return Ok(None);
+        }
+        let r = self.request(CommandType::GetScreenTime)?;
+        match r.payload {
+            Some(Payload::ScreenTime(s)) => Ok(Some(s)),
+            _ => {
+                self.screen_time_supported = false;
+                Ok(None)
+            }
+        }
+    }
+
+    fn send(&mut self, req: Request) -> Result<Response, ClientError> {
+        let id = req.message_id.clone();
+        let body = serde_json::to_vec(&req).map_err(|e| ClientError::Protocol(e.to_string()))?;
         if let Err(write_err) = write_frame(&mut self.stream, &body) {
             // Agent yetkisiz istemciye UNAUTHORIZED yazıp bağlantıyı kapatmış
             // olabilir; yazma hatasından önce tamponda bekleyen yanıtı oku.
@@ -228,7 +279,13 @@ pub fn run_helper(cfg: &HelperConfig, shutdown: &AtomicBool) {
             if sleep_or_shutdown(cfg.heartbeat_interval, shutdown) {
                 break 'outer;
             }
-            match client.request(CommandType::Ping) {
+            // Kalp atışı = etkinlik raporu (P1.C); agent desteklemiyorsa PING.
+            let beat = if client.screen_time_supported() {
+                client.screen_time_cycle().map(|_| ())
+            } else {
+                client.request(CommandType::Ping).map(|_| ())
+            };
+            match beat {
                 Ok(_) => last_ok = Instant::now(),
                 Err(e) => {
                     log_event(
@@ -297,9 +354,12 @@ fn wait_bridge(d: Duration, requests: &Receiver<BridgeRequest>, shutdown: &Atomi
     }
 }
 
-/// `GET_STATUS` + `HEALTH_CHECK` → tek anlık görüntü.
+/// `REPORT_ACTIVITY` + `GET_STATUS` + `HEALTH_CHECK` + `GET_SCREEN_TIME` →
+/// tek anlık görüntü. Kullanım süresi alınamazsa (eski agent, motor yok)
+/// `screen_time: None` olur; masaüstü bunu ölçüm yok olarak gösterir.
 pub fn poll_snapshot(client: &mut Client) -> Result<AgentSnapshot, ClientError> {
     let started = Instant::now();
+    let screen_time = client.screen_time_cycle()?;
     let status = client.request(CommandType::GetStatus)?;
     let health = client.request(CommandType::HealthCheck)?;
     match (status.payload, health.payload) {
@@ -320,6 +380,7 @@ pub fn poll_snapshot(client: &mut Client) -> Result<AgentSnapshot, ClientError> 
             checks,
             received_at_ms: now_ms(),
             round_trip_ms: started.elapsed().as_millis() as u64,
+            screen_time,
         }),
         _ => Err(ClientError::Protocol("unexpected payload".into())),
     }

@@ -4,16 +4,31 @@
 //! - [`handler`]: istek doğrulama, tekrar kimliği tespiti, komut yanıtları.
 //! - [`connection`]: tek bir bağlantının yaşam döngüsü (zaman aşımı, hata
 //!   bütçesi, kapanma), herhangi bir `Read + Write` akışı üzerinde.
+//! - [`ScreenTimeService`]: kullanım süresi motoruna (P1.C) dar arayüz.
 
 pub mod auth;
 pub mod connection;
 pub mod handler;
 
-use ipc_protocol::RunMode;
+use ipc_protocol::{ActivityReport, HealthCheckResult, RunMode, ScreenTimeStatus};
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 pub const AGENT_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Kullanım süresi motoruna agent çekirdeğinden erişim (P1.C, ADR-0014).
+///
+/// Yalnız iki işlem vardır: helper'ın etkinlik raporunu iletmek ve durumu
+/// okumak. Kural değiştirme veya kısıtlama uygulama işlemi **yoktur**.
+pub trait ScreenTimeService: Send + Sync + std::fmt::Debug {
+    /// `client_session`: raporu gönderen sürecin Windows oturumu (işletim
+    /// sisteminden). Dönüş: rapor sayıma girdi mi.
+    fn report_activity(&self, client_session: Option<u32>, report: ActivityReport) -> bool;
+    fn status(&self) -> Option<ScreenTimeStatus>;
+    /// Sağlık denetimine eklenecek satırlar (motor, depolama).
+    fn health(&self) -> Vec<HealthCheckResult>;
+}
 
 /// Agent süreci genelinde paylaşılan durum.
 #[derive(Debug)]
@@ -21,6 +36,7 @@ pub struct AgentState {
     pub run_mode: RunMode,
     started: Instant,
     connected: AtomicU32,
+    screen_time: Option<Arc<dyn ScreenTimeService>>,
 }
 
 impl AgentState {
@@ -29,7 +45,17 @@ impl AgentState {
             run_mode,
             started: Instant::now(),
             connected: AtomicU32::new(0),
+            screen_time: None,
         }
+    }
+
+    pub fn with_screen_time(mut self, service: Arc<dyn ScreenTimeService>) -> Self {
+        self.screen_time = Some(service);
+        self
+    }
+
+    pub fn screen_time(&self) -> Option<&dyn ScreenTimeService> {
+        self.screen_time.as_deref()
     }
 
     pub fn uptime(&self) -> Duration {

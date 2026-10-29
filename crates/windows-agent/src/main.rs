@@ -3,15 +3,21 @@ use std::process::ExitCode;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
+use windows_agent::screen_time::{dev_policy_beside_exe, ScreenTimeConfig};
 use windows_agent::{log, run_agent, AgentConfig};
 
 const USAGE: &str = "\
-Kindora Agent (P1.A prototip — kullanım kilidi yok)
+Kindora Agent (P1.C önizleme — kullanım süresi ölçer; kilit/engelleme yok)
 
 Kullanım:
   kindora-agent console [--idle-timeout-ms N] [--socket PATH]
+                        [--data-dir DIR | --no-store] [--dev-policy FILE]
       Ön planda çalışır. Ctrl+C ile güvenli kapanır.
       --socket yalnız Unix geliştirme taşımasında geçerlidir.
+      --data-dir: SQLite klasörü (varsayılan: Windows %LOCALAPPDATA%\\Kindora\\dev-console,
+        Unix soket klasörü/data). --no-store: yalnız bellek.
+      --dev-policy: DEV test politika dosyası (varsayılan: agent klasöründeki
+        kindora-dev-policy.json). Üretim yetkilendirmesi değildir.
   kindora-agent service
       Yalnız Windows Service Control Manager tarafından çağrılır.
       Kurulum otomatik değildir; bkz. docs/agent/p1a-windows-agent.md
@@ -19,6 +25,9 @@ Kullanım:
 
 fn parse_console(args: &[String]) -> Result<AgentConfig, String> {
     let mut cfg = AgentConfig::default();
+    let mut data_dir: Option<std::path::PathBuf> = None;
+    let mut no_store = false;
+    let mut dev_policy = dev_policy_beside_exe();
     let mut it = args.iter();
     while let Some(a) = it.next() {
         let mut value = || it.next().ok_or_else(|| format!("{a} için değer eksik"));
@@ -29,9 +38,28 @@ fn parse_console(args: &[String]) -> Result<AgentConfig, String> {
             }
             #[cfg(unix)]
             "--socket" => cfg.socket_path = value()?.into(),
+            "--data-dir" => data_dir = Some(value()?.into()),
+            "--no-store" => no_store = true,
+            "--dev-policy" => dev_policy = Some(value()?.into()),
             other => return Err(format!("bilinmeyen argüman: {other}")),
         }
     }
+    let default_dir = || {
+        #[cfg(unix)]
+        {
+            cfg.socket_path.parent().map(|d| d.join("data"))
+        }
+        #[cfg(windows)]
+        {
+            windows_agent::platform::default_data_dir(true)
+        }
+    };
+    let dir = if no_store {
+        None
+    } else {
+        data_dir.or_else(default_dir)
+    };
+    cfg.screen_time = Some(ScreenTimeConfig::new(dir, dev_policy));
     Ok(cfg)
 }
 

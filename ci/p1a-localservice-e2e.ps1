@@ -1,4 +1,4 @@
-# Kindora P1A/P1B - LocalService service end-to-end check (CI, BUG-003, P1.B).
+# Kindora P1A/P1B/P1C - LocalService service end-to-end check (CI, BUG-003, P1.B, P1.C).
 #
 # Installs KindoraAgentDev as NT AUTHORITY\LocalService with the SAME commands
 # as packaging/p1a/README-TEST-TR.md, then checks:
@@ -10,6 +10,11 @@
 #       answers a refresh and exits when stdin closes.
 #   3c. (-DesktopExe) The real Tauri desktop app connects through its helper,
 #       sees the service stop/start, and closes without leaving a helper behind.
+#   3d. (-ScreenTime) P1.C screen time: DEV policy file validated by the agent,
+#       SQLite in the LocalService profile with a protected DACL, totals kept
+#       across a service restart without double counting, corrupt database
+#       recovered, corrupt policy keeps the last valid one, real Windows API
+#       observations (GetLastInputInfo, WTS lock state) recorded.
 #   4. Service stops cleanly; it is always deleted afterwards.
 #
 # Runs under Windows PowerShell 5.1 on purpose (README compatibility).
@@ -20,7 +25,8 @@
 param(
     [Parameter(Mandatory = $true)][string]$BinDir,
     [string]$SummaryFile = '',
-    [string]$DesktopExe = ''
+    [string]$DesktopExe = '',
+    [switch]$ScreenTime
 )
 
 $ErrorActionPreference = 'Stop'
@@ -32,6 +38,10 @@ $logCandidates = @(
     'C:\Windows\Temp\kindora-agent-dev.log'
 )
 $summary = New-Object System.Collections.Generic.List[string]
+$dataDir = 'C:\Windows\ServiceProfiles\LocalService\AppData\Local\Kindora'
+$db = Join-Path $dataDir 'kindora.db'
+$policyFile = Join-Path $dir 'kindora-dev-policy.json'
+$policyV1 = '{"kind":"kindora-dev-policy","dev_only":true,"version":1,"daily_limit_secs":300,"break_interval_secs":120,"break_duration_secs":30,"first_warning_secs":60,"final_warning_secs":20,"idle_threshold_secs":60,"note":"CI quick test"}'
 
 function Get-AgentLog {
     foreach ($p in $logCandidates) {
@@ -67,6 +77,10 @@ Write-Host "runner: $(whoami) session=$session psversion=$($PSVersionTable.PSVer
 Write-Host '== Install (README 4.1 commands) =='
 New-Item -ItemType Directory $dir -Force | Out-Null
 Copy-Item (Join-Path $BinDir 'kindora-agent.exe'), (Join-Path $BinDir 'kindora-helper.exe') $dir
+if ($ScreenTime) {
+    Remove-Item $dataDir -Recurse -Force -ErrorAction SilentlyContinue
+    [IO.File]::WriteAllText($policyFile, $policyV1, [Text.Encoding]::ASCII)
+}
 sc.exe --% create KindoraAgentDev binPath= "\"C:\Program Files\KindoraDev\kindora-agent.exe\" service" start= demand obj= "NT AUTHORITY\LocalService" DisplayName= "Kindora Agent (DEV TEST)"
 Assert-True ($LASTEXITCODE -eq 0) "sc.exe create (exit=$LASTEXITCODE)"
 $qc = sc.exe qc $svc | Out-String
@@ -153,6 +167,10 @@ try {
     if ($session -ne 0) {
         $null = Read-BridgeUntil '"type":"link","state":"connected"' 10000
         $null = Read-BridgeUntil '"type":"snapshot".*"run_mode":"SERVICE".*"healthy":true' 10000
+        if ($ScreenTime) {
+            $null = Read-BridgeUntil '"type":"snapshot".*"screen_time":\{.*"source":"DEV_FILE"' 10000
+            Assert-True $true 'bridge snapshot carries agent screen time (DEV policy)'
+        }
         $sw = [Diagnostics.Stopwatch]::StartNew()
         $bp.StandardInput.WriteLine('{"op":"refresh"}')
         $bp.StandardInput.Flush()
@@ -215,6 +233,90 @@ try {
         }
     }
 
+    if ($ScreenTime) {
+        Write-Host '== 3d. Screen time (P1.C) =='
+        function Get-ScreenTime([int]$ms = 15000) {
+            $sw = [Diagnostics.Stopwatch]::StartNew()
+            while ($true) {
+                $out = & $helper screen-time | Out-String
+                if ($LASTEXITCODE -eq 0) { return ($out | ConvertFrom-Json).payload }
+                if ($sw.ElapsedMilliseconds -gt $ms) { throw "TIMEOUT: screen-time ($out)" }
+                Start-Sleep -Milliseconds 500
+            }
+        }
+        function Total([object]$st) {
+            $t = $st.today
+            return [int64]$t.active_secs + $t.idle_secs + $t.locked_secs + $t.suspended_secs + $t.unknown_secs
+        }
+        if ((Get-Service $svc).Status -ne 'Running') { sc.exe start $svc | Out-Null; Wait-Until { (Get-Service $svc).Status -eq 'Running' } 15000 'service Running (3d)' }
+
+        $st = Get-ScreenTime
+        Write-Host ("screen-time: " + ($st | ConvertTo-Json -Depth 5 -Compress))
+        Assert-True ($st.kind -eq 'SCREEN_TIME') 'GET_SCREEN_TIME answered by the LocalService agent'
+        Assert-True ($st.policy.source -eq 'DEV_FILE' -and $st.policy.version -eq 1 -and $st.policy.status -eq 'OK') 'DEV policy file validated and applied by the agent'
+        Assert-True ($st.daily_limit_secs -eq 300) 'daily limit from DEV policy'
+        Assert-True ($st.storage.persistent -eq $true) 'SQLite storage persistent'
+        Assert-True (Test-Path $db) "database in LocalService profile ($db)"
+        $sddl = (Get-Acl $dataDir).Sddl
+        Write-Host "data dir SDDL: $sddl"
+        Assert-True ($sddl -match '^O:LS' -or $sddl -match '^O:S-1-5-19') 'data dir owned by LocalService'
+        Assert-True (-not ($sddl -match ';;;(BU|WD|IU|AU)\)')) 'data dir DACL has no Users/Everyone/Interactive/AuthenticatedUsers ACE'
+        $summary.Add("SCREENTIME LocalService: GET_SCREEN_TIME ok, DEV policy v1 applied, SQLite at LocalService profile, protected DACL")
+
+        # Real Windows API observations (recorded, not acceptance).
+        $idle1 = & $helper idle | Out-String
+        Add-Type -Namespace KdCi -Name Input -MemberDefinition '[DllImport("user32.dll")] public static extern void mouse_event(uint f, int dx, int dy, uint d, System.UIntPtr e);'
+        [KdCi.Input]::mouse_event(1, 1, 0, 0, [UIntPtr]::Zero)
+        [KdCi.Input]::mouse_event(1, -1, 0, 0, [UIntPtr]::Zero)
+        Start-Sleep -Milliseconds 300
+        $idle2 = & $helper idle | Out-String
+        $ack = & $helper report-activity | Out-String
+        $console = (Get-CimInstance Win32_ComputerSystem).UserName
+        Write-Host "GetLastInputInfo before=$($idle1.Trim()) after_injected_input=$($idle2.Trim()) report=$($ack.Trim()) console_user=$console"
+        $st = Get-ScreenTime
+        Write-Host "state=$($st.state) source=$($st.measurement.source) reason=$($st.measurement.unknown_reason)"
+        $summary.Add("SCREENTIME real API (runner, info): idle before=$($idle1.Trim()) after injected input=$($idle2.Trim()); report=$(($ack | ConvertFrom-Json).payload.applied); state=$($st.state) reason=$($st.measurement.unknown_reason)")
+
+        # Restart: totals kept, no double counting.
+        Start-Sleep -Seconds 16
+        $before = Get-ScreenTime
+        $tb = Total $before
+        $sw = [Diagnostics.Stopwatch]::StartNew()
+        sc.exe stop $svc | Out-Null
+        Wait-Until { (Get-Service $svc).Status -eq 'Stopped' } 15000 'service Stopped (3d)'
+        sc.exe start $svc | Out-Null
+        Wait-Until { (Get-Service $svc).Status -eq 'Running' } 15000 'service Running (3d restart)'
+        $after = Get-ScreenTime
+        $ta = Total $after
+        $gap = [int]($sw.ElapsedMilliseconds / 1000)
+        Write-Host "restart: total before=$tb after=$ta gap=${gap}s active before=$($before.today.active_secs) after=$($after.today.active_secs)"
+        Assert-True ($ta -ge $tb - 1) "totals kept across service restart ($tb -> $ta)"
+        Assert-True ($ta -le $tb + $gap + 5) "no double counting after restart ($tb -> $ta, gap ${gap}s)"
+        Assert-True ($after.policy.version -eq 1) 'last valid policy version kept'
+        Assert-True (@(Get-AgentLog | Where-Object { $_ -match 'event=screen_time kind=AGENT_STOP' }).Count -ge 1) 'graceful stop flushed AGENT_STOP'
+        $summary.Add("SCREENTIME service restart: totals $tb s -> $ta s (gap ${gap}s), no double counting, AGENT_STOP flushed")
+
+        # Corrupt database -> quarantined and recreated.
+        sc.exe stop $svc | Out-Null
+        Wait-Until { (Get-Service $svc).Status -eq 'Stopped' } 15000 'service Stopped (corrupt db)'
+        [IO.File]::WriteAllText($db, 'this is not a sqlite database at all', [Text.Encoding]::ASCII)
+        Remove-Item "$db-wal", "$db-shm" -ErrorAction SilentlyContinue
+        sc.exe start $svc | Out-Null
+        Wait-Until { (Get-Service $svc).Status -eq 'Running' } 15000 'service Running (corrupt db)'
+        $st = Get-ScreenTime
+        Assert-True ($st.storage.persistent -and $st.storage.recovered) 'corrupt database recovered (persistent, recovered=true)'
+        Assert-True (@(Get-ChildItem $dataDir -Filter 'kindora.db.corrupt-*').Count -ge 1) 'corrupt copy kept for diagnostics'
+        $null = Wait-LogLine 'event=screen_time kind=DB_RECOVERED'
+        $summary.Add("SCREENTIME corrupt SQLite: quarantined + recreated, service kept running")
+
+        # Corrupt policy file -> last valid kept.
+        [IO.File]::WriteAllText($policyFile, '{ broken', [Text.Encoding]::ASCII)
+        $script:pst = $null
+        Wait-Until { $script:pst = Get-ScreenTime; $script:pst.policy.status -eq 'INVALID_KEPT_LAST' } 20000 'corrupt policy -> INVALID_KEPT_LAST'
+        Assert-True ($script:pst.policy.version -eq 1 -and $script:pst.daily_limit_secs -eq 300) 'last valid policy still applied'
+        $summary.Add("SCREENTIME corrupt policy file: INVALID_KEPT_LAST, last valid v1 kept; no lock applied")
+    }
+
     Write-Host '== 4. Stop (README 4.6) =='
     sc.exe stop $svc | Out-Host
     Wait-Until { (Get-Service $svc).Status -eq 'Stopped' } 15000 'service Stopped'
@@ -229,6 +331,7 @@ finally {
     Start-Sleep -Seconds 1
     sc.exe delete $svc | Out-Host
     Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
+    if ($ScreenTime) { Remove-Item $dataDir -Recurse -Force -ErrorAction SilentlyContinue }
 }
 
 sc.exe query $svc | Out-Null

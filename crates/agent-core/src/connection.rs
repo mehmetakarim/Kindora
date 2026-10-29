@@ -57,7 +57,7 @@ pub fn serve_connection<S: Read + Write>(
     }
 
     let _guard = state.register_client();
-    let mut handler = SessionHandler::new(limits.clone());
+    let mut handler = SessionHandler::new(limits.clone()).with_client_session(peer.session_id);
     let mut requests = 0u64;
     let mut last_activity = Instant::now();
 

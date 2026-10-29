@@ -1,12 +1,15 @@
-//! Kindora Windows Agent — P1.A prototipi.
+//! Kindora Windows Agent.
 //!
-//! Kapsam: servis yaşam döngüsü (start/stop/status/health/graceful shutdown)
-//! ve Session Helper ile yerel IPC. **Kullanım kilidi, politika motoru,
-//! bulut senkronu yok.** Servis otomatik kurulmaz/başlatılmaz.
+//! Kapsam: servis yaşam döngüsü (start/stop/status/health/graceful shutdown),
+//! Session Helper ile yerel IPC (P1.A) ve yerel kullanım süresi ölçümü + mola
+//! hatırlatma durumu (P1.C, [`screen_time`]). **Kullanım kilidi, engelleme,
+//! program kapatma, bulut senkronu yok.** Servis otomatik kurulmaz/başlatılmaz.
 //!
 //! Servis hesabı ADR-0006 kapsamında açıktır; kod LocalSystem varsaymaz.
 
 pub mod log;
+pub mod platform;
+pub mod screen_time;
 #[cfg(windows)]
 pub mod service;
 
@@ -29,6 +32,8 @@ pub struct AgentConfig {
     pub max_connections: usize,
     #[cfg(unix)]
     pub socket_path: std::path::PathBuf,
+    /// `None`: kullanım süresi motoru çalışmaz (`GET_SCREEN_TIME` → UNAVAILABLE).
+    pub screen_time: Option<screen_time::ScreenTimeConfig>,
 }
 
 impl Default for AgentConfig {
@@ -39,6 +44,7 @@ impl Default for AgentConfig {
             max_connections: 8,
             #[cfg(unix)]
             socket_path: ipc_protocol::transport::unix_dev::default_socket_path(),
+            screen_time: None,
         }
     }
 }
@@ -139,8 +145,15 @@ where
 
 /// Agent'ı `shutdown` ayarlanana kadar çalıştırır; tüm bağlantılar kapanınca döner.
 pub fn run_agent(mode: RunMode, cfg: AgentConfig, shutdown: Arc<AtomicBool>) -> io::Result<()> {
+    let mut state = AgentState::new(mode);
+    let mut screen_time_thread = None;
+    if let Some(st_cfg) = cfg.screen_time.clone() {
+        let (rt, handle) = screen_time::start(st_cfg, shutdown.clone());
+        state = state.with_screen_time(rt);
+        screen_time_thread = Some(handle);
+    }
     let ctx = Ctx {
-        state: Arc::new(AgentState::new(mode)),
+        state: Arc::new(state),
         policy: Arc::new(helper_policy()),
         limits: cfg.limits.clone(),
         shutdown: shutdown.clone(),
@@ -162,6 +175,9 @@ pub fn run_agent(mode: RunMode, cfg: AgentConfig, shutdown: Arc<AtomicBool>) -> 
     shutdown.store(true, Ordering::SeqCst);
     for w in workers {
         let _ = w.join();
+    }
+    if let Some(h) = screen_time_thread {
+        let _ = h.join();
     }
     match &result {
         Ok(()) => log::event("agent_stopped", &[]),

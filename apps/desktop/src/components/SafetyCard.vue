@@ -10,8 +10,13 @@ import { PhShieldCheck } from "@phosphor-icons/vue";
     </h2>
     <ul class="kd-safety__list">
       <li>
-        Bu önizleme <strong>hiçbir kısıtlama uygulamaz</strong>: ekranı kilitlemez, uygulama veya
-        site engellemez, süre sınırı koymaz.
+        Bu önizleme kullanım süresini ölçer ve mola hatırlatır, ama
+        <strong>hiçbir kısıtlama uygulamaz</strong>: ekranı kilitlemez, program kapatmaz, uygulama
+        veya site engellemez; süre dolduğunda da yalnız bilgi verir.
+      </li>
+      <li>
+        Yalnız "son klavye/fare girdisinden bu yana geçen süre" kullanılır. Tuşlar, ekran görüntüsü,
+        açık pencereler veya tarayıcı geçmişi toplanmaz; veriler bu bilgisayarda kalır.
       </li>
       <li>
         Pencereyi kapatmak güvenlidir. Kindora Agent Windows servisi olarak ayrıca yönetilir ve bu

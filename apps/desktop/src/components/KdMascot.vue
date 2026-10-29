@@ -2,6 +2,7 @@
 // Filiz — KONSEPT çizim, nihai değil (design README "Fidelity").
 // Geometri, design_files/Kindora Phase 1 - Visual Foundation.dc.html içindeki
 // `mascot()` işlevinden birebir aktarıldı; yeni karakter veya durum eklenmedi.
+// P1.C: aynı işlevdeki "reminder", "break" ve "encourage" durumları eklendi.
 // Son illüstrasyon mascot_brief/ sürecinden gelecek.
 import { computed } from "vue";
 import type { MascotPose } from "../agent/presentation";
@@ -15,11 +16,12 @@ const body = "#5265D8";
 const ink = "#1B2150";
 const sleepy = computed(() => props.pose === "sleeping");
 const joy = computed(() => props.pose === "happy" || props.pose === "greeting");
-const closed = computed(() => sleepy.value);
+const closed = computed(() => sleepy.value || props.pose === "break");
 const arms = computed(() => {
   switch (props.pose) {
     case "greeting":
       return ["M27 80 Q19 86 21 93", "M93 70 Q106 60 104 46"];
+    case "break":
     case "happy":
       return ["M29 64 Q17 52 21 40", "M91 64 Q103 52 99 40"];
     case "permission":
@@ -116,6 +118,16 @@ const eyeRy = computed(() => (props.pose === "thinking" ? 4 : 4.8));
           stroke-linecap="round"
         />
       </template>
+      <template v-else-if="pose === 'encourage'">
+        <ellipse cx="50" cy="72" rx="3.6" ry="4.8" :fill="ink" />
+        <path
+          d="M66 73 Q70 69 74 73"
+          :stroke="ink"
+          stroke-width="3"
+          fill="none"
+          stroke-linecap="round"
+        />
+      </template>
       <g v-else :class="{ 'kd-mascot__blink': motion }">
         <ellipse :cx="50 + eyeDx" :cy="72 + eyeDy" rx="3.6" :ry="eyeRy" :fill="ink" />
         <ellipse :cx="70 + eyeDx" :cy="72 + eyeDy" rx="3.6" :ry="eyeRy" :fill="ink" />
@@ -125,7 +137,7 @@ const eyeRy = computed(() => (props.pose === "thinking" ? 4 : 4.8));
         <circle cx="78" cy="81" r="3.5" fill="#F4A6B6" opacity=".8" />
       </template>
       <!-- ağız -->
-      <path v-if="joy" d="M53 80 Q60 89 67 80 Z" :fill="ink" />
+      <path v-if="joy || pose === 'encourage'" d="M53 80 Q60 89 67 80 Z" :fill="ink" />
       <ellipse v-else-if="pose === 'permission'" cx="60" cy="83" rx="2.6" ry="3" :fill="ink" />
       <path
         v-else-if="sleepy"
@@ -152,6 +164,21 @@ const eyeRy = computed(() => (props.pose === "thinking" ? 4 : 4.8));
         stroke-linecap="round"
       />
       <!-- durum işaretleri -->
+      <g v-if="pose === 'reminder'">
+        <circle cx="99" cy="40" r="11" fill="#E7A83E" stroke="#FFFFFF" stroke-width="2.5" />
+        <path
+          d="M99 34 L99 40 L103 43"
+          stroke="#FFFFFF"
+          stroke-width="2.5"
+          fill="none"
+          stroke-linecap="round"
+        />
+      </g>
+      <path
+        v-if="pose === 'encourage'"
+        d="M99 28 L102 36 L110 36 L104 41 L106 49 L99 44 L92 49 L94 41 L88 36 L96 36 Z"
+        fill="#E7A83E"
+      />
       <g v-if="pose === 'permission'">
         <circle cx="99" cy="40" r="11" fill="#8C80E8" stroke="#FFFFFF" stroke-width="2.5" />
         <path

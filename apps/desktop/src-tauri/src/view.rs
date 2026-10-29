@@ -1,11 +1,12 @@
 //! Ön yüze gönderilen agent durumu ve köprü olaylarından türetilmesi.
 //!
 //! Tek doğruluk kaynağı helper köprüsünden gelen gerçek olaylardır; bağlantı
-//! yokken agent bilgisi **gösterilmez** (`agent: None`), yalnız son başarılı
-//! iletişim zamanı korunur.
+//! yokken agent bilgisi ve kullanım süresi **gösterilmez** (`agent: None`,
+//! `screen_time: None`), yalnız son başarılı iletişim zamanı korunur. Masaüstü
+//! kullanım süresini kendisi hesaplamaz; agent'ın hesapladığını gösterir.
 
 use ipc_protocol::bridge::{AgentSnapshot, BridgeEvent, LinkState};
-use ipc_protocol::{HealthCheckResult, RunMode};
+use ipc_protocol::{HealthCheckResult, RunMode, ScreenTimeStatus};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -58,6 +59,8 @@ pub struct AgentView {
     pub retry_in_ms: Option<u64>,
     pub link_reason: Option<String>,
     pub agent: Option<AgentInfo>,
+    /// Agent'ın hesapladığı kullanım süresi (P1.C). Bağlantı yokken `None`.
+    pub screen_time: Option<ScreenTimeStatus>,
     pub last_success_ms: Option<u64>,
     pub closing: bool,
     pub updated_ms: u64,
@@ -74,6 +77,7 @@ impl AgentView {
             retry_in_ms: None,
             link_reason: None,
             agent: None,
+            screen_time: None,
             last_success_ms: None,
             closing: false,
             updated_ms: now_ms,
@@ -83,6 +87,7 @@ impl AgentView {
     fn lose_link(&mut self, state: LinkState, reason: Option<String>) {
         self.link = state;
         self.agent = None;
+        self.screen_time = None;
         self.retry_in_ms = None;
         self.link_reason = reason;
     }
@@ -109,6 +114,7 @@ impl AgentView {
                 }
                 if state != LinkState::Connected {
                     self.agent = None;
+                    self.screen_time = None;
                 }
                 self.link = state;
                 self.attempt = attempt;
@@ -121,6 +127,7 @@ impl AgentView {
                 self.retry_in_ms = None;
                 self.link_reason = None;
                 self.last_success_ms = Some(s.received_at_ms);
+                self.screen_time = s.screen_time.clone().map(|b| *b);
                 self.agent = Some(s.into());
             }
             // Masaüstü yalnız izinli istek gönderir; ret yalnız kayda geçer.
@@ -175,6 +182,7 @@ mod tests {
             checks: vec![],
             received_at_ms: at,
             round_trip_ms: 3,
+            screen_time: None,
         })
     }
 
@@ -263,6 +271,67 @@ mod tests {
         let before = v.clone();
         assert!(!v.apply(BridgeEvent::RequestRejected { reason: "x".into() }, 9));
         assert_eq!(v, before);
+    }
+
+    #[test]
+    fn screen_time_is_shown_only_while_connected() {
+        use ipc_protocol::*;
+        let st = ScreenTimeStatus {
+            day: "2026-10-29".into(),
+            state: UsageState::Active,
+            today: DayUsage {
+                active_secs: 600,
+                ..Default::default()
+            },
+            daily_limit_secs: 7200,
+            remaining_secs: 6600,
+            limit_reached: false,
+            break_phase: BreakPhase::Normal,
+            next_break_in_secs: Some(1200),
+            break_remaining_secs: None,
+            notices: vec![],
+            policy: PolicyInfo {
+                version: 0,
+                source: PolicySource::BuiltinDefault,
+                status: PolicyStatus::Ok,
+                daily_limit_secs: 7200,
+                break_interval_secs: 1800,
+                break_duration_secs: 300,
+                first_warning_secs: 300,
+                final_warning_secs: 60,
+                idle_threshold_secs: 300,
+            },
+            measurement: MeasurementInfo {
+                source: MeasurementSource::SessionHelper,
+                last_report_age_ms: Some(100),
+                unknown_reason: None,
+            },
+            storage: StorageInfo {
+                persistent: true,
+                schema_version: 1,
+                recovered: false,
+            },
+            clock_adjusted_today: false,
+            computed_at_ms: 5,
+        };
+        let mut v = AgentView::new(0);
+        let BridgeEvent::Snapshot(mut snap) = snapshot(10) else {
+            unreachable!()
+        };
+        snap.screen_time = Some(Box::new(st.clone()));
+        v.apply(BridgeEvent::Snapshot(snap), 1);
+        assert_eq!(v.screen_time.as_ref(), Some(&st));
+        let json = serde_json::to_value(&v).unwrap();
+        assert_eq!(json["screen_time"]["state"], "ACTIVE");
+        assert_eq!(json["screen_time"]["today"]["active_secs"], 600);
+
+        v.apply(link(LinkState::Disconnected, 1, Some(250)), 2);
+        assert!(
+            v.screen_time.is_none(),
+            "agent yokken ölçüm varmış gibi gösterilmez"
+        );
+        v.helper_exited("x".into(), 3);
+        assert!(v.screen_time.is_none());
     }
 
     #[test]

@@ -1,7 +1,17 @@
 // Saf sunum mantığı: AgentView → ekrandaki metin, ton ve maskot anı.
 // Bileşenlerden bağımsız test edilir (src/__tests__/presentation.spec.ts).
 
-import type { AgentView, HelperState, LinkState, RunMode } from "./types";
+import { tr } from "../i18n/tr";
+import type {
+  AgentView,
+  HelperState,
+  LinkState,
+  Notice,
+  NoticeKind,
+  RunMode,
+  ScreenTimeStatus,
+  UsageState,
+} from "./types";
 
 /** Durum çipinin tonu. Çocuk arayüzünde danger (mercan) kullanılmaz. */
 export type Tone = "success" | "warning" | "info" | "neutral";
@@ -101,13 +111,22 @@ export function reconnectText(view: AgentView): string {
 }
 
 /** Konsept maskot çizimindeki durum adları (design Phase 1 `mascot()`). */
-export type MascotPose = "greeting" | "happy" | "idle" | "thinking" | "sleeping" | "permission";
+export type MascotPose =
+  | "greeting"
+  | "happy"
+  | "idle"
+  | "thinking"
+  | "sleeping"
+  | "permission"
+  | "reminder"
+  | "break"
+  | "encourage";
 
 export type MascotMoment =
   "welcome" | "connected" | "disconnected" | "reconnecting" | "unauthorized" | "closing";
 
 export interface MascotLine {
-  moment: MascotMoment;
+  moment: MascotMoment | NoticeKind | "normal" | "quiet" | "unmeasured";
   pose: MascotPose;
   text: string;
 }
@@ -145,4 +164,129 @@ export function mascotLine(view: AgentView): MascotLine {
 
 export function isLinkState(value: string): value is LinkState {
   return ["connecting", "connected", "disconnected", "unauthorized"].includes(value);
+}
+
+// ---------------------------------------------------------------------------
+// P1.C — kullanım süresi ve mola sunumu. Değerler agent'tan gelir; burada
+// yalnız biçimlendirilir. Mola geri sayımı iki ölçüm arasında yerel saatle
+// yumuşatılır ama agent'ın verdiği değerin dışına çıkamaz.
+
+/** "1 sa 25 dk", "12 dk", "1 dk'dan az". */
+export function formatMinutes(totalSecs: number): string {
+  const s = Math.max(0, Math.floor(totalSecs));
+  if (s < 60) return "1 dk'dan az";
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  if (h > 0) return m > 0 ? `${String(h)} sa ${String(m)} dk` : `${String(h)} sa`;
+  return `${String(m)} dk`;
+}
+
+/** "04:07" */
+export function formatCountdown(totalSecs: number): string {
+  const s = Math.max(0, Math.floor(totalSecs));
+  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+export function breakCountdown(st: ScreenTimeStatus, now: number): number | null {
+  if (st.break_phase !== "BREAK_DUE" || st.break_remaining_secs === undefined) return null;
+  const elapsed = Math.max(0, Math.floor((now - st.computed_at_ms) / 1000));
+  return Math.max(0, Math.min(st.break_remaining_secs, st.break_remaining_secs - elapsed));
+}
+
+export function usageStateLabel(state: UsageState): string {
+  return tr.usage[state];
+}
+
+export function usageTone(state: UsageState): Tone {
+  if (state === "ACTIVE") return "success";
+  if (state === "UNKNOWN") return "warning";
+  return "neutral";
+}
+
+export function unknownReasonText(reason: string | undefined): string {
+  if (reason === undefined) return "—";
+  return tr.unknownReason[reason] ?? reason;
+}
+
+/** Halka için kullanılan oran (0–1). */
+export function usedRatio(st: ScreenTimeStatus): number {
+  if (st.daily_limit_secs <= 0) return 0;
+  return Math.min(1, st.today.active_secs / st.daily_limit_secs);
+}
+
+export function nextBreakText(st: ScreenTimeStatus, now: number): string {
+  switch (st.break_phase) {
+    case "BREAK_DUE": {
+      const left = breakCountdown(st, now) ?? 0;
+      return `Mola zamanı · ${formatCountdown(left)} kaldı`;
+    }
+    case "BREAK_COMPLETE":
+      return "Mola tamamlandı";
+    default:
+      return st.next_break_in_secs === undefined
+        ? "—"
+        : `${formatMinutes(st.next_break_in_secs)} kullanım sonra`;
+  }
+}
+
+export function policyText(st: ScreenTimeStatus): string {
+  const p = st.policy;
+  const source =
+    p.source === "DEV_FILE"
+      ? `${tr.policySource.DEV_FILE} v${String(p.version)}`
+      : tr.policySource.BUILTIN_DEFAULT;
+  return p.status === "OK" ? source : `${source} · ${tr.policyStatus[p.status]}`;
+}
+
+/** Kapatılmamış ilk bildirim; aynı anda yalnız biri gösterilir. */
+export function visibleNotice(
+  st: ScreenTimeStatus | null,
+  dismissed: ReadonlySet<string>,
+): Notice | null {
+  return st?.notices.find((n) => !dismissed.has(n.id)) ?? null;
+}
+
+const NOTICE_LINES: Record<Notice["kind"], { pose: MascotPose; text: string }> = {
+  BREAK_FIRST_WARNING: { pose: "reminder", text: tr.filiz.breakSoon },
+  BREAK_FINAL_WARNING: { pose: "reminder", text: tr.filiz.breakFinal },
+  BREAK_STARTED: { pose: "break", text: tr.filiz.breakNow },
+  BREAK_COMPLETED: { pose: "happy", text: tr.filiz.breakDone },
+  LIMIT_REACHED: { pose: "encourage", text: tr.filiz.limitReached },
+};
+
+/**
+ * Filiz'in sözü. Bağlantı/kapanış anları önceliklidir (P1.B); bağlıyken
+ * kullanım süresi anları gelir. Sessiz modda yalnız mola ve süre uyarıları
+ * konuşulur (normal iltifat yok → metin boş).
+ */
+export function filizLine(
+  view: AgentView,
+  dismissed: ReadonlySet<string>,
+  quiet: boolean,
+): MascotLine {
+  const base = mascotLine(view);
+  const st = view.screen_time;
+  if (base.moment !== "connected" || st === null) return base;
+  const notice = visibleNotice(st, dismissed);
+  if (notice !== null) return { moment: notice.kind, ...NOTICE_LINES[notice.kind] };
+  if (st.state === "UNKNOWN")
+    return { moment: "unmeasured", pose: "thinking", text: tr.filiz.unmeasured };
+  if (quiet) return { moment: "quiet", pose: "idle", text: "" };
+  return {
+    moment: "normal",
+    pose: st.state === "ACTIVE" ? "happy" : "idle",
+    text: tr.filiz.normal,
+  };
+}
+
+/** Uyarı süresi agent'ın uyguladığı politikadan alınır (ör. DEV hızlı testte 1 dk). */
+export function noticeText(n: Notice, st: ScreenTimeStatus): string {
+  switch (n.kind) {
+    case "BREAK_FIRST_WARNING":
+      return tr.notice.BREAK_FIRST_WARNING(formatMinutes(st.policy.first_warning_secs));
+    case "BREAK_FINAL_WARNING":
+      return tr.notice.BREAK_FINAL_WARNING(formatMinutes(st.policy.final_warning_secs));
+    default:
+      return tr.notice[n.kind];
+  }
 }

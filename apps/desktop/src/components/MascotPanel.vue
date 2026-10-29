@@ -9,7 +9,14 @@ defineProps<{ line: MascotLine; motion: boolean }>();
   <section class="kd-card kd-mascot-panel" aria-labelledby="mascot-title">
     <h2 id="mascot-title" class="visually-hidden">Filiz</h2>
     <KdMascot :pose="line.pose" :size="132" :motion="motion" />
-    <div class="kd-bubble" role="status" aria-live="polite" :data-moment="line.moment">
+    <div
+      v-if="line.text"
+      class="kd-bubble"
+      role="status"
+      aria-live="polite"
+      :data-moment="line.moment"
+      data-testid="filiz-bubble"
+    >
       <Transition name="kd-bubble" mode="out-in">
         <p :key="line.moment" class="kd-bubble__text">{{ line.text }}</p>
       </Transition>

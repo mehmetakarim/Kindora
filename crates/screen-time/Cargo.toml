@@ -1,0 +1,14 @@
+[package]
+name = "screen-time"
+description = "Kindora local screen time engine (P1.C): usage accounting, local policy, break reminders, SQLite store"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+ipc-protocol.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true

@@ -1,20 +1,48 @@
 <script setup lang="ts">
 import { PhPlug } from "@phosphor-icons/vue";
-import { computed } from "vue";
+import { computed, shallowRef, watchEffect } from "vue";
+import { filizLine, visibleNotice } from "./agent/presentation";
 import { createAgentSource } from "./agent/source";
 import type { AgentSource } from "./agent/types";
 import AgentStatusCard from "./components/AgentStatusCard.vue";
+import BreakCard from "./components/BreakCard.vue";
+import FilizSettings from "./components/FilizSettings.vue";
 import KdLogo from "./components/KdLogo.vue";
 import MascotPanel from "./components/MascotPanel.vue";
+import MeasurementCard from "./components/MeasurementCard.vue";
+import NoticeBanner from "./components/NoticeBanner.vue";
 import SafetyCard from "./components/SafetyCard.vue";
+import TodayCard from "./components/TodayCard.vue";
 import { useAgent } from "./composables/useAgent";
+import { usePreferences } from "./composables/usePreferences";
 
 const props = withDefaults(defineProps<{ source?: AgentSource; motion?: boolean }>(), {
   source: () => createAgentSource(),
   motion: true,
 });
 
-const { view, now, refreshing, error, status, mascot, refresh, kind } = useAgent(props.source);
+const { view, now, refreshing, error, status, refresh, kind } = useAgent(props.source);
+const { quiet, reduceMotion } = usePreferences();
+const motion = computed(() => props.motion && !reduceMotion.value);
+watchEffect(() => {
+  if (reduceMotion.value) document.documentElement.setAttribute("data-kd-motion", "reduced");
+  else if (props.motion) document.documentElement.removeAttribute("data-kd-motion");
+});
+
+type Tab = "home" | "diagnostics";
+const tab = shallowRef<Tab>("home");
+
+// Kapatılan bildirim kimlikleri: aynı olay bir daha gösterilmez (yeni olay yeni kimlik alır).
+const dismissed = shallowRef<ReadonlySet<string>>(new Set());
+function dismiss(id: string) {
+  dismissed.value = new Set([...dismissed.value, id]);
+}
+
+const screenTime = computed(() => view.value?.screen_time ?? null);
+const notice = computed(() => visibleNotice(screenTime.value, dismissed.value));
+const mascot = computed(() =>
+  view.value ? filizLine(view.value, dismissed.value, quiet.value) : null,
+);
 const disconnected = computed(
   () => view.value !== null && !view.value.closing && view.value.link !== "connected",
 );
@@ -26,8 +54,30 @@ const disconnected = computed(
       <KdLogo :size="36" />
       <div class="kd-topbar__title">
         <h1>Kindora</h1>
-        <p>Masaüstü · P1.B önizleme</p>
+        <p>Masaüstü · P1.C önizleme</p>
       </div>
+      <nav class="kd-tabs" aria-label="Görünüm">
+        <button
+          type="button"
+          class="kd-tab"
+          :class="{ 'kd-tab--active': tab === 'home' }"
+          :aria-pressed="tab === 'home'"
+          data-testid="tab-home"
+          @click="tab = 'home'"
+        >
+          Ana görünüm
+        </button>
+        <button
+          type="button"
+          class="kd-tab"
+          :class="{ 'kd-tab--active': tab === 'diagnostics' }"
+          :aria-pressed="tab === 'diagnostics'"
+          data-testid="tab-diagnostics"
+          @click="tab = 'diagnostics'"
+        >
+          Teknik tanılama
+        </button>
+      </nav>
     </header>
 
     <main class="kd-main">
@@ -65,11 +115,30 @@ const disconnected = computed(
         Uygulama içi hata: {{ error }}
       </div>
 
-      <div v-if="view && mascot" class="kd-grid">
-        <MascotPanel :line="mascot" :motion="motion" />
-        <AgentStatusCard :view="view" :now="now" :refreshing="refreshing" @refresh="refresh" />
-        <SafetyCard class="kd-grid__wide" />
-      </div>
+      <template v-if="view && mascot">
+        <div v-show="tab === 'home'" class="kd-grid" data-testid="home">
+          <div class="kd-col">
+            <MascotPanel :line="mascot" :motion="motion" />
+            <FilizSettings v-model:quiet="quiet" v-model:reduce-motion="reduceMotion" />
+          </div>
+          <div class="kd-col">
+            <NoticeBanner
+              v-if="notice && screenTime"
+              :key="notice.id"
+              :notice="notice"
+              :status="screenTime"
+              @dismiss="dismiss"
+            />
+            <TodayCard :status="screenTime" :now="now" />
+            <BreakCard :status="screenTime" :now="now" />
+          </div>
+        </div>
+        <div v-show="tab === 'diagnostics'" class="kd-grid" data-testid="diagnostics">
+          <AgentStatusCard :view="view" :now="now" :refreshing="refreshing" @refresh="refresh" />
+          <MeasurementCard :status="screenTime" :now="now" />
+          <SafetyCard class="kd-grid__wide" />
+        </div>
+      </template>
       <p v-else-if="!error" class="kd-loading">Yükleniyor…</p>
     </main>
   </div>
@@ -116,6 +185,34 @@ const disconnected = computed(
   gap: 18px;
   align-items: start;
 }
+.kd-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.kd-tabs {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--kd-surface-2);
+}
+.kd-tab {
+  border: 0;
+  background: transparent;
+  color: var(--kd-ink-2);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+.kd-tab--active {
+  background: var(--kd-surface);
+  color: var(--kd-primary-text);
+  box-shadow: 0 1px 2px rgba(26, 32, 51, 0.08);
+}
 .kd-grid__wide {
   grid-column: 1 / -1;
 }
@@ -153,6 +250,7 @@ const disconnected = computed(
   }
   .kd-topbar {
     padding: 12px 16px;
+    flex-wrap: wrap;
   }
 }
 </style>

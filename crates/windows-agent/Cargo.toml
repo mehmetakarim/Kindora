@@ -14,14 +14,20 @@ path = "src/main.rs"
 [dependencies]
 ipc-protocol.workspace = true
 agent-core.workspace = true
+screen-time.workspace = true
 ctrlc.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+libc.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-service.workspace = true
+windows-sys.workspace = true
 
 [dev-dependencies]
 ipc-protocol.workspace = true
 serde_json.workspace = true
+rusqlite.workspace = true
 
 [target.'cfg(unix)'.dev-dependencies]
 libc.workspace = true

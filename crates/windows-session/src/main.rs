@@ -8,7 +8,7 @@ use windows_session::{
 };
 
 const USAGE: &str = "\
-Kindora Session Helper (P1.A prototip — kısıtlama arayüzü yok)
+Kindora Session Helper (P1.C önizleme — kısıtlama arayüzü yok)
 
 Kullanım:
   kindora-helper run [--heartbeat-ms N] [--socket PATH]
@@ -17,8 +17,12 @@ Kullanım:
       Masaüstü uygulamasının alt süreci: stdin'den JSON istek satırları
       (yalnız op=refresh) okur, stdout'a agent durumunu JSON satırları olarak yazar; stdin
       kapanınca çıkar. Elle kullanım için değildir.
-  kindora-helper ping|status|health [--socket PATH]
+  kindora-helper ping|status|health|screen-time [--socket PATH]
       Tek istek gönderir, yanıtı JSON olarak yazar.
+  kindora-helper report-activity [--socket PATH]
+      Bu oturumun son girdiden bu yana geçen süresini bir kez bildirir.
+  kindora-helper idle
+      Yalnız yerel ölçüm: son girdiden bu yana geçen süreyi (ms) yazar.
       Çıkış kodu: 0 OK, 1 agent hata yanıtı, 3 bağlantı/iletişim hatası.
   --socket yalnız Unix geliştirme taşımasında geçerlidir.
 ";
@@ -144,6 +148,34 @@ fn main() -> ExitCode {
         "ping" => one_shot(&cfg, CommandType::Ping),
         "status" => one_shot(&cfg, CommandType::GetStatus),
         "health" => one_shot(&cfg, CommandType::HealthCheck),
+        "screen-time" => one_shot(&cfg, CommandType::GetScreenTime),
+        "report-activity" => {
+            let idle = windows_session::activity::idle_ms();
+            match Client::connect(&cfg).and_then(|mut c| c.report_activity(idle)) {
+                Ok(resp) => {
+                    println!("{}", serde_json::to_string(&resp).unwrap_or_default());
+                    if resp.status == ResponseStatus::Ok {
+                        ExitCode::SUCCESS
+                    } else {
+                        ExitCode::from(1)
+                    }
+                }
+                Err(e) => {
+                    eprintln!("hata: {e}");
+                    ExitCode::from(3)
+                }
+            }
+        }
+        "idle" => match windows_session::activity::idle_ms() {
+            Some(ms) => {
+                println!("{{\"idle_ms\":{ms}}}");
+                ExitCode::SUCCESS
+            }
+            None => {
+                println!("{{\"idle_ms\":null}}");
+                ExitCode::from(1)
+            }
+        },
         _ => {
             eprintln!("{USAGE}");
             ExitCode::from(2)

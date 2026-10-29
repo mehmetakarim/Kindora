@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
-import { connectionStatus, mascotLine } from "../agent/presentation";
+import { connectionStatus } from "../agent/presentation";
 import type { AgentSource, AgentView } from "../agent/types";
 
 /** Agent durumunu kaynaktan okur, olaylara abone olur ve "şimdi"yi saniyede bir günceller. */
@@ -47,7 +47,6 @@ export function useAgent(source: AgentSource) {
   }
 
   const status = computed(() => (view.value ? connectionStatus(view.value) : null));
-  const mascot = computed(() => (view.value ? mascotLine(view.value) : null));
 
-  return { view, now, refreshing, error, status, mascot, refresh, kind: source.kind };
+  return { view, now, refreshing, error, status, refresh, kind: source.kind };
 }

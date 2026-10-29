@@ -9,20 +9,30 @@ pub const MAX_MESSAGE_BYTES: usize = 4 * 1024;
 /// `message_id` en büyük uzunluğu.
 pub const MAX_MESSAGE_ID_LEN: usize = 64;
 
-/// P1.A'da izin verilen komutların tam listesi (beyaz liste).
+/// İzin verilen komutların tam listesi (beyaz liste).
+///
+/// - P1.A: `PING`, `GET_STATUS`, `HEALTH_CHECK` (salt okunur).
+/// - P1.C: `REPORT_ACTIVITY` (helper → agent: yalnız son girdiden bu yana
+///   geçen süre; içerik yok) ve `GET_SCREEN_TIME` (salt okunur).
+///
+/// Kilit, süreç sonlandırma veya kural değiştirme komutu **yoktur**.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum CommandType {
     Ping,
     GetStatus,
     HealthCheck,
+    ReportActivity,
+    GetScreenTime,
 }
 
 impl CommandType {
-    pub const ALL: [CommandType; 3] = [
+    pub const ALL: [CommandType; 5] = [
         CommandType::Ping,
         CommandType::GetStatus,
         CommandType::HealthCheck,
+        CommandType::ReportActivity,
+        CommandType::GetScreenTime,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -30,6 +40,8 @@ impl CommandType {
             CommandType::Ping => "PING",
             CommandType::GetStatus => "GET_STATUS",
             CommandType::HealthCheck => "HEALTH_CHECK",
+            CommandType::ReportActivity => "REPORT_ACTIVITY",
+            CommandType::GetScreenTime => "GET_SCREEN_TIME",
         }
     }
 
@@ -47,6 +59,9 @@ pub struct Request {
     /// Gönderenin duvar saati (Unix ms). Yalnız bilgi amaçlı; yetkilendirme
     /// veya tekrar tespiti için kullanılmaz (saat manipüle edilebilir).
     pub timestamp_ms: u64,
+    /// Yalnız `REPORT_ACTIVITY` ile ve onunla zorunlu.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub activity: Option<ActivityReport>,
 }
 
 impl Request {
@@ -56,8 +71,39 @@ impl Request {
             message_id: message_id.into(),
             command,
             timestamp_ms: now_ms(),
+            activity: None,
         }
     }
+
+    pub fn report_activity(message_id: impl Into<String>, report: ActivityReport) -> Self {
+        Request {
+            activity: Some(report),
+            ..Request::new(message_id, CommandType::ReportActivity)
+        }
+    }
+}
+
+/// `idle_ms` için üst sınır (31 gün). Daha büyük değer geçersiz mesajdır.
+pub const MAX_IDLE_MS: u64 = 31 * 24 * 60 * 60 * 1000;
+
+/// Session Helper'ın kullanıcı oturumundan bildirdiği **tek** etkinlik sinyali:
+/// son klavye/fare girdisinden bu yana geçen süre. Tuş, koordinat, pencere,
+/// uygulama veya içerik bilgisi taşınmaz.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ActivityReport {
+    /// `None`: helper ölçemedi (API hatası / desteklenmeyen platform).
+    /// Alan zorunludur; ölçüm yoksa açıkça `null` gönderilir.
+    #[serde(deserialize_with = "required_option")]
+    pub idle_ms: Option<u64>,
+}
+
+fn required_option<'de, D, T>(d: D) -> Result<Option<T>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+    T: Deserialize<'de>,
+{
+    Option::<T>::deserialize(d)
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -76,6 +122,8 @@ pub enum ErrorCode {
     MessageTooLarge,
     DuplicateMessageId,
     Unauthorized,
+    /// İstenen alt sistem (ör. kullanım süresi motoru) bu agent'ta çalışmıyor.
+    Unavailable,
     Internal,
 }
 
@@ -108,6 +156,178 @@ pub enum Payload {
         healthy: bool,
         checks: Vec<HealthCheckResult>,
     },
+    /// `REPORT_ACTIVITY` yanıtı. `applied=false`: rapor kabul edildi ama
+    /// sayıma girmedi (ör. etkin konsol oturumundan gelmiyor).
+    ActivityAck {
+        applied: bool,
+    },
+    ScreenTime(Box<ScreenTimeStatus>),
+}
+
+/// Kullanım durumu (P1.C, ADR-0014). Yalnız `ACTIVE` kullanım süresine eklenir.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum UsageState {
+    Active,
+    Idle,
+    SessionLocked,
+    Suspended,
+    /// Ölçüm yok veya belirsiz (helper yok, API hatası, süreç duraklaması).
+    Unknown,
+}
+
+impl UsageState {
+    pub const ALL: [UsageState; 5] = [
+        UsageState::Active,
+        UsageState::Idle,
+        UsageState::SessionLocked,
+        UsageState::Suspended,
+        UsageState::Unknown,
+    ];
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            UsageState::Active => "ACTIVE",
+            UsageState::Idle => "IDLE",
+            UsageState::SessionLocked => "SESSION_LOCKED",
+            UsageState::Suspended => "SUSPENDED",
+            UsageState::Unknown => "UNKNOWN",
+        }
+    }
+
+    pub fn parse(s: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|v| v.as_str() == s)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum PolicySource {
+    /// Koddaki test varsayılanları; ebeveyn tercihi değildir.
+    BuiltinDefault,
+    /// Yönetici yazabilen klasördeki DEV test dosyası; üretim yetkilendirmesi değildir.
+    DevFile,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum PolicyStatus {
+    Ok,
+    /// Politika dosyası bozuk; son geçerli politika kullanılıyor.
+    InvalidKeptLast,
+    /// Politika dosyası bozuk ve önceki geçerli politika yok; varsayılanlar.
+    InvalidUsingDefault,
+    /// Sürüm, son geçerli sürümden düşük/eşit (geri alma reddedildi).
+    VersionRejected,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PolicyInfo {
+    pub version: u32,
+    pub source: PolicySource,
+    pub status: PolicyStatus,
+    pub daily_limit_secs: u32,
+    pub break_interval_secs: u32,
+    pub break_duration_secs: u32,
+    pub first_warning_secs: u32,
+    pub final_warning_secs: u32,
+    pub idle_threshold_secs: u32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum BreakPhase {
+    Normal,
+    FirstWarning,
+    FinalWarning,
+    /// Mola zamanı; geri sayım sürüyor.
+    BreakDue,
+    /// Mola süresi doldu (kısa süre gösterilir).
+    BreakComplete,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum NoticeKind {
+    BreakFirstWarning,
+    BreakFinalWarning,
+    BreakStarted,
+    BreakCompleted,
+    /// Günlük süre doldu: yalnız bilgilendirme, kilit yok.
+    LimitReached,
+}
+
+/// Masaüstünde gösterilecek tek seferlik bildirim. Aynı olay aynı `id`'yi taşır;
+/// masaüstü bir `id`'yi bir kez gösterir ve kapatılabilir.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Notice {
+    pub id: String,
+    pub kind: NoticeKind,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum MeasurementSource {
+    /// Etkin konsol oturumundaki Session Helper (`GetLastInputInfo`).
+    SessionHelper,
+    None,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MeasurementInfo {
+    pub source: MeasurementSource,
+    /// Son geçerli helper raporunun yaşı (agent'ın monoton saatiyle).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_report_age_ms: Option<u64>,
+    /// `UNKNOWN` durumunun nedeni (ör. `NO_HELPER`, `IDLE_API_FAILED`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unknown_reason: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StorageInfo {
+    /// `false`: SQLite açılamadı; sayaçlar yalnız bellekte (yeniden başlatmada kaybolur).
+    pub persistent: bool,
+    pub schema_version: u32,
+    /// Bu çalıştırmada bozuk veritabanı kenara alınıp yeniden oluşturuldu.
+    pub recovered: bool,
+}
+
+/// Bugünün süreleri (ms değil saniye; yerel takvim günü).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub struct DayUsage {
+    pub active_secs: u64,
+    pub idle_secs: u64,
+    pub locked_secs: u64,
+    pub suspended_secs: u64,
+    pub unknown_secs: u64,
+}
+
+/// `GET_SCREEN_TIME` yanıtı: agent'ın hesapladığı gerçek kullanım durumu.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ScreenTimeStatus {
+    /// Yerel takvim günü `YYYY-MM-DD`.
+    pub day: String,
+    pub state: UsageState,
+    pub today: DayUsage,
+    pub daily_limit_secs: u64,
+    pub remaining_secs: u64,
+    pub limit_reached: bool,
+    pub break_phase: BreakPhase,
+    /// Sonraki molaya kalan **aktif kullanım** süresi (mola sırasında `None`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_break_in_secs: Option<u64>,
+    /// Mola geri sayımı (yalnız `BREAK_DUE`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub break_remaining_secs: Option<u64>,
+    pub notices: Vec<Notice>,
+    pub policy: PolicyInfo,
+    pub measurement: MeasurementInfo,
+    pub storage: StorageInfo,
+    /// Bugün saat/saat dilimi değişikliği algılandı (kayıtlarda işaretli).
+    pub clock_adjusted_today: bool,
+    /// Agent'ın bu durumu hesapladığı an (Unix ms).
+    pub computed_at_ms: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -220,6 +440,16 @@ pub fn decode_request(bytes: &[u8]) -> Result<Request, RequestError> {
     if !is_valid_message_id(&req.message_id) {
         return Err(invalid(None));
     }
+    // `activity` yalnız REPORT_ACTIVITY'de ve orada zorunlu; değer sınırlı.
+    let activity_ok = match (req.command, &req.activity) {
+        (CommandType::ReportActivity, Some(a)) => a.idle_ms.is_none_or(|ms| ms <= MAX_IDLE_MS),
+        (CommandType::ReportActivity, None) => false,
+        (_, Some(_)) => false,
+        (_, None) => true,
+    };
+    if !activity_ok {
+        return Err(invalid(echo_id));
+    }
     Ok(req)
 }
 
@@ -251,7 +481,10 @@ mod tests {
 
     #[test]
     fn all_whitelisted_commands_decode() {
-        for c in CommandType::ALL {
+        for c in CommandType::ALL
+            .into_iter()
+            .filter(|c| *c != CommandType::ReportActivity)
+        {
             let b = body(serde_json::json!({
                 "protocol_version": 1, "message_id": "a", "command": c.as_str(), "timestamp_ms": 1
             }));
@@ -268,6 +501,42 @@ mod tests {
             let e = decode_request(&b).unwrap_err();
             assert_eq!(e.code, ErrorCode::UnknownCommand, "command {cmd}");
             assert_eq!(e.message_id.as_deref(), Some("x-1"));
+        }
+    }
+
+    #[test]
+    fn report_activity_requires_bounded_activity_and_nothing_else() {
+        let ok = Request::report_activity(
+            "r-1",
+            ActivityReport {
+                idle_ms: Some(1500),
+            },
+        );
+        assert_eq!(
+            decode_request(&serde_json::to_vec(&ok).unwrap()).unwrap(),
+            ok
+        );
+        let unmeasured = Request::report_activity("r-2", ActivityReport { idle_ms: None });
+        let json = serde_json::to_vec(&unmeasured).unwrap();
+        assert_eq!(
+            decode_request(&json).unwrap().activity,
+            Some(ActivityReport { idle_ms: None })
+        );
+
+        let bad = [
+            // activity eksik
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1}),
+            // activity başka komutta
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "PING", "timestamp_ms": 1, "activity": {"idle_ms": 1}}),
+            // içerik taşımaya çalışan ek alan
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": 1, "keys": "abc"}}),
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": -1}}),
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": MAX_IDLE_MS + 1}}),
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {}}),
+        ];
+        for (i, b) in bad.iter().enumerate() {
+            let e = decode_request(&body(b.clone())).unwrap_err();
+            assert_eq!(e.code, ErrorCode::InvalidMessage, "case {i}");
         }
     }
 
