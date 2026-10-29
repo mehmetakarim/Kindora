@@ -77,6 +77,7 @@ Hafıza güncellemesi kendiliğinden **commit, push, deployment veya üretim ort
 - Rust Windows servisi (ve oturum yardımcısı) işletim sistemi düzeyindeki yetkili işlemlerden sorumlu olacak şekilde planlanır.
 - Flutter ve ebeveyn masaüstü uygulaması **aynı** backend yetkilendirme modelini, komut şemasını ve durum makinesini kullanır.
 - Yerel kurallar internet bağlantısı olmadan uygulanabilmelidir (SQLite).
+- Kullanım süresi agent'ta ölçülür ve SQLite'a yalnız agent yazar. Helper'dan gelen tek kullanıcı sinyali "son girdiden bu yana geçen süre"dir. Belirsiz süre (`UNKNOWN`, kilit, uyku) aktif sayılmaz. IPC'de kural yazma komutu yoktur; DEV politika dosyası üretim yetkilendirmesi değildir ([ADR-0014](docs/decisions/0014-yerel-kullanim-suresi-motoru.md)).
 - Supabase cihazlar arası iletişim ve merkezi veri yönetimi için kullanılır; nihai yerel cihaz eyleminin yerine geçmez.
 
 ### 5.2 Kindora kullanım kilidi

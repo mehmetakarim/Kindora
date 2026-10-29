@@ -1,7 +1,7 @@
 # ADR-0013 — Masaüstü kabuğu agent'a Session Helper köprüsüyle bağlanır
 
 - **Tarih:** 2026-10-28
-- **Durum:** Önerildi (P1.B'de uygulandı; Lenovo GUI kabulü bekliyor)
+- **Durum:** Önerildi (P1.B'de uygulandı; Lenovo GUI kabulü PASS, 2026-10-29). P1.C'de köprü sözleşmesi değişmeden snapshot'a `screen_time` eklendi ([ADR-0014](0014-yerel-kullanim-suresi-motoru.md)).
 - **Karar türü:** Teknik uygulama yöntemi
 - **İlgili belgeler:** [P1.B raporu](../desktop/p1b-desktop-shell.md), [ADR-0007](0007-servis-helper-ipc-named-pipe.md), [ADR-0011](0011-p1a-crate-yapisi-ve-gelistirme-tasimasi.md), [ADR-0012](0012-mevcut-windows-hesabinda-calisma.md), [BUG-003](../solutions.md)
 

@@ -1,6 +1,6 @@
 # P1.B — Kindora Desktop kabuğu (Tauri 2 + Vue 3)
 
-> **Durum:** Kodlandı, macOS'ta ve GitHub Actions `windows-2022`'de test edildi. **Lenovo Windows GUI kabulü bekliyor.**
+> **Durum:** Kodlandı, macOS'ta ve GitHub Actions `windows-2022`'de test edildi. **Lenovo GUI Acceptance PASS** (kullanıcı raporu, 2026-10-29): GUI açıldı, LocalService bağlantısı ve gerçek agent bilgileri, servis durunca "Bağlantı yok", yeniden başlayınca otomatik bağlantı, Filiz durum değişimi, X ile kapanışta desktop + helper sonlandı. Son `sc.exe delete` kabul edildi; `1060` doğrulaması yapılmadı. P1.C ile genişletildi: [p1c-screen-time.md](../screen-time/p1c-screen-time.md).
 > Kısıtlama yoktur: kilit, tam ekran/overlay, giriş engelleme, otomatik başlatma, yetki yükseltme, servis kurulumu yok.
 
 ## 1. Mimari

@@ -23,10 +23,37 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 
 ## Aktif / son görevler
 
+### TASK-008 — P1.C: Yerel kullanım süresi motoru ve Filiz mola deneyimi
+
+- **Öncelik:** Yüksek
+- **Durum:** Devam ediyor. Kod, macOS ve Windows CI testleri tamam; prerelease yayımlandı. **Kabul: CONDITIONAL PASS — Pending Lenovo Screen Time Acceptance.**
+- **Amaç ve kapsam:** Gerçek kullanım süresi ölçümü (ACTIVE/IDLE/SESSION_LOCKED/SUSPENDED/UNKNOWN), yerel SQLite, agent tarafında doğrulanan yerel kurallar (DEV test dosyası), Filiz mola hatırlatmaları. Kapsam dışı: kilit, program kapatma, internet/erişim engelleme, ebeveyn yetkilendirmesi, ayrı widget penceresi.
+- **Kabul kriterleri:**
+  - [x] Aktif ve boşta kalma ayrımı çalışıyor (benzetim testleri; CI'da gerçek `GetLastInputInfo` → `ACTIVE`).
+  - [x] Uyku süresi aktif kullanıma eklenmiyor (benzetim; gerçek uyku CI'da yapılamaz).
+  - [x] Günlük toplam tutarlı (gün bölme, saat değişikliği testleri).
+  - [x] SQLite kayıtları yeniden başlatmada korunuyor (macOS e2e; CI LocalService 21 sn → 21 sn).
+  - [x] Yerel politikalar doğrulanıyor (bozuk → son geçerli, eski sürüm reddi; CI'da LocalService ile).
+  - [x] Kalan süre gerçek veriden hesaplanıyor (agent `GET_SCREEN_TIME`).
+  - [x] Filiz doğru zamanda mola hatırlatıyor (benzetim + Vitest; tek seferlik bildirim kimlikleri).
+  - [x] Limit dolunca zorunlu kilit yok (yalnız `LIMIT_REACHED` bildirimi).
+  - [x] Agent bağlantı kaybı doğru yönetiliyor (bağlantı yokken kullanım verisi gösterilmez).
+  - [x] Mevcut IPC güvenliği korunuyor (helper politikası değişmedi; yeni komutlar sınırlı ve test edildi).
+  - [x] P1.A ve P1.B regresyonu geçiyor (`windows-p1a`, `windows-p1b` PASS).
+  - [x] Windows CI başarılı.
+  - [x] Prerelease yayımlandı.
+  - [ ] **Lenovo kullanım süresi kabulü (C-01…C-11)** — bekliyor: gerçek kullanıcı etkinliği, Win+L, uyku/uyanma, mola akışı, servis yeniden başlatma, limit, %125/%150.
+- **Bağımlılıklar:** TASK-007.
+- **İlgili dosyalar:** `crates/screen-time/`, `crates/windows-agent/src/{platform,screen_time,service}.rs`, `crates/windows-session/src/activity.rs`, `crates/ipc-protocol/src/{message,bridge}.rs`, `crates/agent-core/src/{lib,handler}.rs`, `apps/desktop/src/`, `ci/p1a-localservice-e2e.ps1` (`-ScreenTime`), `.github/workflows/windows-p1c.yml`, `packaging/p1c/README-TEST-TR.md`. Rapor: [screen-time/p1c-screen-time.md](screen-time/p1c-screen-time.md); karar: [ADR-0014](decisions/0014-yerel-kullanim-suresi-motoru.md).
+- **Doğrulama sonucu:**
+  - **macOS:** kök Rust 82 test (benzetim senaryoları 1–10, SQLite migration/kurtarma, süreç e2e), masaüstü Rust 14, Vitest 39; fmt, clippy, ESLint, Prettier, vue-tsc, build. Windows hedefli clippy yalnız SQLite'sız crate'lerde ([NOTE-006](solutions.md)). Gerçek Tauri penceresi agent'a bağlandı; görsel ekran görüntüsü NOT RUN.
+  - **Windows CI** [p1c 40926272301](https://github.com/mehmetakarim/Kindora/actions/runs/40926272301) / [p1b 40926272192](https://github.com/mehmetakarim/Kindora/actions/runs/40926272192) / [p1a 40926272444](https://github.com/mehmetakarim/Kindora/actions/runs/40926272444) — PASS. Ayrıntı: [rapor §9](screen-time/p1c-screen-time.md#9-windows-ci-sonuçları).
+- **Yayın durumu:** Prerelease [`p1c-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1c-windows-test.1); [çalıştırma 40928512931](https://github.com/mehmetakarim/Kindora/actions/runs/40928512931); hedef `584f4d1`; `latest` değil. ZIP SHA-256 `91c8e88035e331b21bcfbcde863c26f2a0847411a87c8662a16b531ac950868a`.
+
 ### TASK-007 — P1.B: Windows masaüstü kabuğu ve oturum deneyimi
 
 - **Öncelik:** Yüksek
-- **Durum:** Devam ediyor. Kod, macOS ve Windows CI testleri tamam; prerelease yayımlandı. **Kabul: CONDITIONAL PASS — Pending Lenovo Windows GUI Acceptance.**
+- **Durum:** Tamamlandı. **Kabul edildi — Lenovo GUI Acceptance PASS** (kullanıcı raporu, P1.C mesajı, 2026-10-29).
 - **Amaç ve kapsam:**
   - Mevcut Windows hesabında çalışan, gerçek agent bağlantısına sahip ilk Kindora masaüstü uygulaması (Tauri 2 + Vue 3).
   - Kapsam dışı: kilit, engelleme, filtreleme, süre sınırı.
@@ -43,7 +70,8 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - [x] CI başarılı.
   - [x] Prerelease ve checksum yayımlandı.
   - [x] Proje hafızası ve belgeler güncellendi.
-  - [ ] **Lenovo GUI kabulü (B-01…B-11)** — bekliyor.
+  - [x] **Lenovo GUI kabulü** — PASS (kullanıcı raporu, `p1b-windows-test.1`): Windows GUI açıldı; LocalService agent bağlantısı çalıştı; gerçek agent bilgileri göründü; servis durunca "Bağlantı yok", yeniden başlayınca otomatik bağlantı; Filiz'in görsel durumu değişti; X ile kapatınca desktop ve helper süreçleri sonlandı.
+  - Operasyonel not: son `sc.exe delete` isteği başarıyla kabul edildi; ardından `1060` doğrulaması yapılmadığı için servisin silindiği ayrıca kanıtlanmış sayılmaz. Kullanıcının raporladığı maddeler dışındaki B tablosu satırları (ör. %125/%150 ölçek, Görev Yöneticisi ile helper sonlandırma) ayrı sonuç olarak raporlanmadı.
 - **Bağımlılıklar:** TASK-006.
 - **İlgili dosyalar:** `apps/desktop/`, `crates/ipc-protocol/src/bridge.rs`, `crates/windows-session` (`bridge`), `crates/windows-agent/tests/bridge_lifecycle.rs`, `ci/p1a-localservice-e2e.ps1`, `.github/workflows/windows-p1b.yml`, `packaging/p1b/README-TEST-TR.md`, `.gitattributes`. Rapor: [desktop/p1b-desktop-shell.md](desktop/p1b-desktop-shell.md); karar: [ADR-0013](decisions/0013-masaustu-kabugu-helper-koprusu.md).
 - **Doğrulama sonucu:**

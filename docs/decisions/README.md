@@ -52,4 +52,5 @@ Kindora'nın mimari ve teknik kararlarının geçmişi. Ürün gereksinimleri [K
 | [0010](0010-paylasilan-sozlesme-json-schema.md) | Paylaşılan sözleşme: JSON Schema → TS/Dart/Rust | **Önerildi** | Teknik uygulama yöntemi |
 | [0011](0011-p1a-crate-yapisi-ve-gelistirme-tasimasi.md) | P1.A crate yapısı, pipe erişim modeli, Unix geliştirme taşıması | **Önerildi** | Teknik uygulama yöntemi |
 | [0012](0012-mevcut-windows-hesabinda-calisma.md) | Kindora mevcut Windows hesabında çalışır; çocuk için ayrı hesap zorunlu değil | Kabul edildi | Ürün kararı |
-| [0013](0013-masaustu-kabugu-helper-koprusu.md) | Masaüstü kabuğu agent'a Session Helper köprüsüyle (stdio) bağlanır; politika gevşetilmez | **Önerildi** | Teknik uygulama yöntemi |
+| [0013](0013-masaustu-kabugu-helper-koprusu.md) | Masaüstü kabuğu agent'a Session Helper köprüsüyle (stdio) bağlanır; politika gevşetilmez | **Önerildi** (Lenovo GUI PASS) | Teknik uygulama yöntemi |
+| [0014](0014-yerel-kullanim-suresi-motoru.md) | Yerel kullanım süresi motoru: ölçüm agent'ta, girdi sinyali helper'dan, kayıt SQLite'ta; DEV politika dosyası | **Önerildi** | Teknik uygulama yöntemi |

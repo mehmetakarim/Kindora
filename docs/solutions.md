@@ -97,3 +97,14 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
   - macOS: `printf '\xef\xbb\xbf{"op":"refresh"}\n{"op":"LOCK"}\n' | kindora-helper bridge` komutunda refresh kabul edildi, LOCK anında reddedildi.
   - Windows: düzeltme commit'inin LocalService betiği.
 - **İlgili görev, dosya veya commit:** TASK-007; `crates/ipc-protocol/src/bridge.rs`, `crates/windows-session/src/main.rs`; hata commit'i `1695264`, düzeltme `2fb82cf`.
+
+### NOTE-006 — macOS'ta Windows hedefli clippy, gömülü SQLite nedeniyle derlenemiyor
+
+- **Belirti:** P1.C'de `cargo clippy --workspace --target x86_64-pc-windows-msvc` macOS'ta `libsqlite3-sys` derleme betiğinde durdu: `fatal error: 'stdlib.h' file not found`.
+- **Ortaya çıktığı koşul:** `rusqlite` `bundled` özelliğiyle SQLite C kaynağını derler. macOS'ta MSVC/Windows SDK başlıkları yoktur. `LIBSQLITE3_SYS_BUNDLING=0` ve macOS SDK başlıklarıyla denemeler de başarısız oldu.
+- **Kök neden:** Çapraz derleme için Windows C araç zinciri gerekir; Rust kodu değil, C bağımlılığı derlenemiyor.
+- **Uygulanan çözüm:**
+  - macOS'ta SQLite'a bağlı olmayan crate'ler Windows hedefiyle denetlenir: `cargo clippy -p ipc-protocol -p agent-core -p windows-session --all-targets --target x86_64-pc-windows-msvc -- -D warnings`.
+  - `windows-agent` ve `screen-time`'ın Windows kodu (`platform.rs`) yalnız Windows CI'da (`windows-2022`, MSVC) derlenir ve test edilir.
+- **Doğrulama yöntemi:** P1.C commit'inin `windows-p1c` çalıştırmasında `cargo build/test/clippy --workspace`.
+- **İlgili görev, dosya veya commit:** TASK-008; `Cargo.toml` (`rusqlite` bundled), `crates/windows-agent/src/platform.rs`.
