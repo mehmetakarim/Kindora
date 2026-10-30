@@ -116,8 +116,8 @@ try {
     Assert-True ($t.Actions[0].Execute -match 'conhost\.exe$' -and $t.Actions[0].Arguments -match '--headless .*activity --launch logon-task') 'task action: conhost --headless helper activity --launch logon-task'
     $summary.Add("P1D install: service AUTO_START + recovery restarts; task: logon + 1 min time re-check, Limited/Interactive, battery-safe, PT0S, IgnoreNew, conhost --headless")
 
-    Wait-Until { (Get-Helpers 'activity').Count -eq 1 } 30000 'task started the background helper'
-    $bg = (Get-Helpers 'activity')[0]
+    Wait-Until { @(Get-Helpers 'activity').Count -eq 1 } 30000 'task started the background helper'
+    $bg = @(Get-Helpers 'activity')[0]
     Write-Host "background helper pid=$($bg.ProcessId) session=$($bg.SessionId) parent=$($bg.ParentProcessId)"
     Assert-True ($bg.SessionId -eq $session) 'helper runs in the user session (not session 0)'
     $script:st = $null
@@ -142,7 +142,7 @@ try {
     Assert-True ($dp.CloseMainWindow()) 'WM_CLOSE to desktop'
     Assert-True ($dp.WaitForExit(15000)) 'desktop exits'
     Start-Sleep -Milliseconds 800
-    Assert-True ((Get-Helpers 'bridge').Count -eq 0) 'bridge helper exited with the desktop'
+    Assert-True (@(Get-Helpers 'bridge').Count -eq 0) 'bridge helper exited with the desktop'
     Assert-True ($null -ne (Get-Process -Id $bg.ProcessId -ErrorAction SilentlyContinue)) 'background helper still running after desktop close'
     # Simulated user input while the desktop is closed (CI has no keyboard):
     # only the background helper can report it.
@@ -184,7 +184,7 @@ try {
     Write-Host "reporter released in $($sw.ElapsedMilliseconds) ms"
     Wait-Until { @(Get-Helpers 'activity' | Where-Object { $_.ProcessId -ne $bg.ProcessId }).Count -eq 1 } 180000 'logon task re-check restarted the helper'
     $restartMs = $sw.ElapsedMilliseconds
-    $bg = (Get-Helpers 'activity')[0]
+    $bg = @(Get-Helpers 'activity')[0]
     Wait-Until { $s = Get-ScreenTime; $s.measurement.reporter.kind -eq 'BACKGROUND_LOGON_TASK' -and [int]$s.measurement.reporter.pid -eq [int]$bg.ProcessId } 30000 'restarted helper is the reporter'
     Wait-Until { (Count-HelperLog 'event=previous_exit state=unclean') -ge 1 } 10000 'helper log: previous_exit=unclean'
     $summary.Add("P1D helper kill: reporter released, task restarted helper in $([int]($restartMs/1000)) s (re-check 1 min), previous_exit=unclean logged")
@@ -212,7 +212,7 @@ try {
     $r = Invoke-Script 'install-kindora-test.ps1' @('-AgentStartMode', 'Auto', '-EnableHelperAutostart', '-User', $me, '-HelperRepeatMinutes', '1')
     Assert-True ($r.Code -eq 0) 're-install exit 0'
     Assert-True (@(Get-ScheduledTask -TaskPath '\Kindora\').Count -eq 1) 're-install: still one task'
-    Wait-Until { (Get-Helpers 'activity').Count -eq 1 } 30000 're-install: one background helper'
+    Wait-Until { @(Get-Helpers 'activity').Count -eq 1 } 30000 're-install: one background helper'
     $st = Get-ScreenTime
     Assert-True ((Total $st) -ge $ta - 16) 're-install keeps recorded totals'
     Assert-True ($st.storage.persistent -and -not $st.storage.recovered) 're-install: same SQLite database'
@@ -224,7 +224,7 @@ try {
     sc.exe query $svc | Out-Null
     Assert-True ($LASTEXITCODE -eq 1060) 'service deleted (1060)'
     Assert-True (@(Get-ScheduledTask -TaskPath '\Kindora\' -ErrorAction SilentlyContinue).Count -eq 0) 'logon task removed'
-    Assert-True ((Get-Helpers '').Count -eq 0) 'no kindora-helper process left'
+    Assert-True (@(Get-Helpers '').Count -eq 0) 'no kindora-helper process left'
     Assert-True (-not (Test-Path $dir)) 'program folder removed'
     Assert-True (Test-Path $db) 'database kept without -DeleteData'
     $r = Invoke-Script 'uninstall-kindora-test.ps1' @('-DeleteData', '-Yes')
@@ -234,6 +234,8 @@ try {
 }
 finally {
     $ErrorActionPreference = 'Continue'
+    Write-Host '== kindora-helper processes =='
+    Get-CimInstance Win32_Process -Filter "Name='kindora-helper.exe' OR Name='conhost.exe'" | ForEach-Object { Write-Host "pid=$($_.ProcessId) parent=$($_.ParentProcessId) session=$($_.SessionId) cmd=$($_.CommandLine)" }
     Write-Host '== Helper log =='
     Get-HelperLog | ForEach-Object { Write-Host $_ }
     Write-Host '== Agent log (screen_time / power / reporter) =='
