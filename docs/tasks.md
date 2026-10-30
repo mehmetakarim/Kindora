@@ -26,14 +26,14 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 ### TASK-009 — P1.D: Bağımsız Session Helper ve güvenilir arka plan kullanım süresi
 
 - **Öncelik:** Yüksek
-- **Durum:** Devam ediyor. Kod, macOS testleri ve Windows CI tamam. **Kabul: CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
+- **Durum:** Devam ediyor. Kod, macOS testleri ve Windows CI tamam; prerelease yayımlandı. **Kabul: CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
 - **Amaç ve kapsam:**
   - Masaüstü kapalıyken de mevcut Windows oturumunda çalışan bağımsız helper ile kullanım süresi ölçümü.
   - Oturum açılışında kontrollü başlatma; güvenli kurulum ve kaldırma.
   - Kapsam dışı: zorunlu kilit, site engelleme, uygulama sonlandırma, uzaktan ebeveyn kontrolü.
 - **Kabul kriterleri:**
   - [x] Helper masaüstünden bağımsız çalışıyor (`kindora-helper activity`; macOS e2e + CI).
-  - [x] Masaüstü kapalıyken kullanım süresi artıyor (macOS e2e; CI: enjekte girdiyle — sonuç §doğrulama).
+  - [x] Masaüstü kapalıyken kullanım süresi artıyor (macOS e2e; CI: enjekte girdiyle aktif 0 → 24 sn).
   - [x] Masaüstü tekrar açıldığında gerçek toplam gösteriliyor (agent'tan; CI).
   - [x] Tek bir etkinlik raporlayıcısı kabul ediliyor:
     - agent kiralaması; köprü, tek seferlik ve ikinci arka plan helper'ı reddedilir;
@@ -44,8 +44,8 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - [x] Kurulum ve kaldırma güvenli: idempotent; yalnız Kindora kayıtları; kendini yükseltmez; veri yalnız onayla silinir; 1060 doğrulaması.
   - [x] P1.A/B/C testleri bozulmuyor (`windows-p1a/b/c` + P1A-C betiği p1d iş akışında).
   - [x] IPC güvenliği korunuyor (yeni komut yok; helper politikası ve BUG-003 ACE düzeltmesi değişmedi).
-  - [ ] Windows CI başarılı — bekleniyor.
-  - [ ] Prerelease ve checksum yayımlanıyor.
+  - [x] Windows CI başarılı.
+  - [x] Prerelease ve checksum yayımlandı.
   - [ ] **Lenovo arka plan ölçümü kabulü (D-01…D-10)** — bekliyor.
 - **Bağımlılıklar:** TASK-008.
 - **İlgili dosyalar:**
@@ -57,8 +57,25 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - Rapor: [background/p1d-background-helper.md](background/p1d-background-helper.md); karar: [ADR-0015](decisions/0015-bagimsiz-session-helper-ve-oturum-acilisi.md)
 - **Doğrulama sonucu:**
   - **macOS:** kök Rust testleri, masaüstü Rust 14, Vitest 42; fmt, clippy (macOS + SQLite'sız crate'ler için Windows hedefi), ESLint, Prettier, vue-tsc — PASS. Ayrıntı: [rapor §6](background/p1d-background-helper.md#6-macos-testleri-2026-10-30).
-  - **Windows CI:** bekleniyor.
-- **Yayın durumu:** Henüz yayımlanmadı.
+  - **Windows CI `293e06a`:**
+    - Çalıştırmalar: [p1d 41049107378](https://github.com/mehmetakarim/Kindora/actions/runs/41049107378), [p1c 41049107529](https://github.com/mehmetakarim/Kindora/actions/runs/41049107529), [p1b 41049107532](https://github.com/mehmetakarim/Kindora/actions/runs/41049107532), [p1a 41049107436](https://github.com/mehmetakarim/Kindora/actions/runs/41049107436) — PASS.
+    - Windows'ta `session_end` testi gerçek `WM_ENDSESSION` ile, `background_helper_e2e` de konsol agent'la geçti.
+    - **P1D betiği (paket betikleriyle, LocalService):**
+      - Kurulum: servis `AUTO_START`, 3 kademeli kurtarma eylemi.
+      - Görev: oturum açılışı tetikleyicisi + 1 dk zaman tetikleyicisi; `Limited`/`Interactive`; pilde çalışır; `PT0S`; `IgnoreNew`; `conhost --headless`.
+      - Görev helper'ı oturum 2'de başlattı; raporlayıcı `BACKGROUND_LOGON_TASK`.
+      - Masaüstü açıkken köprü reddedildi. Masaüstü kapalıyken helper çalışmayı sürdürdü (enjekte girdiyle aktif 0 → 24 sn); yeniden açınca toplam korundu.
+      - İkinci örnek 53 ms'de çıktı; tek seferlik rapor `applied=false`.
+      - Helper sonlandırılınca kiralama 339 ms'de boşaldı; görev helper'ı 23 sn'de yeniden başlattı (`previous_exit=unclean`).
+      - Agent yeniden başlatması: 58 → 61 sn, çift sayım yok.
+      - Yeniden kurulum idempotent; veritabanı korundu.
+      - Kaldırma: `1060`, görev/süreç/klasör kaldırıldı, veri korundu. `-DeleteData -Yes` veriyi sildi.
+    - **CI'da bulunan ve düzeltilen:** [NOTE-009](solutions.md) (görev denetimi + zaman tetikleyicisi), [BUG-006](solutions.md) (zamanlamaya bağlı test), PowerShell tek elemanlı dizi sayımı.
+    - **NOT RUN:** gerçek oturum açılışı, oturum kapatma, kullanıcı değiştirme, Windows yeniden başlatma, uyku, standart kullanıcı, Windows Home.
+- **Yayın durumu:**
+  - Prerelease [`p1d-windows-test.1`](https://github.com/mehmetakarim/Kindora/releases/tag/p1d-windows-test.1).
+  - [Çalıştırma 41051052140](https://github.com/mehmetakarim/Kindora/actions/runs/41051052140); hedef `293e06a`; `latest` değil.
+  - ZIP SHA-256 `1bcfa4d903c96ad169a23b210803e2879d52b85e3fca2d6f956dfbeccf768ca9` (5 034 660 bayt); macOS'ta indirilip doğrulandı.
 
 ### TASK-008 — P1.C: Yerel kullanım süresi motoru ve Filiz mola deneyimi
 

@@ -3,7 +3,7 @@
 - **Görev:** [TASK-009](../tasks.md)
 - **Karar:** [ADR-0015](../decisions/0015-bagimsiz-session-helper-ve-oturum-acilisi.md)
 - **Önceki aşama:** [P1.C](../screen-time/p1c-screen-time.md)
-- **Durum:** Kodlandı; macOS ve Windows CI'da test edildi. **CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
+- **Durum:** Kodlandı; macOS ve Windows CI'da test edildi; prerelease `p1d-windows-test.1`. **CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
 - **Kapsam dışı:** zorunlu kilit, site engelleme, program sonlandırma, uzaktan ebeveyn kontrolü, ebeveyn yetkilendirmesi.
 
 ## 1. Mimari ve helper yaşam döngüsü

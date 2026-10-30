@@ -14,7 +14,7 @@
   - `a031ab7` → `p1a-windows-test.2`
   - `2fb82cf` → `p1b-windows-test.1`
   - `584f4d1` → `p1c-windows-test.1`
-  - P1.D kodu `a8a0133` → `p1d-windows-test.1` (yayın durumu: [TASK-009](docs/tasks.md)).
+  - `293e06a` → `p1d-windows-test.1`
 - Güncel HEAD için `git log -1`.
 - **Kimlik (depo-yerel):** `Mehmet Akar <11380904+mehmetakarim@users.noreply.github.com>`; AI attribution kapalı.
 
@@ -55,7 +55,7 @@
 ## Son doğrulamalar (2026-10-30)
 
 - **macOS:** kök Rust testleri (yeni: kiralama, tek raporlayıcı, bağlantı kimliği, tek örnek, `background_helper_e2e`), masaüstü Rust 14, Vitest 42; fmt, clippy (+ SQLite'sız crate'ler için Windows hedefi), ESLint, Prettier, vue-tsc — PASS.
-- **Windows CI:** sonuçlar [TASK-009](docs/tasks.md) kaydında.
+- **Windows CI `293e06a`:** p1a/p1b/p1c/p1d PASS. P1D betiği gerçek LocalService + paket betikleriyle çalıştı: görev → helper, masaüstü kapalıyken ölçüm, tek raporlayıcı, sonlandırma → 23 sn'de yeniden başlatma, agent yeniden başlatma, idempotent kurulum, kaldırma `1060`. Ayrıntı: [TASK-009](docs/tasks.md).
 
 ## Çalıştırılmamış testler
 
