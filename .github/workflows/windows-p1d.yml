@@ -170,6 +170,15 @@ jobs:
           powershell.exe -NoProfile -ExecutionPolicy Bypass -File ci/p1d-background-e2e.ps1 -PackageDir "dist/$env:PACKAGE_NAME" -SummaryFile dist/ci-test-summary.txt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      # P1D.1: Lenovo D-05 senaryosu — varsayılan 5 dk yeniden denetimle, gerçek
+      # zaman tetikleyicisinin helper'ı yeniden başlattığı Görev Zamanlayıcısı
+      # olay kayıtlarıyla kanıtlanır (elle başlatma sayılmaz).
+      - name: Helper kurtarma — gerçek zamanlanmış tetikleyici (P1D.1, D-05)
+        shell: pwsh
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ci/p1d-recovery-e2e.ps1 -PackageDir "dist/$env:PACKAGE_NAME" -SummaryFile dist/ci-test-summary.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Paket içeriğini doğrula
         shell: pwsh
         run: |
@@ -260,7 +269,7 @@ jobs:
             echo
             echo "### Geçen otomatik testler (GitHub-hosted Windows Server runner)"
             echo '```'
-            grep -E "^test result:|MEASURE |LOCALSERVICE |SCREENTIME |P1D |FRONTEND |DESKTOP " dist/ci-test-summary.txt | tr -d '\r' || true
+            grep -E "^test result:|MEASURE |LOCALSERVICE |SCREENTIME |P1D |P1D1 |FRONTEND |DESKTOP " dist/ci-test-summary.txt | tr -d '\r' || true
             echo '```'
             echo
             echo "### Sınırlamalar"
