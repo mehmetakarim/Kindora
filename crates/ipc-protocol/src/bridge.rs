@@ -223,6 +223,13 @@ mod tests {
                 source: MeasurementSource::SessionHelper,
                 last_report_age_ms: Some(u64::MAX),
                 unknown_reason: Some("LOCK_STATE_QUERY_FAILED".into()),
+                reporter: Some(ReporterInfo {
+                    kind: Some(ReporterKind::BackgroundLogonTask),
+                    session_id: Some(u32::MAX),
+                    pid: Some(u32::MAX),
+                    since_ms: u64::MAX,
+                }),
+                competing_reports: u64::MAX,
             },
             storage: StorageInfo {
                 persistent: true,

@@ -6,14 +6,19 @@
 //! 3. motoru ilerletir, 15 sn'de bir (veya olay olduğunda) SQLite'a yazar,
 //! 4. `GET_SCREEN_TIME` için anlık durumu günceller.
 //!
+//! P1.D (ADR-0015): agent aynı anda **tek** etkinlik raporlayıcısı kabul eder
+//! ([`Lease`]). Arka plan helper'ı masaüstü köprüsünden önceliklidir; kopan
+//! veya susan raporlayıcının yeri boşalır. Süre yalnız agent'ın kendi
+//! döngüsünde sayıldığı için raporların tekrarı süreyi iki kez yazamaz.
+//!
 //! Hiçbir adım kilit, engelleme, program kapatma veya ağ işlemi yapmaz.
 
 use crate::log;
 use crate::platform::{self, Signals};
-use agent_core::ScreenTimeService;
+use agent_core::{ClientInfo, ScreenTimeService};
 use ipc_protocol::{
-    now_ms, ActivityReport, HealthCheckResult, MeasurementInfo, MeasurementSource,
-    ScreenTimeStatus, UsageState,
+    now_ms, ActivityReport, HealthCheckResult, MeasurementInfo, MeasurementSource, ReporterInfo,
+    ReporterKind, ScreenTimeStatus, UsageState,
 };
 use screen_time::accounting::Ctx;
 use screen_time::engine::{Engine, LifecycleEvent, Piece, TickInput};
@@ -21,7 +26,7 @@ use screen_time::policy::{self, DevFileRead, Resolution, StoredPolicy, MAX_POLIC
 use screen_time::store::Store;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
@@ -65,30 +70,164 @@ pub fn dev_policy_beside_exe() -> Option<PathBuf> {
 struct Report {
     idle_ms: Option<u64>,
     at: Instant,
+    /// Raporu gönderen sürecin oturumu; konsol oturumu değişince rapor atılır.
+    session: Option<u32>,
 }
+
+/// Kabul edilen tek raporlayıcı.
+#[derive(Debug, Clone, Copy)]
+struct Lease {
+    client: ClientInfo,
+    kind: Option<ReporterKind>,
+    /// Kabul anı (Unix ms) — tanılamada "son (yeniden) bağlantı".
+    since_ms: u64,
+    last_at: Instant,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LeaseDecision {
+    /// Aynı bağlantı: süre uzatılır.
+    Refresh,
+    /// Yer boş veya önceki raporlayıcı sustu: yeni raporlayıcı.
+    Acquire,
+    /// Daha öncelikli raporlayıcı (arka plan helper'ı köprünün yerini alır).
+    Takeover,
+    /// Başka geçerli raporlayıcı var: rapor sayılmaz.
+    Reject,
+}
+
+/// Tek raporlayıcı kuralı. Öncelik eşitse ilk gelen korunur; böylece iki
+/// helper sırayla raporlayıp ölçüm kaynağını titretemez.
+fn decide(
+    lease: Option<&Lease>,
+    client: &ClientInfo,
+    kind: Option<ReporterKind>,
+    now: Instant,
+    fresh_for: Duration,
+) -> LeaseDecision {
+    let Some(l) = lease else {
+        return LeaseDecision::Acquire;
+    };
+    if l.client.connection_id == client.connection_id {
+        return LeaseDecision::Refresh;
+    }
+    if now.saturating_duration_since(l.last_at) > fresh_for
+        || l.client.session_id != client.session_id
+    {
+        return LeaseDecision::Acquire;
+    }
+    if ReporterKind::priority(kind) > ReporterKind::priority(l.kind) {
+        return LeaseDecision::Takeover;
+    }
+    LeaseDecision::Reject
+}
+
+fn describe(client: &ClientInfo, kind: Option<ReporterKind>) -> String {
+    let opt = |v: Option<u32>| v.map_or("-".to_string(), |v| v.to_string());
+    format!(
+        "kind={} session={} pid={} conn={}",
+        kind.map_or("UNSPECIFIED", ReporterKind::as_str),
+        opt(client.session_id),
+        opt(client.pid),
+        client.connection_id
+    )
+}
+
+/// Bellekte bekleyen raporlayıcı olayları için üst sınır (taşma: en eskiler atılır).
+const MAX_QUEUED_EVENTS: usize = 64;
 
 #[derive(Debug)]
 pub struct ScreenTimeRuntime {
     started: Instant,
     signals: Arc<dyn Signals>,
+    report_fresh_for: Duration,
     report: Mutex<Option<Report>>,
+    lease: Mutex<Option<Lease>>,
+    competing_reports: AtomicU64,
+    /// IPC iş parçacıklarından motor döngüsüne aktarılacak yaşam döngüsü olayları.
+    queued_events: Mutex<Vec<LifecycleEvent>>,
     status: Mutex<Option<ScreenTimeStatus>>,
     last_tick: Mutex<Option<Instant>>,
     db_path: Mutex<Option<String>>,
 }
 
 impl ScreenTimeService for ScreenTimeRuntime {
-    fn report_activity(&self, client_session: Option<u32>, report: ActivityReport) -> bool {
-        if !self.signals.accepts_report_from(client_session) {
+    fn report_activity(&self, client: &ClientInfo, report: ActivityReport) -> bool {
+        if !self.signals.accepts_report_from(client.session_id) {
             return false;
+        }
+        let now = Instant::now();
+        {
+            let Ok(mut lease) = self.lease.lock() else {
+                return false;
+            };
+            let decision = decide(
+                lease.as_ref(),
+                client,
+                report.kind,
+                now,
+                self.report_fresh_for,
+            );
+            let event = match decision {
+                LeaseDecision::Reject => {
+                    self.competing_reports.fetch_add(1, Ordering::Relaxed);
+                    return false;
+                }
+                LeaseDecision::Refresh => None,
+                LeaseDecision::Acquire => {
+                    Some(("REPORTER_ACQUIRED", describe(client, report.kind)))
+                }
+                LeaseDecision::Takeover => Some((
+                    "REPORTER_TAKEOVER",
+                    format!(
+                        "{} previous_{}",
+                        describe(client, report.kind),
+                        lease
+                            .as_ref()
+                            .map(|l| describe(&l.client, l.kind))
+                            .unwrap_or_default()
+                    ),
+                )),
+            };
+            match (decision, lease.as_mut()) {
+                (LeaseDecision::Refresh, Some(l)) => l.last_at = now,
+                _ => {
+                    *lease = Some(Lease {
+                        client: *client,
+                        kind: report.kind,
+                        since_ms: now_ms(),
+                        last_at: now,
+                    })
+                }
+            }
+            if let Some((kind, detail)) = event {
+                self.queue_event(kind, detail);
+            }
         }
         if let Ok(mut r) = self.report.lock() {
             *r = Some(Report {
                 idle_ms: report.idle_ms,
-                at: Instant::now(),
+                at: now,
+                session: client.session_id,
             });
         }
         true
+    }
+
+    fn connection_closed(&self, connection_id: u64) {
+        let released = self
+            .lease
+            .lock()
+            .ok()
+            .and_then(|mut l| l.take_if(|l| l.client.connection_id == connection_id));
+        if let Some(l) = released {
+            // Son rapor bir ölçüm noktasıdır; tazeliği bitince ölçüm UNKNOWN olur.
+            // Kopuk süre için etkinlik uydurulmaz (girdi sınırı modeli).
+            self.queue_event(
+                "REPORTER_RELEASED",
+                format!("reason=disconnected {}", describe(&l.client, l.kind)),
+            );
+        }
     }
 
     fn status(&self) -> Option<ScreenTimeStatus> {
@@ -138,6 +277,65 @@ impl ScreenTimeService for ScreenTimeRuntime {
 impl ScreenTimeRuntime {
     pub fn db_path(&self) -> Option<String> {
         self.db_path.lock().ok().and_then(|p| p.clone())
+    }
+
+    fn queue_event(&self, kind: &'static str, detail: String) {
+        if let Ok(mut q) = self.queued_events.lock() {
+            if q.len() >= MAX_QUEUED_EVENTS {
+                q.remove(0);
+            }
+            q.push(LifecycleEvent {
+                wall_ms: now_ms(),
+                kind,
+                detail,
+            });
+        }
+    }
+
+    /// Motor döngüsünden: susan raporlayıcının ve başka oturuma ait raporun
+    /// yerini boşaltır, bekleyen olayları verir.
+    fn housekeeping(&self, now: Instant) -> Vec<LifecycleEvent> {
+        let mut released = None;
+        if let Ok(mut lease) = self.lease.lock() {
+            let reason = lease.as_ref().and_then(|l| {
+                if !self.signals.accepts_report_from(l.client.session_id) {
+                    Some("console_session_changed")
+                } else if now.saturating_duration_since(l.last_at) > self.report_fresh_for {
+                    Some("stale")
+                } else {
+                    None
+                }
+            });
+            if let Some(reason) = reason {
+                released = lease.take().map(|l| (reason, l));
+            }
+        }
+        if let Some((reason, l)) = released {
+            self.queue_event(
+                "REPORTER_RELEASED",
+                format!("reason={reason} {}", describe(&l.client, l.kind)),
+            );
+        }
+        if let Ok(mut r) = self.report.lock() {
+            if r.is_some_and(|r| !self.signals.accepts_report_from(r.session)) {
+                // Önceki konsol oturumunun raporu yeni oturuma yazılmaz.
+                *r = None;
+            }
+        }
+        self.queued_events
+            .lock()
+            .map(|mut q| std::mem::take(&mut *q))
+            .unwrap_or_default()
+    }
+
+    fn reporter_info(&self) -> Option<ReporterInfo> {
+        let l = (*self.lease.lock().ok()?)?;
+        Some(ReporterInfo {
+            kind: l.kind,
+            session_id: l.client.session_id,
+            pid: l.client.pid,
+            since_ms: l.since_ms,
+        })
     }
 }
 
@@ -194,6 +392,8 @@ fn measure(
                 source,
                 last_report_age_ms: age,
                 unknown_reason: Some(reason.into()),
+                reporter: None,
+                competing_reports: 0,
             },
         )
     };
@@ -208,6 +408,8 @@ fn measure(
         source,
         last_report_age_ms: age,
         unknown_reason: None,
+        reporter: None,
+        competing_reports: 0,
     };
     if signals.suspended() {
         return (Ctx::Blocked(UsageState::Suspended), info);
@@ -224,6 +426,7 @@ fn measure(
         Some(Report {
             idle_ms: Some(idle),
             at,
+            ..
         }) => {
             let at_mono = at.saturating_duration_since(started).as_millis() as u64;
             (
@@ -252,7 +455,11 @@ pub fn start(
     let rt = Arc::new(ScreenTimeRuntime {
         started,
         signals: cfg.signals.clone(),
+        report_fresh_for: cfg.report_fresh_for,
         report: Mutex::new(None),
+        lease: Mutex::new(None),
+        competing_reports: AtomicU64::new(0),
+        queued_events: Mutex::new(Vec::new()),
         status: Mutex::new(None),
         last_tick: Mutex::new(None),
         db_path: Mutex::new(None),
@@ -357,13 +564,16 @@ fn run(cfg: ScreenTimeConfig, rt: &ScreenTimeRuntime, shutdown: &AtomicBool) {
             }
         }
 
+        pending_events.extend(rt.housekeeping(now));
         let report = rt.report.lock().ok().and_then(|r| *r);
-        let (ctx, measurement) = measure(
+        let (ctx, mut measurement) = measure(
             rt.signals.as_ref(),
             report,
             rt.started,
             cfg.report_fresh_for,
         );
+        measurement.reporter = rt.reporter_info();
+        measurement.competing_reports = rt.competing_reports.load(Ordering::Relaxed);
         let resumed = rt.signals.take_resumed();
         let (local, offset) = platform::local_stamp();
         let input = TickInput {
@@ -444,6 +654,16 @@ mod tests {
         suspended: AtomicBool,
         locked: AtomicBool,
         fail: AtomicBool,
+        /// Konsol oturumu 1 → 2 (hızlı kullanıcı değiştirme benzetimi).
+        switched: AtomicBool,
+    }
+
+    fn client(conn: u64, session: Option<u32>) -> ClientInfo {
+        ClientInfo {
+            connection_id: conn,
+            session_id: session,
+            pid: Some(1000 + conn as u32),
+        }
     }
 
     impl Signals for FakeSignals {
@@ -463,8 +683,166 @@ mod tests {
             }
         }
         fn accepts_report_from(&self, s: Option<u32>) -> bool {
-            s == Some(1)
+            s == Some(if self.switched.load(Ordering::SeqCst) {
+                2
+            } else {
+                1
+            })
         }
+    }
+
+    #[test]
+    fn lease_decisions() {
+        use LeaseDecision::*;
+        let now = Instant::now();
+        let fresh = Duration::from_secs(15);
+        let lease = |conn, kind, age_s| Lease {
+            client: client(conn, Some(1)),
+            kind,
+            since_ms: 0,
+            last_at: now - Duration::from_secs(age_s),
+        };
+        let bg = Some(ReporterKind::BackgroundLogonTask);
+        let bridge = Some(ReporterKind::DesktopBridge);
+        let c2 = client(2, Some(1));
+        assert_eq!(decide(None, &c2, bridge, now, fresh), Acquire);
+        assert_eq!(
+            decide(Some(&lease(2, bridge, 1)), &c2, bridge, now, fresh),
+            Refresh
+        );
+        // Eşit öncelik: ilk gelen korunur (iki arka plan helper'ı titreşmez).
+        assert_eq!(decide(Some(&lease(1, bg, 1)), &c2, bg, now, fresh), Reject);
+        assert_eq!(
+            decide(
+                Some(&lease(1, None, 1)),
+                &c2,
+                Some(ReporterKind::OneShot),
+                now,
+                fresh
+            ),
+            Reject
+        );
+        // Arka plan helper'ı köprünün yerini alır; tersi olmaz.
+        assert_eq!(
+            decide(Some(&lease(1, bridge, 1)), &c2, bg, now, fresh),
+            Takeover
+        );
+        assert_eq!(
+            decide(Some(&lease(1, bg, 1)), &c2, bridge, now, fresh),
+            Reject
+        );
+        // Susan raporlayıcının yeri boşalmış sayılır.
+        assert_eq!(
+            decide(Some(&lease(1, bg, 16)), &c2, bridge, now, fresh),
+            Acquire
+        );
+        // Başka oturumun raporlayıcısı (kullanıcı değişti) geçerli değildir.
+        let other = Lease {
+            client: client(1, Some(2)),
+            ..lease(1, bg, 1)
+        };
+        assert_eq!(decide(Some(&other), &c2, bridge, now, fresh), Acquire);
+    }
+
+    fn total(s: &ScreenTimeStatus) -> u64 {
+        let t = &s.today;
+        t.active_secs + t.idle_secs + t.locked_secs + t.suspended_secs + t.unknown_secs
+    }
+
+    #[test]
+    fn single_reporter_lifecycle_and_no_double_counting() {
+        let dir =
+            std::env::temp_dir().join(format!("kd-lease-{}-{}", std::process::id(), now_ms()));
+        let mut cfg = ScreenTimeConfig::new(Some(dir.clone()), None);
+        cfg.tick = Duration::from_millis(100);
+        cfg.flush_every = Duration::from_millis(200);
+        cfg.report_fresh_for = Duration::from_millis(600);
+        let sig = Arc::new(FakeSignals::default());
+        cfg.signals = sig.clone();
+        let shutdown = Arc::new(AtomicBool::new(false));
+        let (rt, h) = start(cfg, shutdown.clone());
+        let started = Instant::now();
+        let rep = |kind| ActivityReport {
+            idle_ms: Some(0),
+            kind: Some(kind),
+        };
+        let reporter = || rt.status().and_then(|s| s.measurement.reporter);
+        let wait = |what: &str, f: &dyn Fn() -> bool| {
+            let t = Instant::now();
+            while !f() {
+                assert!(t.elapsed() < Duration::from_secs(5), "{what}");
+                thread::sleep(Duration::from_millis(20));
+            }
+        };
+
+        // Köprü yer alır; arka plan helper'ı onun yerini alır; köprü artık reddedilir.
+        let bridge = client(1, Some(1));
+        let bg = client(2, Some(1));
+        assert!(rt.report_activity(&bridge, rep(ReporterKind::DesktopBridge)));
+        assert!(rt.report_activity(&bg, rep(ReporterKind::BackgroundLogonTask)));
+        assert!(!rt.report_activity(&bridge, rep(ReporterKind::DesktopBridge)));
+        // İkinci bir arka plan helper'ı (ör. eski sürüm) da reddedilir.
+        assert!(!rt.report_activity(&client(3, Some(1)), rep(ReporterKind::BackgroundManual)));
+        wait("reporter=bg", &|| {
+            reporter().is_some_and(|r| {
+                r.kind == Some(ReporterKind::BackgroundLogonTask) && r.pid == Some(1002)
+            })
+        });
+        assert_eq!(rt.status().unwrap().measurement.competing_reports, 2);
+
+        // Aynı anda iki raporlayıcı rapor yağdırsa da süre bir kez sayılır.
+        let flood_end = Instant::now() + Duration::from_millis(500);
+        while Instant::now() < flood_end {
+            rt.report_activity(&bg, rep(ReporterKind::BackgroundLogonTask));
+            rt.report_activity(&bridge, rep(ReporterKind::DesktopBridge));
+            thread::sleep(Duration::from_millis(5));
+        }
+
+        // Arka plan helper'ı koptu: yer boşalır, köprü devralır.
+        rt.connection_closed(bg.connection_id);
+        assert!(reporter_released_now(&rt));
+        assert!(rt.report_activity(&bridge, rep(ReporterKind::DesktopBridge)));
+        wait("reporter=bridge", &|| {
+            reporter().is_some_and(|r| r.kind == Some(ReporterKind::DesktopBridge))
+        });
+
+        // Rapor kesildi: tazelik bitince yer boşalır, ölçüm UNKNOWN (uydurma yok).
+        wait("stale release", &|| {
+            rt.status()
+                .is_some_and(|s| s.measurement.reporter.is_none() && s.state == UsageState::Unknown)
+        });
+
+        // Konsol oturumu değişti: eski oturumun raporu ve raporlayıcısı atılır.
+        assert!(rt.report_activity(&bg, rep(ReporterKind::BackgroundLogonTask)));
+        sig.switched.store(true, Ordering::SeqCst);
+        wait("session switch", &|| {
+            rt.status().is_some_and(|s| {
+                s.measurement.reporter.is_none()
+                    && s.measurement.unknown_reason.as_deref() == Some("NO_HELPER")
+            })
+        });
+        assert!(!rt.report_activity(&bg, rep(ReporterKind::BackgroundLogonTask)));
+        assert!(rt.report_activity(&client(4, Some(2)), rep(ReporterKind::BackgroundLogonTask)));
+
+        let elapsed = started.elapsed().as_secs();
+        let s = rt.status().unwrap();
+        shutdown.store(true, Ordering::SeqCst);
+        h.join().unwrap();
+        assert!(
+            total(&s) <= elapsed + 1,
+            "süre iki kez sayıldı: {} > {elapsed}",
+            total(&s)
+        );
+
+        let store = Store::open(Some(&dir), "check", now_ms());
+        assert_eq!(store.count_events("REPORTER_ACQUIRED"), 4);
+        assert_eq!(store.count_events("REPORTER_TAKEOVER"), 1);
+        assert_eq!(store.count_events("REPORTER_RELEASED"), 3);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    fn reporter_released_now(rt: &ScreenTimeRuntime) -> bool {
+        rt.lease.lock().unwrap().is_none()
     }
 
     #[test]
@@ -476,6 +854,7 @@ mod tests {
             Some(Report {
                 idle_ms: idle,
                 at: Instant::now(),
+                session: Some(1),
             })
         };
 
@@ -499,6 +878,7 @@ mod tests {
         let stale = Some(Report {
             idle_ms: Some(0),
             at: Instant::now() - Duration::from_secs(30),
+            session: Some(1),
         });
         let (_, info) = measure(&sig, stale, started, fresh);
         assert_eq!(info.unknown_reason.as_deref(), Some("STALE_REPORT"));
@@ -531,8 +911,12 @@ mod tests {
         cfg.signals = Arc::new(FakeSignals::default());
         let shutdown = Arc::new(AtomicBool::new(false));
         let (rt, h) = start(cfg, shutdown.clone());
-        assert!(!rt.report_activity(Some(2), ActivityReport { idle_ms: Some(0) }));
-        assert!(rt.report_activity(Some(1), ActivityReport { idle_ms: Some(0) }));
+        let report = ActivityReport {
+            idle_ms: Some(0),
+            kind: None,
+        };
+        assert!(!rt.report_activity(&client(1, Some(2)), report));
+        assert!(rt.report_activity(&client(1, Some(1)), report));
         thread::sleep(Duration::from_millis(400));
         let s = rt.status().expect("status");
         assert!(s.storage.persistent);

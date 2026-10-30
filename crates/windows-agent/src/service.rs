@@ -70,9 +70,20 @@ fn run_service() -> windows_service::Result<()> {
                 PowerEventParam::ResumeAutomatic | PowerEventParam::ResumeSuspend => Some(false),
                 _ => None,
             };
+            // P1.D tanı: Lenovo'da uyku "ölçülemeyen" sayıldı (P1.C C-08); hangi
+            // güç olaylarının geldiği kayda geçsin. Yalnız üç olay durumu değiştirir.
+            // Pil/şarj durumu değişimi sık gelir; kayıt şişmesin diye yazılmaz.
+            if !matches!(p, PowerEventParam::PowerStatusChange) {
+                log::event(
+                    "power_event",
+                    &[
+                        ("event", format!("{p:?}")),
+                        ("applied", suspending.is_some().to_string()),
+                    ],
+                );
+            }
             if let Some(s) = suspending {
                 power.on_power_event(s);
-                log::event("power_event", &[("event", format!("{p:?}"))]);
             }
             ServiceControlHandlerResult::NoError
         }

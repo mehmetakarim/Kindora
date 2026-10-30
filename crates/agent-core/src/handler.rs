@@ -1,6 +1,6 @@
 //! Bağlantı başına istek işleyici.
 
-use crate::{AgentState, ConnectionLimits, AGENT_VERSION};
+use crate::{AgentState, ClientInfo, ConnectionLimits, AGENT_VERSION};
 use ipc_protocol::{
     decode_request, CommandType, ErrorCode, HealthCheckResult, Payload, Request, Response,
 };
@@ -24,8 +24,8 @@ pub struct SessionHandler {
     seen_order: VecDeque<String>,
     seen: HashSet<String>,
     errors: u32,
-    /// İstemcinin Windows oturumu (işletim sisteminden; mesajdan değil).
-    client_session: Option<u32>,
+    /// İstemci kimliği (işletim sisteminden ve agent'tan; mesajdan değil).
+    client: ClientInfo,
     last_activity_report: Option<Instant>,
 }
 
@@ -36,13 +36,13 @@ impl SessionHandler {
             seen_order: VecDeque::new(),
             seen: HashSet::new(),
             errors: 0,
-            client_session: None,
+            client: ClientInfo::default(),
             last_activity_report: None,
         }
     }
 
-    pub fn with_client_session(mut self, session: Option<u32>) -> Self {
-        self.client_session = session;
+    pub fn with_client(mut self, client: ClientInfo) -> Self {
+        self.client = client;
         self
     }
 
@@ -104,7 +104,7 @@ impl SessionHandler {
                 let throttled = self
                     .last_activity_report
                     .is_some_and(|t| now.duration_since(t) < MIN_ACTIVITY_REPORT_GAP);
-                let applied = !throttled && service.report_activity(self.client_session, report);
+                let applied = !throttled && service.report_activity(&self.client, report);
                 if !throttled {
                     self.last_activity_report = Some(now);
                 }
@@ -160,13 +160,13 @@ mod tests {
 
     #[derive(Debug, Default)]
     struct FakeScreenTime {
-        reports: Mutex<Vec<(Option<u32>, ActivityReport)>>,
+        reports: Mutex<Vec<(ClientInfo, ActivityReport)>>,
     }
 
     impl ScreenTimeService for FakeScreenTime {
-        fn report_activity(&self, s: Option<u32>, r: ActivityReport) -> bool {
-            self.reports.lock().unwrap().push((s, r));
-            s == Some(1)
+        fn report_activity(&self, c: &ClientInfo, r: ActivityReport) -> bool {
+            self.reports.lock().unwrap().push((*c, r));
+            c.session_id == Some(1)
         }
         fn status(&self) -> Option<ScreenTimeStatus> {
             None
@@ -202,7 +202,12 @@ mod tests {
     fn activity_report_carries_os_session_and_is_throttled() {
         let fake = Arc::new(FakeScreenTime::default());
         let s = AgentState::new(RunMode::Service).with_screen_time(fake.clone());
-        let mut h = SessionHandler::new(ConnectionLimits::default()).with_client_session(Some(1));
+        let client = ClientInfo {
+            connection_id: 7,
+            session_id: Some(1),
+            pid: Some(99),
+        };
+        let mut h = SessionHandler::new(ConnectionLimits::default()).with_client(client);
         let (r, _) = h.handle(&s, &activity("a-1", Some(1500)));
         assert_eq!(r.payload, Some(Payload::ActivityAck { applied: true }));
         // Aynı bağlantıdan hemen gelen ikinci rapor uygulanmaz (hata değil).
@@ -212,16 +217,20 @@ mod tests {
         assert_eq!(
             fake.reports.lock().unwrap()[0],
             (
-                Some(1),
+                client,
                 ActivityReport {
-                    idle_ms: Some(1500)
+                    idle_ms: Some(1500),
+                    kind: None,
                 }
             )
         );
 
         // Başka oturumdan gelen rapor sayılmaz.
-        let mut other =
-            SessionHandler::new(ConnectionLimits::default()).with_client_session(Some(2));
+        let mut other = SessionHandler::new(ConnectionLimits::default()).with_client(ClientInfo {
+            connection_id: 8,
+            session_id: Some(2),
+            pid: None,
+        });
         let (r, _) = other.handle(&s, &activity("a-3", Some(1)));
         assert_eq!(r.payload, Some(Payload::ActivityAck { applied: false }));
 

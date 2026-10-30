@@ -203,6 +203,29 @@ export function usageTone(state: UsageState): Tone {
   return "neutral";
 }
 
+/** Arka plan ölçümünün durumu (P1.D): pencere kapalıyken ölçüm sürer mi. */
+export type BackgroundMeasurement = "on" | "windowOnly" | "none";
+
+export function backgroundMeasurement(st: ScreenTimeStatus): BackgroundMeasurement {
+  const kind = st.measurement.reporter?.kind;
+  if (kind === "BACKGROUND_LOGON_TASK" || kind === "BACKGROUND_MANUAL") return "on";
+  if (st.measurement.reporter) return "windowOnly";
+  return "none";
+}
+
+export function backgroundText(st: ScreenTimeStatus): string {
+  return tr.background[backgroundMeasurement(st)];
+}
+
+export function reporterText(st: ScreenTimeStatus): string {
+  const r = st.measurement.reporter;
+  if (!r) return "Yok";
+  const parts: string[] = [r.kind ? tr.reporterKind[r.kind] : tr.reporterKind.unspecified];
+  if (r.pid !== undefined) parts.push(`PID ${String(r.pid)}`);
+  if (r.session_id !== undefined) parts.push(`oturum ${String(r.session_id)}`);
+  return parts.join(" · ");
+}
+
 export function unknownReasonText(reason: string | undefined): string {
   if (reason === undefined) return "—";
   return tr.unknownReason[reason] ?? reason;

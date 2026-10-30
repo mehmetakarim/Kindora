@@ -37,6 +37,18 @@ export const tr = {
     NO_CONSOLE_SESSION: "Etkin konsol oturumu yok",
     STARTING: "Ölçüm başlıyor",
   } as Record<string, string>,
+  reporterKind: {
+    BACKGROUND_LOGON_TASK: "Arka plan yardımcısı (oturum açılışı görevi)",
+    BACKGROUND_MANUAL: "Arka plan yardımcısı (elle başlatıldı)",
+    DESKTOP_BRIDGE: "Masaüstü köprüsü (yedek; yalnız bu pencere açıkken)",
+    ONE_SHOT: "Tek seferlik rapor (tanılama)",
+    unspecified: "Rolünü bildirmeyen eski yardımcı",
+  },
+  background: {
+    on: "Arka plan ölçümü açık — pencere kapalıyken de süre ölçülür.",
+    windowOnly: "Arka plan yardımcısı çalışmıyor — süre yalnız bu pencere açıkken ölçülüyor.",
+    none: "Ölçüm yapan yardımcı yok — ölçülemeyen süre kullanım sayılmaz.",
+  },
   policySource: {
     BUILTIN_DEFAULT: "Test varsayılanları (ebeveyn tercihi değil)",
     DEV_FILE: "DEV test politikası",

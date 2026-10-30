@@ -305,6 +305,8 @@ mod tests {
                 source: MeasurementSource::SessionHelper,
                 last_report_age_ms: Some(100),
                 unknown_reason: None,
+                reporter: None,
+                competing_reports: 0,
             },
             storage: StorageInfo {
                 persistent: true,

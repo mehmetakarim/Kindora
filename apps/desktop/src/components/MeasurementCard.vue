@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import {
+  backgroundText,
   formatDuration,
   formatLastSuccess,
   policyText,
+  reporterText,
   unknownReasonText,
   usageStateLabel,
 } from "../agent/presentation";
@@ -26,6 +28,24 @@ defineProps<{ status: ScreenTimeStatus | null; now: number }>();
             : "Yok"
         }}
       </dd>
+      <dt>Arka plan ölçümü</dt>
+      <dd data-testid="diag-background">{{ backgroundText(status) }}</dd>
+      <dt>Etkinlik raporlayıcısı</dt>
+      <dd data-testid="diag-reporter">{{ reporterText(status) }}</dd>
+      <dt>Son (yeniden) bağlantı</dt>
+      <dd data-testid="diag-reporter-since">
+        {{
+          status.measurement.reporter
+            ? formatLastSuccess(status.measurement.reporter.since_ms, now)
+            : "—"
+        }}
+      </dd>
+      <dt>Reddedilen ikinci raporlayıcı</dt>
+      <dd data-testid="diag-competing">
+        {{ String(status.measurement.competing_reports ?? 0) }} rapor (yalnız biri sayılır)
+      </dd>
+      <dt>Ölçülemeyen süre (bugün)</dt>
+      <dd data-testid="diag-unknown">{{ formatDuration(status.today.unknown_secs) }}</dd>
       <dt>Ölçülemiyorsa nedeni</dt>
       <dd>{{ unknownReasonText(status.measurement.unknown_reason) }}</dd>
       <dt>Son helper raporu</dt>

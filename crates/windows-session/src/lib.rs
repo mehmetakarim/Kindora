@@ -12,20 +12,35 @@
 //! P1.C (ADR-0014): helper her döngüde kendi oturumundaki "son girdiden bu
 //! yana geçen süre"yi [`activity::idle_ms`] ile ölçüp `REPORT_ACTIVITY` olarak
 //! bildirir. Başka hiçbir kullanıcı verisi okunmaz.
+//!
+//! P1.D (ADR-0015): iki ayrı rol vardır.
+//! - [`run_activity`] (`kindora-helper activity`): masaüstünden **bağımsız**
+//!   arka plan raporlayıcısı. Oturum başına tek örnek ([`instance`]), oturum
+//!   açılışında Zamanlanmış Görev ile başlar; masaüstü açılıp kapanınca durmaz.
+//! - [`run_bridge`] (`kindora-helper bridge`): masaüstünün alt süreci; durum
+//!   okur ve yalnız yedek raporlayıcıdır (agent arka plan helper'ını önceler).
+//!
+//! Raporlar anlık ölçümdür: bağlantı yokken biriktirilmez, yeniden bağlanınca
+//! geçmiş için rapor gönderilmez.
 
 pub mod activity;
+pub mod instance;
+#[cfg(windows)]
+pub mod session_end;
 
 use ipc_protocol::bridge::{
     encode_bridge_line, AgentSnapshot, BridgeEvent, BridgeRequest, LinkState, BRIDGE_VERSION,
 };
 use ipc_protocol::frame::{read_frame, write_frame, FrameError};
 use ipc_protocol::{
-    decode_response, now_ms, ActivityReport, CommandType, ErrorCode, Payload, Request, Response,
-    MAX_MESSAGE_BYTES,
+    decode_response, now_ms, ActivityReport, CommandType, ErrorCode, Payload, ReporterKind,
+    Request, Response, MAX_MESSAGE_BYTES,
 };
 use std::io::{self, Read, Write};
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{Receiver, RecvTimeoutError};
+use std::sync::{Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -34,7 +49,10 @@ impl<T: Read + Write + Send> Stream for T {}
 
 #[derive(Debug, Clone)]
 pub struct HelperConfig {
+    /// `activity` modunda rapor aralığı (eski adı: kalp atışı).
     pub heartbeat_interval: Duration,
+    /// Bu süreç hangi rolle rapor gönderir (agent önceliklendirmesi için).
+    pub reporter_kind: ReporterKind,
     pub response_timeout: Duration,
     pub reconnect_min: Duration,
     pub reconnect_max: Duration,
@@ -50,6 +68,7 @@ impl Default for HelperConfig {
     fn default() -> Self {
         HelperConfig {
             heartbeat_interval: Duration::from_secs(5),
+            reporter_kind: ReporterKind::OneShot,
             response_timeout: Duration::from_secs(3),
             reconnect_min: Duration::from_millis(250),
             reconnect_max: Duration::from_secs(5),
@@ -84,6 +103,46 @@ impl std::fmt::Display for ClientError {
     }
 }
 
+static LOG_FILE: OnceLock<Mutex<std::fs::File>> = OnceLock::new();
+
+/// Bu boyutu aşan kayıt dosyası açılışta `.1` olarak kenara alınır (tek kopya).
+pub const MAX_LOG_BYTES: u64 = 1024 * 1024;
+
+/// Kayıtları stderr'e ek olarak dosyaya da yazar (arka plan helper'ında stderr
+/// görünmez). Süreçte bir kez çağrılır.
+pub fn set_log_file(path: &Path) -> io::Result<()> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    if std::fs::metadata(path).is_ok_and(|m| m.len() > MAX_LOG_BYTES) {
+        let mut old = path.as_os_str().to_owned();
+        old.push(".1");
+        let _ = std::fs::rename(path, PathBuf::from(old));
+    }
+    let f = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)?;
+    LOG_FILE
+        .set(Mutex::new(f))
+        .map_err(|_| io::Error::other("log file already set"))
+}
+
+/// Windows: `%LOCALAPPDATA%\Kindora\helper\activity.log` (kullanıcının kendi
+/// profili; tuş, ekran veya içerik içermez). Diğer: yok.
+pub fn default_activity_log() -> Option<PathBuf> {
+    if cfg!(windows) {
+        std::env::var_os("LOCALAPPDATA").map(|d| {
+            PathBuf::from(d)
+                .join("Kindora")
+                .join("helper")
+                .join("activity.log")
+        })
+    } else {
+        None
+    }
+}
+
 pub fn log_event(name: &str, fields: &[(&str, String)]) {
     let mut line = format!("ts_ms={} event={}", now_ms(), name);
     for (k, v) in fields {
@@ -94,6 +153,36 @@ pub fn log_event(name: &str, fields: &[(&str, String)]) {
         }
     }
     eprintln!("{line}");
+    if let Some(f) = LOG_FILE.get() {
+        if let Ok(mut f) = f.lock() {
+            let _ = writeln!(f, "{line}");
+        }
+    }
+}
+
+/// Önceki çalıştırmanın temiz bitip bitmediğini izleyen dosya
+/// (`<kayıt>.running`). Süreç sonlandırılır veya çökerse dosya kalır; bir
+/// sonraki açılış bunu `previous_exit=unclean` olarak kaydeder.
+pub struct RunMarker(PathBuf);
+
+impl RunMarker {
+    /// Dönüş: (iz, önceki çalıştırma temiz bitmediyse onun içeriği).
+    pub fn create(log_file: &Path) -> (Option<RunMarker>, Option<String>) {
+        let mut p = log_file.as_os_str().to_owned();
+        p.push(".running");
+        let path = PathBuf::from(p);
+        let previous = std::fs::read_to_string(&path)
+            .ok()
+            .map(|s| s.trim().chars().take(80).collect());
+        let content = format!("pid={} started_ms={}", std::process::id(), now_ms());
+        let marker = std::fs::write(&path, content).ok().map(|_| RunMarker(path));
+        (marker, previous)
+    }
+
+    /// Temiz çıkış: iz silinir.
+    pub fn clear(self) {
+        let _ = std::fs::remove_file(&self.0);
+    }
 }
 
 fn connect_stream(cfg: &HelperConfig) -> io::Result<(Box<dyn Stream>, Option<u32>)> {
@@ -122,6 +211,7 @@ pub struct Client {
     /// Agent kullanım süresi komutlarını reddettiyse (eski sürüm / motor yok)
     /// bu bağlantıda bir daha gönderilmez; hata bütçesi tüketilmez.
     screen_time_supported: bool,
+    reporter_kind: ReporterKind,
 }
 
 impl Client {
@@ -133,6 +223,7 @@ impl Client {
             counter: 0,
             server_pid,
             screen_time_supported: true,
+            reporter_kind: cfg.reporter_kind,
         })
     }
 
@@ -146,7 +237,13 @@ impl Client {
     pub fn report_activity(&mut self, idle_ms: Option<u64>) -> Result<Response, ClientError> {
         self.counter += 1;
         let id = format!("{}-{}", self.id_prefix, self.counter);
-        self.send(Request::report_activity(id, ActivityReport { idle_ms }))
+        self.send(Request::report_activity(
+            id,
+            ActivityReport {
+                idle_ms,
+                kind: Some(self.reporter_kind),
+            },
+        ))
     }
 
     pub fn screen_time_supported(&self) -> bool {
@@ -226,37 +323,83 @@ fn sleep_or_shutdown(d: Duration, shutdown: &AtomicBool) -> bool {
     shutdown.load(Ordering::SeqCst)
 }
 
-/// Helper ana döngüsü: bağlan → durum al → kalp atışı → kopunca yeniden bağlan.
-pub fn run_helper(cfg: &HelperConfig, shutdown: &AtomicBool) {
-    log_event("helper_started", &[("pid", std::process::id().to_string())]);
+/// Arka plan helper'ında yeniden bağlanma aralığının üst sınırı (agent
+/// kapalıyken düşük kaynak kullanımı).
+pub const ACTIVITY_RECONNECT_MAX: Duration = Duration::from_secs(10);
+
+/// Bağımsız arka plan raporlayıcısı (`activity`; eski adı `run`).
+///
+/// Bağlan → `GET_STATUS` → her aralıkta yalnız `REPORT_ACTIVITY` → kopunca
+/// üstel geri çekilmeyle (en çok [`ACTIVITY_RECONNECT_MAX`]) yeniden bağlan.
+/// Agent yetkisiz derse `unauthorized_retry` kadar bekler. Kayıt yalnız durum
+/// geçişlerinde yazılır. Agent kullanım süresini desteklemiyorsa `PING` gönderir.
+pub fn run_activity(cfg: &HelperConfig, shutdown: &AtomicBool) {
+    log_event(
+        "helper_started",
+        &[
+            ("pid", std::process::id().to_string()),
+            ("kind", cfg.reporter_kind.as_str().into()),
+            ("version", env!("CARGO_PKG_VERSION").into()),
+            (
+                "interval_ms",
+                cfg.heartbeat_interval.as_millis().to_string(),
+            ),
+        ],
+    );
+    let reconnect_max = cfg.reconnect_max.max(ACTIVITY_RECONNECT_MAX);
     let mut backoff = cfg.reconnect_min;
+    let mut connects: u64 = 0;
+    let mut failing = false;
 
     'outer: while !shutdown.load(Ordering::SeqCst) {
         let mut client = match Client::connect(cfg) {
             Ok(c) => c,
             Err(e) => {
-                log_event(
-                    "connect_failed",
-                    &[
-                        ("error", e.to_string()),
-                        ("retry_ms", backoff.as_millis().to_string()),
-                    ],
-                );
+                // Agent kapalıyken her denemede satır yazılmaz.
+                if !failing {
+                    failing = true;
+                    log_event(
+                        "connect_failed",
+                        &[
+                            ("error", e.to_string()),
+                            ("retry_ms", backoff.as_millis().to_string()),
+                        ],
+                    );
+                }
                 if sleep_or_shutdown(backoff, shutdown) {
                     break;
                 }
-                backoff = (backoff * 2).min(cfg.reconnect_max);
+                backoff = (backoff * 2).min(reconnect_max);
                 continue;
             }
         };
+        failing = false;
         backoff = cfg.reconnect_min;
+        connects += 1;
         let connected_at = Instant::now();
-        let mut fields = vec![];
+        let mut fields = vec![("reconnects", (connects - 1).to_string())];
         if let Some(pid) = client.server_pid {
             fields.push(("server_pid", pid.to_string()));
         }
         log_event("connected", &fields);
 
+        let lost = |e: &ClientError, phase: &str, last_ok: Instant| {
+            log_event(
+                "connection_lost",
+                &[
+                    ("reason", e.to_string()),
+                    ("phase", phase.into()),
+                    (
+                        "since_last_ok_ms",
+                        last_ok.elapsed().as_millis().to_string(),
+                    ),
+                    (
+                        "connected_ms",
+                        connected_at.elapsed().as_millis().to_string(),
+                    ),
+                ],
+            );
+        };
         match client.request(CommandType::GetStatus) {
             Ok(r) => log_event(
                 "agent_status",
@@ -266,44 +409,60 @@ pub fn run_helper(cfg: &HelperConfig, shutdown: &AtomicBool) {
                 )],
             ),
             Err(e) => {
-                log_event(
-                    "connection_lost",
-                    &[("reason", e.to_string()), ("phase", "status".into())],
-                );
+                lost(&e, "status", connected_at);
+                if matches!(e, ClientError::Unauthorized)
+                    && sleep_or_shutdown(cfg.unauthorized_retry, shutdown)
+                {
+                    break 'outer;
+                }
                 continue 'outer;
             }
         }
 
         let mut last_ok = Instant::now();
+        let mut accepted: Option<bool> = None;
+        let mut first = true;
         loop {
-            if sleep_or_shutdown(cfg.heartbeat_interval, shutdown) {
+            // İlk rapor bağlanır bağlanmaz; sonrakiler aralıkla.
+            if !first && sleep_or_shutdown(cfg.heartbeat_interval, shutdown) {
                 break 'outer;
             }
-            // Kalp atışı = etkinlik raporu (P1.C); agent desteklemiyorsa PING.
+            first = false;
             let beat = if client.screen_time_supported() {
-                client.screen_time_cycle().map(|_| ())
+                client.report_activity(activity::idle_ms()).map(|r| {
+                    match r.payload {
+                        Some(Payload::ActivityAck { applied }) => Some(applied),
+                        _ => {
+                            // Kullanım süresi motoru yok: bundan sonra PING.
+                            client.screen_time_supported = false;
+                            None
+                        }
+                    }
+                })
             } else {
-                client.request(CommandType::Ping).map(|_| ())
+                client.request(CommandType::Ping).map(|_| None)
             };
             match beat {
-                Ok(_) => last_ok = Instant::now(),
+                Ok(applied) => {
+                    last_ok = Instant::now();
+                    if applied.is_some() && applied != accepted {
+                        // Tek raporlayıcı kuralı: başka raporlayıcı varsa beklemede.
+                        log_event(
+                            if applied == Some(true) {
+                                "reporter_active"
+                            } else {
+                                "reporter_standby"
+                            },
+                            &[],
+                        );
+                        accepted = applied;
+                    }
+                }
                 Err(e) => {
-                    log_event(
-                        "connection_lost",
-                        &[
-                            ("reason", e.to_string()),
-                            (
-                                "since_last_ok_ms",
-                                last_ok.elapsed().as_millis().to_string(),
-                            ),
-                            (
-                                "connected_ms",
-                                connected_at.elapsed().as_millis().to_string(),
-                            ),
-                        ],
-                    );
-                    if matches!(e, ClientError::Unauthorized) {
-                        // Yetkisiz helper'ın agent'ı yoklamaya devam etmesi anlamsız.
+                    lost(&e, "report", last_ok);
+                    if matches!(e, ClientError::Unauthorized)
+                        && sleep_or_shutdown(cfg.unauthorized_retry, shutdown)
+                    {
                         break 'outer;
                     }
                     continue 'outer;

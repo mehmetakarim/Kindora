@@ -28,7 +28,12 @@ function demoScreenTime(at: number): ScreenTimeStatus {
       final_warning_secs: 60,
       idle_threshold_secs: 300,
     },
-    measurement: { source: "SESSION_HELPER", last_report_age_ms: 900 },
+    measurement: {
+      source: "SESSION_HELPER",
+      last_report_age_ms: 900,
+      reporter: { kind: "BACKGROUND_LOGON_TASK", pid: 4321, session_id: 1, since_ms: at - 60_000 },
+      competing_reports: 0,
+    },
     storage: { persistent: false, schema_version: 1, recovered: false },
     clock_adjusted_today: false,
     computed_at_ms: at,

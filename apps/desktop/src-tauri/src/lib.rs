@@ -7,8 +7,11 @@
 //!
 //! Bu sürüm hiçbir kısıtlama uygulamaz: tam ekran, always-on-top, giriş
 //! engelleme, otomatik başlatma, yetki yükseltme veya servis kurulumu yoktur.
-//! Pencereyi kapatmak yalnız masaüstü uygulamasını ve onun helper'ını kapatır;
-//! Windows servisi (agent) SCM tarafından yönetilir ve çalışmaya devam eder.
+//! Pencereyi kapatmak yalnız masaüstü uygulamasını ve onun köprü helper'ını
+//! kapatır; Windows servisi (agent) SCM tarafından, bağımsız arka plan helper'ı
+//! (`kindora-helper activity`, P1.D) oturum açılışı görevi tarafından yönetilir
+//! ve ikisi de çalışmaya devam eder. Bu uygulama arka plan helper'ını başlatmaz
+//! veya durdurmaz; köprü yalnız arka plan helper'ı yokken yedek raporlayıcıdır.
 
 pub mod logging;
 pub mod supervisor;

@@ -52,6 +52,19 @@ export interface PolicyInfo {
   idle_threshold_secs: number;
 }
 
+/** Etkinlik raporlayıcısının rolü (P1.D, ADR-0015). */
+export type ReporterKind =
+  "BACKGROUND_LOGON_TASK" | "BACKGROUND_MANUAL" | "DESKTOP_BRIDGE" | "ONE_SHOT";
+
+/** Agent'ın kabul ettiği tek raporlayıcı (oturum ve PID işletim sisteminden). */
+export interface ReporterInfo {
+  kind?: ReporterKind;
+  session_id?: number;
+  pid?: number;
+  /** Kabul anı (Unix ms) — son (yeniden) bağlantı. */
+  since_ms: number;
+}
+
 export interface ScreenTimeStatus {
   day: string;
   state: UsageState;
@@ -74,6 +87,8 @@ export interface ScreenTimeStatus {
     source: "SESSION_HELPER" | "NONE";
     last_report_age_ms?: number;
     unknown_reason?: string;
+    reporter?: ReporterInfo;
+    competing_reports?: number;
   };
   storage: { persistent: boolean; schema_version: number; recovered: boolean };
   clock_adjusted_today: boolean;

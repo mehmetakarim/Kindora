@@ -5,7 +5,7 @@
 
 use crate::auth::{Authorizer, DenyReason};
 use crate::handler::{Disposition, SessionHandler};
-use crate::{AgentState, ConnectionLimits};
+use crate::{AgentState, ClientInfo, ConnectionLimits};
 use ipc_protocol::frame::{read_frame, write_frame, FrameError};
 use ipc_protocol::transport::PeerIdentity;
 use ipc_protocol::{ErrorCode, Response};
@@ -57,7 +57,12 @@ pub fn serve_connection<S: Read + Write>(
     }
 
     let _guard = state.register_client();
-    let mut handler = SessionHandler::new(limits.clone()).with_client_session(peer.session_id);
+    let connection_id = state.next_connection_id();
+    let mut handler = SessionHandler::new(limits.clone()).with_client(ClientInfo {
+        connection_id,
+        session_id: peer.session_id,
+        pid: peer.pid,
+    });
     let mut requests = 0u64;
     let mut last_activity = Instant::now();
 
@@ -94,6 +99,11 @@ pub fn serve_connection<S: Read + Write>(
             }
         }
     };
+
+    // Raporlayıcı bu bağlantıysa yeri hemen boşalır (P1.D tek raporlayıcı).
+    if let Some(st) = state.screen_time() {
+        st.connection_closed(connection_id);
+    }
 
     ConnectionReport {
         outcome,
@@ -262,6 +272,76 @@ mod tests {
             h.server.join().unwrap().outcome,
             ConnectionOutcome::TooManyErrors
         );
+    }
+
+    #[derive(Debug, Default)]
+    struct Recorder {
+        reports: std::sync::Mutex<Vec<crate::ClientInfo>>,
+        closed: std::sync::Mutex<Vec<u64>>,
+    }
+
+    impl crate::ScreenTimeService for Recorder {
+        fn report_activity(
+            &self,
+            client: &crate::ClientInfo,
+            _r: ipc_protocol::ActivityReport,
+        ) -> bool {
+            self.reports.lock().unwrap().push(*client);
+            true
+        }
+        fn connection_closed(&self, id: u64) {
+            self.closed.lock().unwrap().push(id);
+        }
+        fn status(&self) -> Option<ipc_protocol::ScreenTimeStatus> {
+            None
+        }
+        fn health(&self) -> Vec<ipc_protocol::HealthCheckResult> {
+            vec![]
+        }
+    }
+
+    #[test]
+    fn reports_carry_unique_connection_ids_and_close_is_signalled() {
+        // P1.D: her bağlantı agent'tan benzersiz kimlik alır (PID değil);
+        // bağlantı bitince motor haberdar edilir (raporlayıcı yeri boşalır).
+        let rec = Arc::new(Recorder::default());
+        let state = Arc::new(AgentState::new(RunMode::Console).with_screen_time(rec.clone()));
+        let mut ids = vec![];
+        for n in 0..2 {
+            let (mut client, mut server) = UnixStream::pair().unwrap();
+            server.set_read_timeout(Some(POLL)).unwrap();
+            let st = state.clone();
+            let p = PeerIdentity {
+                uid: Some(7),
+                pid: Some(4242),
+                session_id: Some(1),
+                ..Default::default()
+            };
+            let sd = Arc::new(AtomicBool::new(false));
+            let t = thread::spawn(move || {
+                serve_connection(&mut server, &p, &st, &uid_policy(7), &limits(), &sd)
+            });
+            let body = serde_json::to_vec(&Request::report_activity(
+                format!("r-{n}"),
+                ipc_protocol::ActivityReport {
+                    idle_ms: Some(1),
+                    kind: None,
+                },
+            ))
+            .unwrap();
+            let r = send(&mut client, &body);
+            assert_eq!(r.status, ResponseStatus::Ok);
+            drop(client);
+            assert_eq!(t.join().unwrap().outcome, ConnectionOutcome::PeerClosed);
+            let last = *rec.reports.lock().unwrap().last().unwrap();
+            assert_eq!((last.session_id, last.pid), (Some(1), Some(4242)));
+            ids.push(last.connection_id);
+        }
+        assert_ne!(
+            ids[0], ids[1],
+            "aynı PID'den gelse de bağlantı kimlikleri farklı"
+        );
+        assert_eq!(*rec.closed.lock().unwrap(), ids);
     }
 
     #[test]

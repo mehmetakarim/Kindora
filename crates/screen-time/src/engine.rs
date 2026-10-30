@@ -136,6 +136,8 @@ impl Engine {
                 source: MeasurementSource::None,
                 last_report_age_ms: None,
                 unknown_reason: Some("STARTING".into()),
+                reporter: None,
+                competing_reports: 0,
             },
             storage,
             limit_announced: today.active_ms >= limit_ms,

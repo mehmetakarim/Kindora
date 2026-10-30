@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import {
+  backgroundText,
   formatLastSuccess,
   formatMinutes,
   policyText,
@@ -65,6 +66,7 @@ const low = computed(
       <p class="kd-today__meta" data-testid="last-measured">
         Son ölçüm: {{ formatLastSuccess(status.computed_at_ms, now) }}
       </p>
+      <p class="kd-today__meta" data-testid="background">{{ backgroundText(status) }}</p>
     </template>
     <p v-else class="kd-today__empty" data-testid="usage-unavailable">
       Bağlantı yok — Kindora Agent'a ulaşılamadığı için kullanım süresi gösterilemiyor.

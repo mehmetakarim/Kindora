@@ -96,6 +96,48 @@ pub struct ActivityReport {
     /// Alan zorunludur; ölçüm yoksa açıkça `null` gönderilir.
     #[serde(deserialize_with = "required_option")]
     pub idle_ms: Option<u64>,
+    /// Raporlayıcının rolü (P1.D, ADR-0015). Yetki **vermez**: agent'ı
+    /// yalnız aynı oturumdaki yetkili helper'lar arasında tek raporlayıcı
+    /// seçerken önceliklendirmede kullanır. Eski helper'lar göndermez.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<ReporterKind>,
+}
+
+/// Etkinlik raporlayıcısının rolü ve başlatılma yolu (P1.D).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ReporterKind {
+    /// Bağımsız arka plan helper'ı; Windows oturum açılışı görevi başlattı.
+    BackgroundLogonTask,
+    /// Bağımsız arka plan helper'ı; elle başlatıldı (`kindora-helper activity`).
+    BackgroundManual,
+    /// Masaüstü köprüsü (`bridge`): yalnız arka plan helper'ı yokken yedek.
+    DesktopBridge,
+    /// Tek seferlik `report-activity` (tanılama / test).
+    OneShot,
+}
+
+impl ReporterKind {
+    /// Tek raporlayıcı seçiminde öncelik: arka plan helper'ı köprüden önce gelir.
+    pub fn priority(kind: Option<ReporterKind>) -> u8 {
+        match kind {
+            Some(ReporterKind::BackgroundLogonTask | ReporterKind::BackgroundManual) => 2,
+            _ => 1,
+        }
+    }
+
+    pub fn is_background(kind: Option<ReporterKind>) -> bool {
+        Self::priority(kind) == 2
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ReporterKind::BackgroundLogonTask => "BACKGROUND_LOGON_TASK",
+            ReporterKind::BackgroundManual => "BACKGROUND_MANUAL",
+            ReporterKind::DesktopBridge => "DESKTOP_BRIDGE",
+            ReporterKind::OneShot => "ONE_SHOT",
+        }
+    }
 }
 
 fn required_option<'de, D, T>(d: D) -> Result<Option<T>, D::Error>
@@ -282,6 +324,27 @@ pub struct MeasurementInfo {
     /// `UNKNOWN` durumunun nedeni (ör. `NO_HELPER`, `IDLE_API_FAILED`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unknown_reason: Option<String>,
+    /// Agent'ın kabul ettiği tek etkinlik raporlayıcısı (P1.D). `None`: yok.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reporter: Option<ReporterInfo>,
+    /// Agent başladığından beri reddedilen ikinci raporlayıcı raporları.
+    #[serde(default)]
+    pub competing_reports: u64,
+}
+
+/// Kabul edilen raporlayıcının tanılama bilgisi. Kimlik bilgileri işletim
+/// sisteminden (oturum, PID); `kind` helper'ın kendi beyanıdır.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReporterInfo {
+    /// `None`: eski helper rolünü bildirmedi.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<ReporterKind>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pid: Option<u32>,
+    /// Bu raporlayıcının kabul edildiği an (Unix ms; son (yeniden) bağlantı).
+    pub since_ms: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -510,17 +573,27 @@ mod tests {
             "r-1",
             ActivityReport {
                 idle_ms: Some(1500),
+                kind: Some(ReporterKind::BackgroundLogonTask),
             },
         );
         assert_eq!(
             decode_request(&serde_json::to_vec(&ok).unwrap()).unwrap(),
             ok
         );
-        let unmeasured = Request::report_activity("r-2", ActivityReport { idle_ms: None });
+        let unmeasured = Request::report_activity(
+            "r-2",
+            ActivityReport {
+                idle_ms: None,
+                kind: None,
+            },
+        );
         let json = serde_json::to_vec(&unmeasured).unwrap();
         assert_eq!(
             decode_request(&json).unwrap().activity,
-            Some(ActivityReport { idle_ms: None })
+            Some(ActivityReport {
+                idle_ms: None,
+                kind: None
+            })
         );
 
         let bad = [
@@ -530,6 +603,9 @@ mod tests {
             serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "PING", "timestamp_ms": 1, "activity": {"idle_ms": 1}}),
             // içerik taşımaya çalışan ek alan
             serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": 1, "keys": "abc"}}),
+            // bilinmeyen rol / rol yerine serbest metin
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": 1, "kind": "ADMIN"}}),
+            serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": 1, "kind": {"role": "x"}}}),
             serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": -1}}),
             serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {"idle_ms": MAX_IDLE_MS + 1}}),
             serde_json::json!({"protocol_version": 1, "message_id": "a", "command": "REPORT_ACTIVITY", "timestamp_ms": 1, "activity": {}}),

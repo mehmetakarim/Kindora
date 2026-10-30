@@ -11,20 +11,34 @@ pub mod connection;
 pub mod handler;
 
 use ipc_protocol::{ActivityReport, HealthCheckResult, RunMode, ScreenTimeStatus};
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 pub const AGENT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-/// Kullanım süresi motoruna agent çekirdeğinden erişim (P1.C, ADR-0014).
+/// Raporu gönderen bağlantının işletim sisteminden ve agent'tan gelen kimliği.
+/// Mesaj gövdesindeki hiçbir alan buraya girmez.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct ClientInfo {
+    /// Agent'ın bu süreç ömründe her bağlantıya verdiği benzersiz sayı (PID değil).
+    pub connection_id: u64,
+    /// İstemci sürecin Windows oturumu.
+    pub session_id: Option<u32>,
+    /// Yalnız tanılama; yetkilendirmede kullanılmaz.
+    pub pid: Option<u32>,
+}
+
+/// Kullanım süresi motoruna agent çekirdeğinden erişim (P1.C ADR-0014, P1.D ADR-0015).
 ///
-/// Yalnız iki işlem vardır: helper'ın etkinlik raporunu iletmek ve durumu
-/// okumak. Kural değiştirme veya kısıtlama uygulama işlemi **yoktur**.
+/// İşlemler: helper'ın etkinlik raporunu iletmek, bağlantının bittiğini
+/// bildirmek ve durumu okumak. Kural değiştirme veya kısıtlama uygulama
+/// işlemi **yoktur**.
 pub trait ScreenTimeService: Send + Sync + std::fmt::Debug {
-    /// `client_session`: raporu gönderen sürecin Windows oturumu (işletim
-    /// sisteminden). Dönüş: rapor sayıma girdi mi.
-    fn report_activity(&self, client_session: Option<u32>, report: ActivityReport) -> bool;
+    /// Dönüş: rapor kabul edildi mi (etkin konsol oturumu ve tek raporlayıcı kuralı).
+    fn report_activity(&self, client: &ClientInfo, report: ActivityReport) -> bool;
+    /// Bağlantı kapandı; bu bağlantı raporlayıcıysa yeri boşalır.
+    fn connection_closed(&self, _connection_id: u64) {}
     fn status(&self) -> Option<ScreenTimeStatus>;
     /// Sağlık denetimine eklenecek satırlar (motor, depolama).
     fn health(&self) -> Vec<HealthCheckResult>;
@@ -36,6 +50,7 @@ pub struct AgentState {
     pub run_mode: RunMode,
     started: Instant,
     connected: AtomicU32,
+    next_connection: AtomicU64,
     screen_time: Option<Arc<dyn ScreenTimeService>>,
 }
 
@@ -45,6 +60,7 @@ impl AgentState {
             run_mode,
             started: Instant::now(),
             connected: AtomicU32::new(0),
+            next_connection: AtomicU64::new(1),
             screen_time: None,
         }
     }
@@ -64,6 +80,11 @@ impl AgentState {
 
     pub fn connected_clients(&self) -> u32 {
         self.connected.load(Ordering::SeqCst)
+    }
+
+    /// Yeni bağlantı kimliği (1'den başlar, tekrar etmez).
+    pub fn next_connection_id(&self) -> u64 {
+        self.next_connection.fetch_add(1, Ordering::SeqCst)
     }
 
     /// Yetkilendirilmiş bağlantı sayacı; `Drop` ile azalır.

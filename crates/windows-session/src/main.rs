@@ -1,18 +1,25 @@
-use ipc_protocol::{CommandType, ResponseStatus};
+use ipc_protocol::{CommandType, ReporterKind, ResponseStatus};
+use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 use windows_session::{
-    log_event, run_bridge, run_helper, write_bridge_event, Client, HelperConfig,
+    default_activity_log, instance, log_event, run_activity, run_bridge, set_log_file,
+    write_bridge_event, Client, HelperConfig, RunMarker,
 };
 
 const USAGE: &str = "\
-Kindora Session Helper (P1.C önizleme — kısıtlama arayüzü yok)
+Kindora Session Helper (P1.D önizleme — kısıtlama arayüzü yok)
 
 Kullanım:
-  kindora-helper run [--heartbeat-ms N] [--socket PATH]
-      Agent'a bağlanır, kalp atışı gönderir; Ctrl+C ile kapanır.
+  kindora-helper activity [--launch logon-task|manual] [--interval-ms N]
+                          [--log-file PATH] [--socket PATH]
+      Bağımsız arka plan raporlayıcısı: bu oturumun son girdiden bu yana
+      geçen süresini agent'a bildirir. Oturum başına tek örnek; ikincisi
+      hemen çıkar (kod 0). Masaüstü uygulamasından bağımsızdır. Ctrl+C veya
+      Windows oturumunun kapanmasıyla temiz çıkar. `run` eski adıdır.
+      Windows kaydı: %LOCALAPPDATA%\\Kindora\\helper\\activity.log
   kindora-helper bridge [--socket PATH]
       Masaüstü uygulamasının alt süreci: stdin'den JSON istek satırları
       (yalnız op=refresh) okur, stdout'a agent durumunu JSON satırları olarak yazar; stdin
@@ -27,22 +34,97 @@ Kullanım:
   --socket yalnız Unix geliştirme taşımasında geçerlidir.
 ";
 
-fn parse(args: &[String]) -> Result<HelperConfig, String> {
+struct Args {
+    cfg: HelperConfig,
+    log_file: Option<PathBuf>,
+}
+
+fn parse(args: &[String]) -> Result<Args, String> {
     let mut cfg = HelperConfig::default();
+    let mut log_file = None;
     let mut it = args.iter();
     while let Some(a) = it.next() {
         let mut value = || it.next().ok_or_else(|| format!("{a} için değer eksik"));
         match a.as_str() {
-            "--heartbeat-ms" => {
-                let ms: u64 = value()?.parse().map_err(|_| "geçersiz --heartbeat-ms")?;
+            "--heartbeat-ms" | "--interval-ms" => {
+                let ms: u64 = value()?.parse().map_err(|_| format!("geçersiz {a}"))?;
                 cfg.heartbeat_interval = Duration::from_millis(ms.max(50));
             }
+            "--launch" => {
+                cfg.reporter_kind = match value()?.as_str() {
+                    "logon-task" => ReporterKind::BackgroundLogonTask,
+                    "manual" => ReporterKind::BackgroundManual,
+                    other => return Err(format!("geçersiz --launch: {other}")),
+                }
+            }
+            "--log-file" => log_file = Some(PathBuf::from(value()?)),
             #[cfg(unix)]
             "--socket" => cfg.socket_path = value()?.into(),
             other => return Err(format!("bilinmeyen argüman: {other}")),
         }
     }
-    Ok(cfg)
+    Ok(Args { cfg, log_file })
+}
+
+/// Arka plan raporlayıcısı. Çıkış: 0 (temiz / zaten çalışıyor), 1 (kilit hatası).
+fn activity(mut cfg: HelperConfig, log_file: Option<PathBuf>) -> ExitCode {
+    if !ReporterKind::is_background(Some(cfg.reporter_kind)) {
+        cfg.reporter_kind = ReporterKind::BackgroundManual;
+    }
+    let log_file = log_file.or_else(default_activity_log);
+    if let Some(path) = &log_file {
+        if let Err(e) = set_log_file(path) {
+            eprintln!("kayıt dosyası açılamadı ({}): {e}", path.display());
+        }
+    }
+    let _guard = match instance::acquire(&cfg) {
+        Ok(Some(g)) => g,
+        Ok(None) => {
+            log_event(
+                "already_running",
+                &[
+                    ("pid", std::process::id().to_string()),
+                    ("kind", cfg.reporter_kind.as_str().into()),
+                ],
+            );
+            return ExitCode::SUCCESS;
+        }
+        Err(e) => {
+            log_event("instance_lock_failed", &[("error", e.to_string())]);
+            return ExitCode::from(1);
+        }
+    };
+    let (marker, previous) = match &log_file {
+        Some(p) => RunMarker::create(p),
+        None => (None, None),
+    };
+    if let Some(prev) = previous {
+        // Önceki örnek sonlandırıldı veya çöktü (temiz çıkış izini silemedi).
+        log_event(
+            "previous_exit",
+            &[("state", "unclean".into()), ("previous", prev)],
+        );
+    }
+
+    let shutdown = Arc::new(AtomicBool::new(false));
+    let stopped = Arc::new(AtomicBool::new(false));
+    let flag = shutdown.clone();
+    if let Err(e) = ctrlc::set_handler(move || {
+        log_event("shutdown_requested", &[("source", "ctrl_c".into())]);
+        flag.store(true, Ordering::SeqCst);
+    }) {
+        log_event("ctrl_c_handler_failed", &[("error", e.to_string())]);
+    }
+    #[cfg(windows)]
+    if let Err(e) = windows_session::session_end::watch(shutdown.clone(), stopped.clone()) {
+        log_event("session_end_watch_failed", &[("error", e.to_string())]);
+    }
+    run_activity(&cfg, &shutdown);
+    if let Some(m) = marker {
+        m.clear();
+    }
+    stopped.store(true, Ordering::SeqCst);
+    ExitCode::SUCCESS
 }
 
 fn one_shot(cfg: &HelperConfig, command: CommandType) -> ExitCode {
@@ -117,8 +199,8 @@ fn main() -> ExitCode {
         eprintln!("{USAGE}");
         return ExitCode::from(2);
     };
-    let cfg = match parse(&args[1..]) {
-        Ok(c) => c,
+    let Args { mut cfg, log_file } = match parse(&args[1..]) {
+        Ok(a) => a,
         Err(e) => {
             eprintln!("{e}\n\n{USAGE}");
             return ExitCode::from(2);
@@ -131,20 +213,12 @@ fn main() -> ExitCode {
         log_event("process_query_grant_failed", &[("error", e.to_string())]);
     }
     match cmd {
-        "run" => {
-            let shutdown = Arc::new(AtomicBool::new(false));
-            let flag = shutdown.clone();
-            if let Err(e) = ctrlc::set_handler(move || {
-                log_event("shutdown_requested", &[("source", "ctrl_c".into())]);
-                flag.store(true, Ordering::SeqCst);
-            }) {
-                eprintln!("Ctrl+C işleyicisi kurulamadı: {e}");
-                return ExitCode::FAILURE;
-            }
-            run_helper(&cfg, &shutdown);
-            ExitCode::SUCCESS
+        "activity" | "run" => activity(cfg, log_file),
+        "bridge" => {
+            // Köprü yalnız yedek raporlayıcıdır; agent arka plan helper'ını önceler.
+            cfg.reporter_kind = ReporterKind::DesktopBridge;
+            bridge(&cfg)
         }
-        "bridge" => bridge(&cfg),
         "ping" => one_shot(&cfg, CommandType::Ping),
         "status" => one_shot(&cfg, CommandType::GetStatus),
         "health" => one_shot(&cfg, CommandType::HealthCheck),

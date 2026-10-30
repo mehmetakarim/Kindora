@@ -2,12 +2,14 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import App from "../App.vue";
 import {
+  backgroundMeasurement,
   breakCountdown,
   filizLine,
   formatCountdown,
   formatMinutes,
   nextBreakText,
   policyText,
+  reporterText,
   usageTone,
   visibleNotice,
 } from "../agent/presentation";
@@ -108,6 +110,52 @@ describe("screen time presentation", () => {
     expect(visibleNotice(st, new Set(["b1-due"]))?.id).toBe("d-limit");
     expect(visibleNotice(st, new Set(["b1-due", "d-limit"]))).toBeNull();
     expect(visibleNotice(null, new Set())).toBeNull();
+  });
+});
+
+describe("background measurement (P1.D)", () => {
+  const withReporter = (kind?: string, extra = {}) =>
+    screenTime({
+      measurement: {
+        source: "SESSION_HELPER",
+        last_report_age_ms: 500,
+        reporter: { kind: kind as never, pid: 4242, session_id: 1, since_ms: 1_000, ...extra },
+        competing_reports: 3,
+      },
+    });
+
+  it("tells whether measurement survives closing the window", () => {
+    expect(backgroundMeasurement(withReporter("BACKGROUND_LOGON_TASK"))).toBe("on");
+    expect(backgroundMeasurement(withReporter("BACKGROUND_MANUAL"))).toBe("on");
+    expect(backgroundMeasurement(withReporter("DESKTOP_BRIDGE"))).toBe("windowOnly");
+    expect(backgroundMeasurement(withReporter(undefined))).toBe("windowOnly");
+    expect(backgroundMeasurement(screenTime())).toBe("none");
+  });
+
+  it("describes the single reporter with OS identity", () => {
+    expect(reporterText(withReporter("BACKGROUND_LOGON_TASK"))).toBe(
+      "Arka plan yardımcısı (oturum açılışı görevi) · PID 4242 · oturum 1",
+    );
+    expect(reporterText(screenTime())).toBe("Yok");
+  });
+
+  it("shows helper status on home and details in diagnostics", async () => {
+    const f = fakeSource(
+      connectedView({
+        screen_time: withReporter("BACKGROUND_LOGON_TASK", {}),
+      }),
+    );
+    const w = mount(App, { props: { source: f.source, motion: false }, attachTo: document.body });
+    await flushPromises();
+    expect(w.get('[data-testid="background"]').text()).toBe(tr.background.on);
+    await w.get('[data-testid="tab-diagnostics"]').trigger("click");
+    expect(w.get('[data-testid="diag-reporter"]').text()).toContain("oturum açılışı görevi");
+    expect(w.get('[data-testid="diag-competing"]').text()).toContain("3 rapor");
+    expect(w.get('[data-testid="diag-unknown"]').text()).not.toBe("");
+    f.push(connectedView({ screen_time: withReporter("DESKTOP_BRIDGE") }));
+    await flushPromises();
+    expect(w.get('[data-testid="diag-background"]').text()).toBe(tr.background.windowOnly);
+    w.unmount();
   });
 });
 

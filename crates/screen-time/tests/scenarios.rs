@@ -112,6 +112,8 @@ impl Sim {
             },
             last_report_age_ms: Some(500),
             unknown_reason: reason.map(str::to_owned),
+            reporter: None,
+            competing_reports: 0,
         };
         match user {
             User::Busy | User::Away => (
