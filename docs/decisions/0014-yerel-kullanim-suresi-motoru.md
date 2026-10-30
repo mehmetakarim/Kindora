@@ -1,7 +1,7 @@
 # ADR-0014 — Yerel kullanım süresi motoru: ölçüm agent'ta, sinyal helper'dan, kayıt SQLite'ta
 
 - **Tarih:** 2026-10-29
-- **Durum:** Önerildi (P1.C'de uygulandı; Lenovo kullanım süresi kabulü bekliyor)
+- **Durum:** Önerildi (P1.C'de uygulandı; Lenovo temel kullanım süresi kabulü PASS, 2026-10-30). "Yalnız masaüstü açıkken ölçüm" sınırlaması [ADR-0015](0015-bagimsiz-session-helper-ve-oturum-acilisi.md) ile kaldırıldı; ölçüm modeli değişmedi.
 - **Karar türü:** Teknik uygulama yöntemi
 - **İlgili belgeler:** [P1.C raporu](../screen-time/p1c-screen-time.md), [ADR-0002](0002-supabase-sqlite-gorev-ayrimi.md), [ADR-0006](0006-agent-surec-ve-hesap-modeli.md), [ADR-0012](0012-mevcut-windows-hesabinda-calisma.md), [ADR-0013](0013-masaustu-kabugu-helper-koprusu.md), [T0-D](../feasibility/T0-D-offline-policy.md)
 

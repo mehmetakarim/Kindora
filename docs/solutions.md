@@ -108,3 +108,34 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
   - `windows-agent` ve `screen-time`'ın Windows kodu (`platform.rs`) yalnız Windows CI'da (`windows-2022`, MSVC) derlenir ve test edilir.
 - **Doğrulama yöntemi:** P1.C commit'inin `windows-p1c` çalıştırmasında `cargo build/test/clippy --workspace`.
 - **İlgili görev, dosya veya commit:** TASK-008; `Cargo.toml` (`rusqlite` bundled), `crates/windows-agent/src/platform.rs`.
+
+### NOTE-007 — `windows-sys` `WNDCLASSW` / `RegisterClassW` için `Win32_Graphics_Gdi` özelliği gerekir
+
+- **Belirti:** P1.D'de oturum sonu penceresi (`crates/windows-session/src/session_end.rs`) Windows hedefli clippy'de `no RegisterClassW / WNDCLASSW in Win32::UI::WindowsAndMessaging` hatası verdi.
+- **Kök neden:** `windows-sys` 0.61'de bu öğeler `#[cfg(feature = "Win32_Graphics_Gdi")]` arkasındadır (`HBRUSH` alanı). Yalnız `Win32_UI_WindowsAndMessaging` yetmez.
+- **Uygulanan çözüm:** Kök `Cargo.toml` `windows-sys` özelliklerine `Win32_Graphics_Gdi`, `Win32_UI_WindowsAndMessaging` ve `Win32_System_LibraryLoader` eklendi.
+- **Doğrulama yöntemi:** macOS'ta `cargo clippy -p windows-session --target x86_64-pc-windows-msvc --all-targets -- -D warnings` PASS; Windows CI'da `session_end` testi gerçek `WM_ENDSESSION` iletisiyle.
+- **İlgili görev, dosya veya commit:** TASK-009; `Cargo.toml`, `crates/windows-session/src/session_end.rs`.
+
+### NOTE-008 — Lenovo'da uyku süresi "uyku" değil "ölçülemeyen" sayıldı (P1.C C-08)
+
+- **Belirti:** `p1c-windows-test.1` Lenovo testinde Windows uykusundan sonra uyku sayacı 0 kaldı, ölçülemeyen süre arttı; aktif süre artmadı.
+- **Ortaya çıktığı koşul:** Gerçek Lenovo dizüstü, Başlat → Güç → Uyku. Model, Windows sürümü ve Modern Standby (S0ix) olup olmadığı raporlanmadı.
+- **Kök neden:** **Doğrulanmadı.** Olası nedenler [Çıkarım]:
+  - Servise `PBT_APMSUSPEND` / `PBT_APMRESUMEAUTOMATIC` gelmedi (Modern Standby'da beklenen davranış olabilir).
+  - Agent döngüsü uyku boyunca kesilmeden işledi; helper raporu eskidi (`STALE_REPORT`).
+  - Monoton saat uykuda ilerlemedi; aralık 5 sn'yi aşınca `UNKNOWN` yazıldı.
+- **Uygulanan çözüm:** Davranış güvenli yönde (aktif sayılmıyor) ve README C-08 bunu kabul ediyor. P1.D'de doğrulanamayan uyku zorla `SUSPENDED` yapılmadı. Agent artık pil durumu değişimi dışındaki bütün `POWER_EVENT` türlerini `event=power_event event=… applied=…` olarak kaydeder.
+- **Doğrulama yöntemi:** P1.D Lenovo D-11 (isteğe bağlı): uyku sonrası agent kaydındaki `power_event` satırları ve tanılamadaki ölçülemeyen nedeni.
+- **İlgili görev, dosya veya commit:** TASK-008, TASK-009; `crates/windows-agent/src/service.rs`.
+
+### NOTE-009 — `Export-ScheduledTask` varsayılan değerleri yazmaz; görev denetimi nesne özellikleriyle yapılır
+
+- **Belirti:** P1.D ilk CI çalıştırmasında ([41043545839](https://github.com/mehmetakarim/Kindora/actions/runs/41043545839)) kurulum, görev ve helper başlatma başarılı oldu. Buna rağmen `task: LeastPrivilege + InteractiveToken` denetimi başarısız oldu.
+- **Kök neden:** Dışa aktarılan XML, varsayılan olan `<RunLevel>LeastPrivilege</RunLevel>` gibi öğeleri içermiyor. Boş alan, beklenen değerle karşılaştırılınca hata verdi.
+- **Uygulanan çözüm:** `ci/p1d-background-e2e.ps1` görevi `Get-ScheduledTask` nesnesinden denetler: `Principal.RunLevel=Limited`, `LogonType=Interactive`, `Settings.*`, tetikleyici sınıfları ve `Actions`.
+- **Aynı incelemede düzeltilen tasarım açığı [Çıkarım]:**
+  - Oturum açılışı tetikleyicisinin tekrarı (`Repetition`) yalnız tetikleyici gerçekten ateşlenince başlar. Kurulumdan veya elle başlatmadan sonra çöken helper, bir sonraki oturum açılışına kadar yeniden başlatılmazdı.
+  - Yeniden denetim ayrı bir zaman tetikleyicisine taşındı. Kurulum ve kaldırma, süreçleri sonlandırmadan önce görevi durdurur (`Stop-ScheduledTask`); böylece `IgnoreNew` yeni örneği engellemez.
+- **Doğrulama yöntemi:** `windows-p1d` CI §4 (helper sonlandırılır → zaman tetikleyicisi yeniden başlatır).
+- **İlgili görev, dosya veya commit:** TASK-009; `packaging/p1d/install-kindora-test.ps1`, `ci/p1d-background-e2e.ps1`.

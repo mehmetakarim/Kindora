@@ -45,6 +45,7 @@ if ($DeleteData -and -not $Yes) {
 # 1. Logon tasks (first, so nothing restarts the helper).
 $tasks = @(Get-ScheduledTask -TaskPath $taskPath -ErrorAction SilentlyContinue)
 foreach ($t in $tasks) {
+    Stop-ScheduledTask -TaskPath $taskPath -TaskName $t.TaskName -ErrorAction SilentlyContinue
     Unregister-ScheduledTask -TaskPath $taskPath -TaskName $t.TaskName -Confirm:$false
     Say "Gorev kaldirildi: $taskPath$($t.TaskName)"
 }

@@ -9,8 +9,9 @@
 #   - ONLY with -EnableHelperAutostart: a per-user Task Scheduler task
 #     \Kindora\SessionHelper-<SID> that starts "kindora-helper.exe activity"
 #     at logon of that user, without administrator rights (LeastPrivilege),
-#     hidden (conhost --headless), and re-checks every N minutes (a running
-#     helper is never duplicated: IgnoreNew + per-session single instance).
+#     hidden (conhost --headless), and re-checks every N minutes with a time
+#     trigger while the user is logged on (a running helper is never
+#     duplicated: IgnoreNew + per-session single instance).
 #
 # Never touches: the screen time database (LocalService profile), the DEV
 # policy file, other services, other tasks, Windows accounts or security
@@ -62,6 +63,9 @@ if ($EnableHelperAutostart) {
 }
 
 # --- Stop running Kindora processes from this install dir only ---------------
+# Stop the task first so its host process (conhost) does not keep the task
+# "running" and block the restart below (IgnoreNew).
+Get-ScheduledTask -TaskPath $taskPath -ErrorAction SilentlyContinue | Stop-ScheduledTask -ErrorAction SilentlyContinue
 $running = @(Get-CimInstance Win32_Process -Filter "Name='kindora-helper.exe' OR Name='kindora-desktop.exe'" |
     Where-Object { $_.ExecutablePath -and $_.ExecutablePath.StartsWith($dir + '\', [StringComparison]::OrdinalIgnoreCase) })
 foreach ($p in $running) {
@@ -122,6 +126,11 @@ $taskName = "SessionHelper-$sid"
 if ($EnableHelperAutostart) {
     $conhost = Join-Path $env:SystemRoot 'System32\conhost.exe'
     $esc = [Security.SecurityElement]
+    # Re-check trigger: a time trigger repeats on its own schedule, so a crashed
+    # helper is restarted even before the next logon (a logon trigger's
+    # repetition only starts after a real logon). Runs only while the user is
+    # logged on (InteractiveToken); IgnoreNew + the helper mutex prevent copies.
+    $start = (Get-Date).AddMinutes(1).ToString('yyyy-MM-ddTHH:mm:ss')
     $xml = @"
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
@@ -133,11 +142,15 @@ if ($EnableHelperAutostart) {
     <LogonTrigger>
       <Enabled>true</Enabled>
       <UserId>$sid</UserId>
+    </LogonTrigger>
+    <TimeTrigger>
+      <Enabled>true</Enabled>
+      <StartBoundary>$start</StartBoundary>
       <Repetition>
         <Interval>PT$($HelperRepeatMinutes)M</Interval>
         <StopAtDurationEnd>false</StopAtDurationEnd>
       </Repetition>
-    </LogonTrigger>
+    </TimeTrigger>
   </Triggers>
   <Principals>
     <Principal id="Author">

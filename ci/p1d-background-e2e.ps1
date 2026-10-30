@@ -100,15 +100,21 @@ try {
     $task = @(Get-ScheduledTask -TaskPath '\Kindora\')
     Assert-True ($task.Count -eq 1) 'one Kindora logon task'
     $taskName = $task[0].TaskName
-    $x = [xml](Export-ScheduledTask -TaskPath '\Kindora\' -TaskName $taskName)
-    $set = $x.Task.Settings
-    $pr = $x.Task.Principals.Principal
-    Assert-True ($pr.RunLevel -eq 'LeastPrivilege' -and $pr.LogonType -eq 'InteractiveToken') 'task: LeastPrivilege + InteractiveToken (no admin, no password)'
-    Assert-True ($set.DisallowStartIfOnBatteries -eq 'false' -and $set.StopIfGoingOnBatteries -eq 'false') 'task: runs on battery'
-    Assert-True ($set.ExecutionTimeLimit -eq 'PT0S' -and $set.MultipleInstancesPolicy -eq 'IgnoreNew') 'task: no time limit, IgnoreNew'
-    Assert-True ($x.Task.Triggers.LogonTrigger.Repetition.Interval -eq 'PT1M') 'task: logon trigger + 1 min re-check'
-    Assert-True ($x.Task.Actions.Exec.Arguments -match 'activity --launch logon-task') 'task action: helper activity --launch logon-task'
-    $summary.Add("P1D install: service AUTO_START + recovery restarts; logon task LeastPrivilege/InteractiveToken, battery-safe, PT0S, IgnoreNew")
+    # Task object properties (Export-ScheduledTask omits default values such as LeastPrivilege).
+    $t = $task[0]
+    Write-Host ("task principal: user={0} logon={1} runlevel={2}" -f $t.Principal.UserId, $t.Principal.LogonType, $t.Principal.RunLevel)
+    Write-Host ("task settings: batteries(disallow={0} stop={1}) limit={2} instances={3} priority={4}" -f $t.Settings.DisallowStartIfOnBatteries, $t.Settings.StopIfGoingOnBatteries, $t.Settings.ExecutionTimeLimit, $t.Settings.MultipleInstances, $t.Settings.Priority)
+    Assert-True ([string]$t.Principal.RunLevel -eq 'Limited' -and [string]$t.Principal.LogonType -eq 'Interactive') 'task: Limited run level + Interactive logon (no admin, no password)'
+    Assert-True (-not $t.Settings.DisallowStartIfOnBatteries -and -not $t.Settings.StopIfGoingOnBatteries) 'task: runs on battery'
+    Assert-True ($t.Settings.ExecutionTimeLimit -eq 'PT0S' -and [string]$t.Settings.MultipleInstances -eq 'IgnoreNew') 'task: no time limit, IgnoreNew'
+    $trg = @($t.Triggers)
+    $trg | ForEach-Object { Write-Host ("trigger {0} start={1} repeat={2}" -f $_.CimClass.CimClassName, $_.StartBoundary, $_.Repetition.Interval) }
+    $logon = @($trg | Where-Object { $_.CimClass.CimClassName -eq 'MSFT_TaskLogonTrigger' })
+    $timer = @($trg | Where-Object { $_.CimClass.CimClassName -eq 'MSFT_TaskTimeTrigger' })
+    Assert-True ($logon.Count -eq 1 -and $timer.Count -eq 1 -and $timer[0].Repetition.Interval -eq 'PT1M') 'task: logon trigger + time trigger re-check every 1 min'
+    Assert-True ([string]::IsNullOrEmpty($timer[0].Repetition.Duration)) 're-check repeats indefinitely'
+    Assert-True ($t.Actions[0].Execute -match 'conhost\.exe$' -and $t.Actions[0].Arguments -match '--headless .*activity --launch logon-task') 'task action: conhost --headless helper activity --launch logon-task'
+    $summary.Add("P1D install: service AUTO_START + recovery restarts; task: logon + 1 min time re-check, Limited/Interactive, battery-safe, PT0S, IgnoreNew, conhost --headless")
 
     Wait-Until { (Get-Helpers 'activity').Count -eq 1 } 30000 'task started the background helper'
     $bg = (Get-Helpers 'activity')[0]
@@ -163,6 +169,7 @@ try {
     Write-Host '== 3. Single reporter / single instance =='
     $sw = [Diagnostics.Stopwatch]::StartNew()
     $p2 = Start-Process -FilePath $helper -ArgumentList 'activity', '--launch', 'manual' -PassThru -WindowStyle Hidden
+    $null = $p2.Handle  # keeps ExitCode readable after exit (PowerShell quirk)
     Assert-True ($p2.WaitForExit(10000)) "second activity instance exits ($($sw.ElapsedMilliseconds) ms)"
     Assert-True ($p2.ExitCode -eq 0) 'second instance exit code 0'
     Wait-Until { (Count-HelperLog 'event=already_running') -ge 1 } 5000 'helper log: already_running'

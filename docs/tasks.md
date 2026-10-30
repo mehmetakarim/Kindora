@@ -23,10 +23,47 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 
 ## Aktif / son görevler
 
+### TASK-009 — P1.D: Bağımsız Session Helper ve güvenilir arka plan kullanım süresi
+
+- **Öncelik:** Yüksek
+- **Durum:** Devam ediyor. Kod, macOS testleri ve Windows CI tamam. **Kabul: CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
+- **Amaç ve kapsam:**
+  - Masaüstü kapalıyken de mevcut Windows oturumunda çalışan bağımsız helper ile kullanım süresi ölçümü.
+  - Oturum açılışında kontrollü başlatma; güvenli kurulum ve kaldırma.
+  - Kapsam dışı: zorunlu kilit, site engelleme, uygulama sonlandırma, uzaktan ebeveyn kontrolü.
+- **Kabul kriterleri:**
+  - [x] Helper masaüstünden bağımsız çalışıyor (`kindora-helper activity`; macOS e2e + CI).
+  - [x] Masaüstü kapalıyken kullanım süresi artıyor (macOS e2e; CI: enjekte girdiyle — sonuç §doğrulama).
+  - [x] Masaüstü tekrar açıldığında gerçek toplam gösteriliyor (agent'tan; CI).
+  - [x] Tek bir etkinlik raporlayıcısı kabul ediliyor:
+    - agent kiralaması; köprü, tek seferlik ve ikinci arka plan helper'ı reddedilir;
+    - oturum başına tek örnek.
+  - [x] Agent/helper yeniden bağlantısı çalışıyor (agent yeniden başlatma, helper sonlandırma ve görevle yeniden başlatma).
+  - [x] SQLite süreleri korunuyor (şema v1 değişmedi; yeniden kurulum ve kaldırma veriyi korur).
+  - [x] Windows oturum başlangıcıyla helper kontrollü açılıyor. Kullanıcı başına Zamanlanmış Görev; CI'da görev elle tetiklendi; **gerçek oturum açılışı NOT RUN**.
+  - [x] Kurulum ve kaldırma güvenli: idempotent; yalnız Kindora kayıtları; kendini yükseltmez; veri yalnız onayla silinir; 1060 doğrulaması.
+  - [x] P1.A/B/C testleri bozulmuyor (`windows-p1a/b/c` + P1A-C betiği p1d iş akışında).
+  - [x] IPC güvenliği korunuyor (yeni komut yok; helper politikası ve BUG-003 ACE düzeltmesi değişmedi).
+  - [ ] Windows CI başarılı — bekleniyor.
+  - [ ] Prerelease ve checksum yayımlanıyor.
+  - [ ] **Lenovo arka plan ölçümü kabulü (D-01…D-10)** — bekliyor.
+- **Bağımlılıklar:** TASK-008.
+- **İlgili dosyalar:**
+  - `crates/windows-session/src/{lib,main,instance,session_end}.rs`
+  - `crates/windows-agent/src/{screen_time,service}.rs`, `crates/windows-agent/tests/background_helper_e2e.rs`
+  - `crates/agent-core/src/{lib,handler,connection}.rs`, `crates/ipc-protocol/src/message.rs`
+  - `apps/desktop/src/` (raporlayıcı tanılaması)
+  - `packaging/p1d/`, `ci/p1d-background-e2e.ps1`, `.github/workflows/windows-p1d.yml`
+  - Rapor: [background/p1d-background-helper.md](background/p1d-background-helper.md); karar: [ADR-0015](decisions/0015-bagimsiz-session-helper-ve-oturum-acilisi.md)
+- **Doğrulama sonucu:**
+  - **macOS:** kök Rust testleri, masaüstü Rust 14, Vitest 42; fmt, clippy (macOS + SQLite'sız crate'ler için Windows hedefi), ESLint, Prettier, vue-tsc — PASS. Ayrıntı: [rapor §6](background/p1d-background-helper.md#6-macos-testleri-2026-10-30).
+  - **Windows CI:** bekleniyor.
+- **Yayın durumu:** Henüz yayımlanmadı.
+
 ### TASK-008 — P1.C: Yerel kullanım süresi motoru ve Filiz mola deneyimi
 
 - **Öncelik:** Yüksek
-- **Durum:** Devam ediyor. Kod, macOS ve Windows CI testleri tamam; prerelease yayımlandı. **Kabul: CONDITIONAL PASS — Pending Lenovo Screen Time Acceptance.**
+- **Durum:** Tamamlandı. **Kabul edildi — Lenovo temel kullanım süresi kabulü PASS** (kullanıcı raporu, P1.D mesajı, 2026-10-30).
 - **Amaç ve kapsam:** Gerçek kullanım süresi ölçümü (ACTIVE/IDLE/SESSION_LOCKED/SUSPENDED/UNKNOWN), yerel SQLite, agent tarafında doğrulanan yerel kurallar (DEV test dosyası), Filiz mola hatırlatmaları. Kapsam dışı: kilit, program kapatma, internet/erişim engelleme, ebeveyn yetkilendirmesi, ayrı widget penceresi.
 - **Kabul kriterleri:**
   - [x] Aktif ve boşta kalma ayrımı çalışıyor (benzetim testleri; CI'da gerçek `GetLastInputInfo` → `ACTIVE`).
@@ -42,7 +79,13 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - [x] P1.A ve P1.B regresyonu geçiyor (`windows-p1a`, `windows-p1b` PASS).
   - [x] Windows CI başarılı.
   - [x] Prerelease yayımlandı.
-  - [ ] **Lenovo kullanım süresi kabulü (C-01…C-11)** — bekliyor: gerçek kullanıcı etkinliği, Win+L, uyku/uyanma, mola akışı, servis yeniden başlatma, limit, %125/%150.
+  - [x] **Lenovo kullanım süresi kabulü** (`p1c-windows-test.1`, kullanıcı raporu):
+    - C-01…C-10 temel kabul PASS.
+    - C-11 (isteğe bağlı, bozuk kural) NOT RUN.
+    - Windows uyku testinde uyku sayacı 0 kaldı, **ölçülemeyen** süre arttı; aktif süre artmadı. README C-08 bunu kabul ediyor ("uyku veya ölçülemeyen"). Neden doğrulanmadı: güç olayı gelmemiş veya helper raporu eskimiş olabilir. P1.D'de bütün güç olayları agent kaydına yazılır.
+    - Agent yeniden başlatmasından sonra SQLite süreleri korundu.
+    - Agent servisi STOPPED; `sc delete` sonrası `1060` doğrulandı.
+    - Ayrı sonuç olarak raporlanmayanlar: %125/%150 ölçek.
 - **Bağımlılıklar:** TASK-007.
 - **İlgili dosyalar:** `crates/screen-time/`, `crates/windows-agent/src/{platform,screen_time,service}.rs`, `crates/windows-session/src/activity.rs`, `crates/ipc-protocol/src/{message,bridge}.rs`, `crates/agent-core/src/{lib,handler}.rs`, `apps/desktop/src/`, `ci/p1a-localservice-e2e.ps1` (`-ScreenTime`), `.github/workflows/windows-p1c.yml`, `packaging/p1c/README-TEST-TR.md`. Rapor: [screen-time/p1c-screen-time.md](screen-time/p1c-screen-time.md); karar: [ADR-0014](decisions/0014-yerel-kullanim-suresi-motoru.md).
 - **Doğrulama sonucu:**

@@ -78,6 +78,7 @@ Hafıza güncellemesi kendiliğinden **commit, push, deployment veya üretim ort
 - Flutter ve ebeveyn masaüstü uygulaması **aynı** backend yetkilendirme modelini, komut şemasını ve durum makinesini kullanır.
 - Yerel kurallar internet bağlantısı olmadan uygulanabilmelidir (SQLite).
 - Kullanım süresi agent'ta ölçülür ve SQLite'a yalnız agent yazar. Helper'dan gelen tek kullanıcı sinyali "son girdiden bu yana geçen süre"dir. Belirsiz süre (`UNKNOWN`, kilit, uyku) aktif sayılmaz. IPC'de kural yazma komutu yoktur; DEV politika dosyası üretim yetkilendirmesi değildir ([ADR-0014](docs/decisions/0014-yerel-kullanim-suresi-motoru.md)).
+- Etkinlik sinyalini masaüstünden bağımsız arka plan helper'ı (`kindora-helper activity`) gönderir; masaüstü köprüsü yalnız yedektir. Agent aynı anda tek raporlayıcı kabul eder; süre raporlardan değil agent döngüsünden sayılır. Helper oturum açılışında kullanıcı başına Zamanlanmış Görev ile yöneticisiz başlar; otomatik başlatma yalnız açık onayla kurulur, kurulum betikleri kendini yükseltmez ve veriyi onaysız silmez ([ADR-0015](docs/decisions/0015-bagimsiz-session-helper-ve-oturum-acilisi.md)).
 - Supabase cihazlar arası iletişim ve merkezi veri yönetimi için kullanılır; nihai yerel cihaz eyleminin yerine geçmez.
 
 ### 5.2 Kindora kullanım kilidi

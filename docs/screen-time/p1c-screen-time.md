@@ -1,6 +1,10 @@
 # P1.C — Yerel kullanım süresi motoru ve Filiz mola deneyimi
 
-> **Durum:** Kodlandı; macOS'ta ve GitHub Actions `windows-2022`'de test edildi. **Lenovo kullanım süresi kabulü bekliyor** (C-01…C-11).
+> **Durum:** Kabul edildi — **Lenovo temel kullanım süresi kabulü PASS** (2026-10-30, kullanıcı raporu).
+> - C-01…C-10 PASS; C-11 NOT RUN.
+> - Uyku testinde uyku 0, ölçülemeyen arttı; aktif artmadı.
+> - Agent yeniden başlatmasında süreler korundu; kaldırmada `1060` doğrulandı.
+> - Ayrıntı: [TASK-008](../tasks.md). Arka plan ölçümü: [P1.D](../background/p1d-background-helper.md).
 > Karar: [ADR-0014](../decisions/0014-yerel-kullanim-suresi-motoru.md). Görev: [TASK-008](../tasks.md).
 
 ## 1. Mimari
@@ -167,7 +171,7 @@ Lenovo testi: [packaging/p1c/README-TEST-TR.md](../../packaging/p1c/README-TEST-
 
 ## 11. Açık riskler ve P1.D bağımlılıkları
 
-- Helper yalnız masaüstü açıkken ölçer; kapalıyken süre `UNKNOWN` (eksik sayım). Oturum açılışında helper başlatma ve kurcalama tespiti (ADR-0006 M1/M2) — P1.D.
+- Helper yalnız masaüstü açıkken ölçer; kapalıyken süre `UNKNOWN` (eksik sayım). Oturum açılışında helper başlatma ve kurcalama tespiti (ADR-0006 M1/M2) — P1.D. **P1.D'de çözüldü:** bağımsız arka plan helper'ı ([ADR-0015](../decisions/0015-bagimsiz-session-helper-ve-oturum-acilisi.md)).
 - Kurallar yalnız DEV dosyasından; ebeveyn kimlik doğrulaması, eşleştirme ve sunucu yetkilendirmesi yok (ADR-0002/0008/0009).
 - Saat ileri alma / saat dilimi ile gün erken başlayabilir (kaydedilir, engellenmez); güvenilir zaman kaynağı yok.
 - Mola ve limit yalnız bilgilendirir; Kindora kullanım kilidi (ADR-0001) PoC'si yapılmadı.
