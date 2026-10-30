@@ -50,6 +50,10 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
     - **D-05 (helper sonlandırılınca yeniden başlama) kabulü bekliyor.**
       - İlk Lenovo denemesinde yeniden başlama gözlenmedi. Kontrolün `NextRunTime`'dan sonra yapıldığı doğrulanmadı.
       - P1.D.1 araştırması: CI'da gerçek 5 dk'lık zaman tetikleyicisi helper'ı yeniden başlattı (olay 107/129). `0x800710E0` = "örnek zaten çalışıyor" reddi (olay 322). Yazılım hatası bulunamadı ([NOTE-010](solutions.md)).
+      - CI kanıtı `2e340d3`:
+        - [p1d 41100377217](https://github.com/mehmetakarim/Kindora/actions/runs/41100377217) — PASS; p1a/p1b/p1c regresyonu da PASS.
+        - Akış: kill 17:53:48 → olay 107 17:58:13 → yeni helper. Olay 129'daki süreç yeni helper'ın üst süreci; olay 110 yok.
+        - Raporlayıcı `DESKTOP_BRIDGE` → `BACKGROUND_LOGON_TASK`. Günlük toplam 362 sn, kurulumdan beri geçen 364 sn'yi aşmadı.
       - Tekrar rehberi: [p1d-d05-retest-tr.md](background/p1d-d05-retest-tr.md). Yeni prerelease gerekmedi.
 - **Bağımlılıklar:** TASK-008.
 - **İlgili dosyalar:**
