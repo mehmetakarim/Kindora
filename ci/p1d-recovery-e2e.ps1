@@ -171,7 +171,11 @@ try {
     $launchPid = [int]([regex]::Match($launch[-1].Message, 'process ID (\d+)').Groups[1].Value)
     Write-Host "event 129 process id=$launchPid"
     Assert-True ($launchPid -eq [int]$new.ParentProcessId) 'new helper is the child of the process created by the trigger (conhost)'
-    Assert-True ($restartAt -ge $next.AddSeconds(-5)) 'restart happened at the scheduled time, not earlier'
+    # Get-ScheduledTaskInfo.NextRunTime was observed ~30 s off the real firing
+    # (event 107) on the runner; the event log is authoritative.
+    $fired = @($ev | Where-Object { $_.Id -eq 107 })[-1].TimeCreated
+    Write-Host "time trigger fired at $($fired.ToString('HH:mm:ss')) (NextRunTime reported $($next.ToString('HH:mm:ss')))"
+    Assert-True ($fired -gt $killAt -and [math]::Abs(($fired - $next).TotalSeconds) -le 60) 'restart by the scheduled firing that followed the kill (within 60 s of NextRunTime)'
 
     Write-Host '== 6. reporter, unclean exit, no double counting =='
     $script:after = $null

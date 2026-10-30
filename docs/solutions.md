@@ -171,6 +171,7 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
   - Lenovo gözleminin en olası açıklaması kontrolün `NextRunTime`'dan önce yapılmasıdır [Çıkarım; kanıtlanmadı].
   - Lenovo'da Görev Zamanlayıcısı Operational günlüğü varsayılan olarak kapalıdır; olay kanıtı yoktur.
 - **Bulunan yan hata (belge):** Belgeler `RestartOnFailure`'ın (1 dk × 3) ek güvence olduğunu söylüyordu. Sonlandırılan helper'da `conhost` 0 koduyla çıktığı için bu ayar hiç devreye girmez. ADR-0015 ve P1.D raporu düzeltildi. Ayar zararsız olduğu için paket değişmedi.
+- **`NextRunTime` kayması (CI'da gözlendi):** `Get-ScheduledTaskInfo` runner'da `LastRunTime`/`NextRunTime` değerlerini gerçek tetiklenmeden ~30 sn sonra gösterdi. Örnek: olay 107 17:36:03, `NextRunTime` 17:36:36; görevin `StartBoundary` saniyesi `:02`. Kanıt için olay kaydı esas alınır. Lenovo tekrar rehberi `NextRunTime`'dan sonra 1 dk ek bekleme ister.
 - **CI test düzeltmesi:** Kill öncesi henüz sınıflanmamış (bekleyen) süre sonradan sınıflandığı için "sonra − önce ≤ kesinti" denetimi geçersizdi. Doğru sınır, günlük toplamın kurulumdan beri geçen gerçek süreyi aşmamasıdır.
 - **Doğrulama yöntemi:** `ci/p1d-recovery-e2e.ps1` (`windows-p1d` iş akışı); Lenovo'da D-05 tekrarı ([rehber](background/p1d-d05-retest-tr.md)).
 - **İlgili görev, dosya veya commit:** TASK-009; `ci/p1d-recovery-e2e.ps1`, ADR-0015.
