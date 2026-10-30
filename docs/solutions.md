@@ -147,3 +147,30 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
 - **Uygulanan çözüm:** Sabit uyku kaldırıldı. Test, durum ve sağlık denetimi hazır olana kadar en çok 10 sn bekler.
 - **Doğrulama yöntemi:** macOS'ta 3 ardışık çalıştırma; sonraki `windows-p1d` CI.
 - **İlgili görev, dosya veya commit:** TASK-009; `crates/windows-agent/src/screen_time.rs`.
+
+### NOTE-010 — Lenovo D-05: helper sonlandırıldıktan sonra yeniden başlamadı gözlemi (P1.D.1 araştırması)
+
+- **Belirti (Lenovo, `p1d-windows-test.1`):**
+  - Helper çalışırken görev `Running` durumundaydı ve son sonuç `0x800710E0` idi.
+  - `Stop-Process -Id <helper>` sonrasında görev `Ready` oldu; `LastRunTime 19:09:06`, `NextRunTime 19:14:04`, `LastTaskResult 0`.
+  - Raporlayıcı `DESKTOP_BRIDGE` oldu.
+  - Sonraki kontrolde helper yoktu ve `LastRunTime` değişmemişti. Kontrolün 19:14:04'ten sonra yapıldığı doğrulanmadı.
+- **`0x800710E0` (doğrulandı):**
+  - `HRESULT_FROM_WIN32(4320)` = `ERROR_REQUEST_REFUSED` ("The operator or administrator has refused the request").
+  - CI'da zaman tetikleyicisi, helper çalışırken ateşlendiğinde Görev Zamanlayıcısı olay **322**'yi yazdı ("did not launch task … because instance … of the same task is already running"). Aynı anda `LastRunTime` güncellendi ve `LastTaskResult = 0x800710E0` oldu.
+  - Bu, `IgnoreNew` politikasının beklenen ve zararsız sonucudur; hata değildir.
+  - Lenovo'daki `19:09:06` / `19:14:04` değerleri, kurulumdaki 5 dk'lık zaman tetikleyicisinin aynı takvimine (`:04`) uyar. Yani tetikleyici Lenovo'da da ateşleniyor ve reddediliyordu.
+- **Kurtarma (CI'da yeniden üretildi):**
+  - Ortam: varsayılan 5 dk, gerçek `windows-2022`, [çalıştırma 41093442720](https://github.com/mehmetakarim/Kindora/actions/runs/41093442720).
+  - Kill sonrası görev `Ready` oldu, `LastTaskResult 0x0` (olay 201/102 "successfully completed").
+  - `NextRunTime` 17:11:11'de olay **107** ("due to a time trigger condition") ve **129** (PID 3668) geldi. Yeni helper'ın üst süreci 3668'dir.
+  - Kill'den sonra elle başlatma (olay 110) yok.
+  - Raporlayıcı köprüden `BACKGROUND_LOGON_TASK`'a geri döndü (`REPORTER_TAKEOVER`). Helper `previous_exit=unclean` kaydetti. Kill → yeniden başlama 265 sn.
+- **Kök neden:**
+  - Yazılım veya görev yapılandırması hatası **bulunamadı**. Mekanizma tasarlandığı gibi bir sonraki zaman tetikleyicisinde (en çok 5 dk) kurtarıyor.
+  - Lenovo gözleminin en olası açıklaması kontrolün `NextRunTime`'dan önce yapılmasıdır [Çıkarım; kanıtlanmadı].
+  - Lenovo'da Görev Zamanlayıcısı Operational günlüğü varsayılan olarak kapalıdır; olay kanıtı yoktur.
+- **Bulunan yan hata (belge):** Belgeler `RestartOnFailure`'ın (1 dk × 3) ek güvence olduğunu söylüyordu. Sonlandırılan helper'da `conhost` 0 koduyla çıktığı için bu ayar hiç devreye girmez. ADR-0015 ve P1.D raporu düzeltildi. Ayar zararsız olduğu için paket değişmedi.
+- **CI test düzeltmesi:** Kill öncesi henüz sınıflanmamış (bekleyen) süre sonradan sınıflandığı için "sonra − önce ≤ kesinti" denetimi geçersizdi. Doğru sınır, günlük toplamın kurulumdan beri geçen gerçek süreyi aşmamasıdır.
+- **Doğrulama yöntemi:** `ci/p1d-recovery-e2e.ps1` (`windows-p1d` iş akışı); Lenovo'da D-05 tekrarı ([rehber](background/p1d-d05-retest-tr.md)).
+- **İlgili görev, dosya veya commit:** TASK-009; `ci/p1d-recovery-e2e.ps1`, ADR-0015.

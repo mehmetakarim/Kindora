@@ -27,6 +27,10 @@
   - C-01…C-10 PASS; C-11 NOT RUN.
   - Uyku 0, ölçülemeyen arttı ([NOTE-008](docs/solutions.md)).
   - Kaldırmada `1060` doğrulandı.
+- **P1.D.1 (D-05 kurtarma araştırması):**
+  - CI'da gerçek 5 dk zaman tetikleyicisiyle kurtarma kanıtlandı. `0x800710E0` = `IgnoreNew` reddi (olay 322).
+  - Yazılım hatası yok. `RestartOnFailure`'ın etkisiz olduğu belgeye işlendi ([NOTE-010](docs/solutions.md)).
+  - Yeni prerelease yok. Kullanıcı D-05'i [tekrar rehberiyle](docs/background/p1d-d05-retest-tr.md) yeniden dener.
 - **P1.E başlamadı.**
 
 ## Gerçek durum (kısa)
@@ -74,7 +78,7 @@
 
 ## Sonraki somut adım (öneri — otomatik başlatma yetkisi değildir)
 
-1. Kullanıcıdan D-01…D-10 tablosunu ve `status-kindora-test.ps1` çıktısını al; TASK-009'a işle.
+1. Kullanıcıdan D-05 tekrar sonucunu (NextRunTime sonrası yeni PID) ve kalan D tablosunu al; TASK-009'a işle.
 2. D-11 yapıldıysa `power_event` satırlarıyla NOTE-008'i güncelle.
 3. Kabul gelirse durumu "Kabul edildi" yap. P1.E yalnız kullanıcı onayıyla başlar.
 

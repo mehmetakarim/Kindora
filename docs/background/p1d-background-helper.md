@@ -54,7 +54,7 @@ Windows oturum açılışı ──► Zamanlanmış Görev \Kindora\SessionHelpe
 | Pil | `DisallowStartIfOnBatteries=false`, `StopIfGoingOnBatteries=false` | Dizüstünde (Lenovo) varsayılanlar helper'ı durdururdu |
 | Süre sınırı | `PT0S` | Varsayılan 72 sa sınırı helper'ı sonlandırırdu |
 | Öncelik | 7 (normalin altı) | Düşük kaynak |
-| Hata durumunda | 1 dk arayla 3 kez | Ek güvence; asıl kurtarma yeniden denetimdir |
+| Hata durumunda | 1 dk arayla 3 kez | **Etkisiz** (P1.D.1): sonlandırılan helper'da `conhost` 0 koduyla çıkar, görev başarılı sayılır. Kurtarma yalnız zaman tetikleyicisiyle olur ([NOTE-010](../solutions.md)). |
 | Eylem | `conhost.exe --headless "…\kindora-helper.exe" activity --launch logon-task` | Konsol penceresi görünmez |
 
 **Agent:**

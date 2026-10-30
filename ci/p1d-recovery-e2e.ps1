@@ -178,12 +178,16 @@ try {
     Wait-Until { $script:after = Get-ScreenTime; $script:after.measurement.reporter.kind -eq 'BACKGROUND_LOGON_TASK' -and [int]$script:after.measurement.reporter.pid -eq [int]$new.ProcessId } 30000 'reporter back to BACKGROUND_LOGON_TASK (new pid)'
     Wait-Until { @(Get-Content $helperLog | Where-Object { $_.Contains('event=previous_exit state=unclean') }).Count -ge 1 } 10000 'helper log: previous_exit=unclean'
     Assert-True (@(Get-Content $agentLog | Where-Object { $_ -match 'REPORTER_TAKEOVER .*kind=BACKGROUND_LOGON_TASK' }).Count -ge 1) 'agent log: background helper took over from the bridge'
+    # Time still pending at the kill (input frontier) is classified later, so
+    # "after - before <= outage" is not a valid bound. The day total can never
+    # exceed the wall time since the agent (fresh database) started.
     $elapsed = [int]((Get-Date) - $killAt).TotalSeconds
+    $sinceInstall = [int]((Get-Date) - $installAt).TotalSeconds
     $tb = Total $before; $ta = Total $script:after
-    Write-Host "totals: $tb -> $ta s over $elapsed s"
-    Assert-True ($ta -le $tb + $elapsed + 5) 'no double counting across the outage'
+    Write-Host "totals: $tb -> $ta s (outage $elapsed s, since install $sinceInstall s)"
+    Assert-True ($ta -le $sinceInstall + 2) "no double counting: day total $ta s <= wall time since install $sinceInstall s"
     Assert-True ($ta -ge $tb) 'totals kept'
-    $summary.Add("P1D1 scheduled recovery: kill $($killAt.ToString('HH:mm:ss')) -> new helper $($restartAt.ToString('HH:mm:ss')) (next run $($next.ToString('HH:mm:ss'))), events 107+129 (pid=$launchPid = parent), no event 110, reporter BACKGROUND_LOGON_TASK pid $($new.ProcessId), totals $tb -> $ta s over $elapsed s")
+    $summary.Add("P1D1 scheduled recovery: kill $($killAt.ToString('HH:mm:ss')) -> new helper $($restartAt.ToString('HH:mm:ss')) (next run $($next.ToString('HH:mm:ss'))), events 107+129 (pid=$launchPid = parent), no event 110, reporter BACKGROUND_LOGON_TASK pid $($new.ProcessId), day total $ta s <= $sinceInstall s since install")
 }
 finally {
     $ErrorActionPreference = 'Continue'

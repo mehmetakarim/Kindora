@@ -47,6 +47,10 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - [x] Windows CI başarılı.
   - [x] Prerelease ve checksum yayımlandı.
   - [ ] **Lenovo arka plan ölçümü kabulü (D-01…D-10)** — bekliyor.
+    - **D-05 (helper sonlandırılınca yeniden başlama) kabulü bekliyor.**
+      - İlk Lenovo denemesinde yeniden başlama gözlenmedi. Kontrolün `NextRunTime`'dan sonra yapıldığı doğrulanmadı.
+      - P1.D.1 araştırması: CI'da gerçek 5 dk'lık zaman tetikleyicisi helper'ı yeniden başlattı (olay 107/129). `0x800710E0` = "örnek zaten çalışıyor" reddi (olay 322). Yazılım hatası bulunamadı ([NOTE-010](solutions.md)).
+      - Tekrar rehberi: [p1d-d05-retest-tr.md](background/p1d-d05-retest-tr.md). Yeni prerelease gerekmedi.
 - **Bağımlılıklar:** TASK-008.
 - **İlgili dosyalar:**
   - `crates/windows-session/src/{lib,main,instance,session_end}.rs`

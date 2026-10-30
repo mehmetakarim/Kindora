@@ -1,7 +1,7 @@
 # ADR-0015 — Bağımsız Session Helper, tek raporlayıcı ve oturum açılışında başlatma
 
 - **Tarih:** 2026-10-30
-- **Durum:** Önerildi (P1.D'de uygulandı; Lenovo arka plan ölçümü kabulü bekliyor)
+- **Durum:** Önerildi (P1.D'de uygulandı; P1.D.1'de kurtarma CI'da gerçek zaman tetikleyicisiyle kanıtlandı; Lenovo D-05 kabulü bekliyor)
 - **Karar türü:** Teknik uygulama yöntemi
 - **İlgili belgeler:** [P1.D raporu](../background/p1d-background-helper.md), [ADR-0006](0006-agent-surec-ve-hesap-modeli.md), [ADR-0012](0012-mevcut-windows-hesabinda-calisma.md), [ADR-0013](0013-masaustu-kabugu-helper-koprusu.md), [ADR-0014](0014-yerel-kullanim-suresi-motoru.md)
 
@@ -86,7 +86,8 @@
   - Masaüstü açıksa köprü devralır.
   - Görevin yeniden denetimi en geç N dk (varsayılan 5) içinde helper'ı yeniden başlatır.
   - Yeni örnek önceki çıkışın temiz olmadığını `previous_exit state=unclean` ile kaydeder.
-  - Sürekli yeniden başlatma döngüsü yoktur: en fazla N dk'da bir, artı Windows'un 3 kez/1 dk görev yeniden denemesi.
+  - Sürekli yeniden başlatma döngüsü yoktur: en fazla N dk'da bir.
+  - **P1.D.1 düzeltmesi (CI kanıtı, [NOTE-010](../solutions.md)):** Helper sonlandırılınca `conhost --headless` 0 koduyla çıkar; görev "başarıyla tamamlandı" sayılır (olay 201/102, `LastTaskResult 0x0`). Bu yüzden `RestartOnFailure` **hiç devreye girmez**. Tek kurtarma yolu zaman tetikleyicisidir. Ayar zararsız olduğu için pakette bırakıldı; kurtarma süresi bir sonraki `NextRunTime`'a kadar, yani en çok N dk'dır.
 - **Agent yeniden başlar:** helper üstel geri çekilmeyle (en çok 10 sn) yeniden bağlanır.
 - **Agent çöker:** servis kurtarma eylemleri 5 sn, 60 sn ve sonra 5 dk'da bir yeniden başlatır (`sc failure`, sıfırlama 1 gün).
 - **Oturum kapanır:**
@@ -141,7 +142,7 @@
 ## Bilinmeyenler / doğrulama gereken noktalar
 
 - Gerçek oturum açılışı tetikleyicisi, oturum kapatma, Windows yeniden başlatma ve hızlı kullanıcı değiştirme (Lenovo D-08, D-09, D-12). CI'da görev yalnız elle tetiklenebilir.
-- `RestartOnFailure`'ın helper çıkış koduna tepkisi. Yeniden denetim tetikleyicisi bundan bağımsız çalışır.
+- ~~`RestartOnFailure`'ın helper çıkış koduna tepkisi~~ — P1.D.1'de yanıtlandı: sonlandırmada devreye girmez (NOTE-010).
 - Lenovo'da uyku sırasında hangi güç olaylarının geldiği. P1.C C-08 bulgusu: uyku 0, ölçülemeyen arttı. P1.D'de bütün güç olayları agent kaydına yazılır.
 
 ## İlişkili kararlar
