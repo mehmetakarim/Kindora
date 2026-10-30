@@ -139,3 +139,11 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
   - Yeniden denetim ayrı bir zaman tetikleyicisine taşındı. Kurulum ve kaldırma, süreçleri sonlandırmadan önce görevi durdurur (`Stop-ScheduledTask`); böylece `IgnoreNew` yeni örneği engellemez.
 - **Doğrulama yöntemi:** `windows-p1d` CI §4 (helper sonlandırılır → zaman tetikleyicisi yeniden başlatır).
 - **İlgili görev, dosya veya commit:** TASK-009; `packaging/p1d/install-kindora-test.ps1`, `ci/p1d-background-e2e.ps1`.
+
+### BUG-006 — `runtime_persists_and_reports_only_from_console_session` Windows CI'da zamanlamaya bağlı başarısız
+
+- **Belirti:** P1.D ikinci CI çalıştırmasında ([41045437248](https://github.com/mehmetakarim/Kindora/actions/runs/41045437248)) P1.C birim testi `status` beklentisinde paniğe düştü. Aynı kod önceki çalıştırmada geçmişti.
+- **Kök neden:** Test, çalışma zamanı başladıktan sonra sabit 400 ms bekleyip durumu okuyordu. Yavaş Windows runner'da yeni kiralama testiyle paralel SQLite açılışı bu süreyi aştı.
+- **Uygulanan çözüm:** Sabit uyku kaldırıldı. Test, durum ve sağlık denetimi hazır olana kadar en çok 10 sn bekler.
+- **Doğrulama yöntemi:** macOS'ta 3 ardışık çalıştırma; sonraki `windows-p1d` CI.
+- **İlgili görev, dosya veya commit:** TASK-009; `crates/windows-agent/src/screen_time.rs`.

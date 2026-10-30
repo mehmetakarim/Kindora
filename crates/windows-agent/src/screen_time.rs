@@ -917,8 +917,19 @@ mod tests {
         };
         assert!(!rt.report_activity(&client(1, Some(2)), report));
         assert!(rt.report_activity(&client(1, Some(1)), report));
-        thread::sleep(Duration::from_millis(400));
-        let s = rt.status().expect("status");
+        // Yavaş CI makinesinde SQLite açılışı sürebilir: sabit uyku yerine bekle.
+        let t = Instant::now();
+        let s = loop {
+            if let Some(s) = rt.status().filter(|_| rt.health().iter().all(|c| c.ok)) {
+                break s;
+            }
+            assert!(
+                t.elapsed() < Duration::from_secs(10),
+                "status: {:?}",
+                rt.health()
+            );
+            thread::sleep(Duration::from_millis(50));
+        };
         assert!(s.storage.persistent);
         assert_eq!(s.policy.source, PolicySource::BuiltinDefault);
         assert!(rt.health().iter().all(|c| c.ok), "{:?}", rt.health());
