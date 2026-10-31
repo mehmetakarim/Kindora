@@ -26,6 +26,23 @@ $helperPath = (Resolve-Path $Helper).Path
 $conhost = Join-Path $env:SystemRoot 'System32\conhost.exe'
 $clean = 0
 
+# Finds the console window of a process (attach to its console, read the
+# window handle, detach) and posts WM_CLOSE to it - the same message a user
+# sends by closing the console window. conhost then raises CTRL_CLOSE_EVENT.
+Add-Type -Namespace KdCi -Name Console -MemberDefinition @'
+[DllImport("kernel32.dll", SetLastError = true)] public static extern bool FreeConsole();
+[DllImport("kernel32.dll", SetLastError = true)] public static extern bool AttachConsole(uint pid);
+[DllImport("kernel32.dll")] public static extern System.IntPtr GetConsoleWindow();
+[DllImport("user32.dll")] public static extern bool PostMessage(System.IntPtr h, uint m, System.IntPtr w, System.IntPtr l);
+public static System.IntPtr WindowOf(uint pid) {
+    FreeConsole();
+    if (!AttachConsole(pid)) { return System.IntPtr.Zero; }
+    System.IntPtr h = GetConsoleWindow();
+    FreeConsole();
+    return h;
+}
+'@
+
 for ($r = 1; $r -le $Rounds; $r++) {
     $dir = Join-Path $env:RUNNER_TEMP "obs011-$r"
     Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
@@ -46,12 +63,12 @@ for ($r = 1; $r -le $Rounds; $r++) {
     Start-Sleep -Milliseconds 1500
     Write-Host "round $r : helper pid=$($hp.Id) parent(conhost)=$($host_.Id) marker_exists=$(Test-Path $marker)"
 
-    $sw = [Diagnostics.Stopwatch]::StartNew()
-    while ($host_.MainWindowHandle -eq [IntPtr]::Zero -and $sw.ElapsedMilliseconds -lt 10000) { Start-Sleep -Milliseconds 100; $host_.Refresh() }
-    if ($host_.MainWindowHandle -eq [IntPtr]::Zero) { throw "conhost has no console window (round $r)" }
+    $hwnd = [KdCi.Console]::WindowOf([uint32]$hp.Id)
+    Write-Host "round $r : console window=0x$($hwnd.ToString('X'))"
+    if ($hwnd -eq [IntPtr]::Zero) { throw "could not find the helper console window (round $r)" }
 
     $sw = [Diagnostics.Stopwatch]::StartNew()
-    $null = $host_.CloseMainWindow()   # WM_CLOSE -> CTRL_CLOSE_EVENT to the helper
+    $null = [KdCi.Console]::PostMessage($hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)   # WM_CLOSE -> CTRL_CLOSE_EVENT
     if (-not $hp.WaitForExit(10000)) { throw "helper still running 10 s after console close (round $r)" }
     $exitMs = $sw.ElapsedMilliseconds
     Start-Sleep -Milliseconds 300
