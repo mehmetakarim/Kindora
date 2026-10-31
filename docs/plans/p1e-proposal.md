@@ -3,6 +3,7 @@
 - **Tarih:** 2026-10-31 (öneri), 2026-10-31 (kapsam kararları)
 - **Durum:** **Kapsam onaylandı (K-1…K-10); uygulama başlamadı.**
   - Ürün kodu yazmak için önce **E.0 kapısı** geçilmelidir (§8): PoC kabul kriterleri ve geri alma yöntemi kesinleşir, ADR-0016 kullanıcı tarafından onaylanır.
+  - **E.0 belgesi:** [ADR-0016 taslağı](../decisions/0016-yerel-kindora-kisitlamasi-poc.md). Kesin kararlar, zaman modeli, fail-open matrisi, kurtarma sınıflandırması ve kabul kriterleri orada; bu planla çelişirse ADR-0016 esas alınır.
   - Görev: [TASK-010](../tasks.md).
 - **Dayanak:**
   - [KINDORA_PROJECT_CONTEXT.md](../../design/KINDORA_PROJECT_CONTEXT.md) §5.3, §8.2, §9, §11, §16–17
@@ -208,7 +209,7 @@ Kindora kullanım kısıtlamasının (ADR-0001) mevcut mimari üzerinde **yerel*
 | E.9 | `windows-p1e` CI uçtan uca + P1.A–D regresyonu | CI | E.8 |
 | E.10 | Lenovo ölçüm turu | Ölçüm tablosu | E.9 + kullanıcı onayı |
 
-### İlk uygulanabilir alt görev: E.1 — OBS-011
+### İlk uygulanabilir alt görev: E.1 — OBS-011 (2026-10-31: **tamamlandı**, [BUG-011](../solutions.md))
 
 - **Amaç:** Windows oturumu kapanırken veya `conhost` konsolu kapatırken arka plan helper'ı temiz çıkış izini silebilsin. Temiz kapanış `previous_exit state=unclean` olarak görünmesin.
 - **Hipotez (H1):** `ctrlc` 3.5.2 işleyicisi `CTRL_CLOSE` / `LOGOFF` / `SHUTDOWN` olaylarında hemen `TRUE` döner; Windows süreci beklemeden sonlandırır.

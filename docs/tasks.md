@@ -26,7 +26,9 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 ### TASK-010 — P1.E: Yerel Kindora kullanım kısıtlaması PoC'si (ölçüm odaklı)
 
 - **Öncelik:** Yüksek
-- **Durum:** Planlandı. Kapsam kararları K-1…K-10 kullanıcı tarafından verildi (2026-10-31). **Ürün kodu başlamadı.**
+- **Durum:** Devam ediyor.
+  - Kapsam kararları K-1…K-10 verildi (2026-10-31).
+  - E.0 belgeleri ve E.1 düzeltmesi tamam. **Kısıtlama kodu (E.2+) başlamadı**; ADR-0016 onayı bekleniyor.
 - **Amaç ve kapsam:**
   - ADR-0001 Kindora kısıtlamasının yerel, geri alınabilir ve ölçülebilir ilk sürümü.
   - Kısıtlama yalnız DEV dosyasıyla uygulanır; varsayılan 10 dk, mutlak sınır 30 dk; fail-open; geçici Win32 kısıtlama ekranı.
@@ -34,13 +36,18 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - Ayrıntı: [plans/p1e-proposal.md](plans/p1e-proposal.md).
 - **Kabul kriterleri:** E.0'da kesinleşir. Kesinleşmeden kısıtlama kodu (E.2+) başlamaz. Taslak: plan §3.2, §9, §10, §11.
 - **Alt görevler:**
-  - [ ] E.0 kabul kriterleri + geri alma yöntemi + ADR-0016 (belge; kullanıcı onayı)
-  - [ ] **E.1 OBS-011 sağlamlaştırma** (ilk uygulanabilir alt görev; yalnız helper)
+  - [x] E.0 belgeleri hazırlandı: [ADR-0016 taslağı](decisions/0016-yerel-kindora-kisitlamasi-poc.md) (kabul kriterleri, fail-open matrisi, kurtarma sınıflandırması, tehdit modeli, CI ve Lenovo planı). **Kullanıcı onayı bekliyor**; onay olmadan E.2+ başlamaz.
+  - [x] **E.1 OBS-011 sağlamlaştırma** — kök neden gerçek Windows'ta doğrulandı ve düzeltildi ([BUG-011](solutions.md)).
+    - Konsol kapanışı: düzeltme öncesi 3/3 UNCLEAN → sonrası 3/3 CLEAN.
+    - Gerçek oturum kapatma: Lenovo'da isteğe bağlı, NOT RUN.
   - [ ] E.2…E.10 (plan §8)
 - **Bağımlılıklar:** TASK-009.
 - **İlgili dosyalar:** `docs/plans/p1e-proposal.md`, [OBS-011](solutions.md).
-- **Doğrulama sonucu:** NOT RUN.
-- **Yayın durumu:** Yok.
+- **Doğrulama sonucu (E.1):**
+  - **Windows CI `windows-p1e1`** (gerçek `CTRL_CLOSE_EVENT`): 3/3 CLEAN; Windows birim testi PASS.
+  - **macOS:** kök Rust testleri, fmt, clippy (+ `windows-session` için Windows hedefi) PASS.
+  - P1.A–P1.D regresyonu: `main` push'u sonrası `windows-p1a/b/c/d`.
+- **Yayın durumu:** Yok (yeni prerelease oluşturulmadı).
 
 ### TASK-009 — P1.D: Bağımsız Session Helper ve güvenilir arka plan kullanım süresi
 

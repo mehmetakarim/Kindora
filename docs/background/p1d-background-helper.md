@@ -223,6 +223,6 @@ CI sonuçları, prerelease ve SHA-256 değerleri [tasks.md TASK-009](../tasks.md
 - **Yönetici hesap:** Kullanıcının hesabı yöneticiyse servisi, görevi ve dosyaları değiştirebilir veya kaldırabilir. Bu tespit edilebilir, engellenemez ([ADR-0012](../decisions/0012-mevcut-windows-hesabinda-calisma.md)).
 - **`conhost --headless` bağımlılığı:** Belgelenmemiş bir parametredir. Lenovo'da (Windows 11) ve Windows Server 2022 CI'da çalıştı; diğer sürümler doğrulanmadı.
 - **Kurtarma aralığı:** Kurtarma zamanlanmış denetim aralığına bağlıdır (en çok 5 dk). Bu sürede masaüstü açıksa köprü raporlar; değilse süre `UNKNOWN` sayılır.
-- **Oturum kapanışı:** `previous_exit state=unclean` gözlemi açıklanmadı ([OBS-011](../solutions.md)). Hata olarak sınıflandırılmadı.
+- **Oturum kapanışı:** `previous_exit state=unclean` gözlemi P1.E.1'de açıklandı ve düzeltildi ([BUG-011](../solutions.md)); daha önce açıklanmadı ([OBS-011](../solutions.md)). Hata olarak sınıflandırılmadı.
 - **Doğrulanmamış kapsamlar:** Windows Home, ekran ölçeklendirmesi (%125/%150), uyku (D-11; [NOTE-008](../solutions.md)), hızlı kullanıcı değiştirme (D-12), standart kullanıcı hesabı.
 - **Teslim biçimi:** İmzalı EXE, kurucu ve ebeveyn yetkilendirmesi yok. DEV betikleri üretim kurucusu değildir.

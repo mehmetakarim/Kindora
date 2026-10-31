@@ -176,7 +176,7 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
 - **Doğrulama yöntemi:** `ci/p1d-recovery-e2e.ps1` (`windows-p1d` iş akışı); Lenovo'da D-05 tekrarı ([rehber](background/p1d-d05-retest-tr.md)).
 - **İlgili görev, dosya veya commit:** TASK-009; `ci/p1d-recovery-e2e.ps1`, ADR-0015.
 
-### OBS-011 — Oturum kapanışında `session_ending` sonrası `previous_exit state=unclean` (gözlem; hata olarak sınıflandırılmadı)
+### OBS-011 → BUG-011 — Oturum kapanışında `session_ending` sonrası `previous_exit state=unclean` (P1.E.1'de doğrulandı ve düzeltildi)
 
 - **Gözlem (Lenovo, P1.D D-08 ve D-09):** Oturum kapatma ve Windows yeniden başlatma sırasında helper günlüğüne `event=session_ending` yazıldı. Bir sonraki açılışta yeni helper `event=previous_exit state=unclean` kaydetti. Kabulü engellemedi: helper yeniden başladı, süreler korundu.
 - **Beklenen:** `WM_ENDSESSION` sonrası ana döngü biter, iz dosyası (`activity.log.running`) silinir. Böylece bir sonraki açılış `unclean` yazmaz.
@@ -195,3 +195,21 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
   3. Windows CI'da `GenerateConsoleCtrlEvent` ile `CTRL_CLOSE` benzetimi ve iz dosyası denetimi yapılır.
 - **Planlama:** P1.E'nin ilk alt görevi **E.1** olarak planlandı (K-9; [TASK-010](tasks.md), [plan §8](plans/p1e-proposal.md)).
 - **İlgili görev, dosya veya commit:** TASK-009, TASK-010; `crates/windows-session/src/{main,session_end}.rs`, `RunMarker`.
+
+#### P1.E.1 sonucu (2026-10-31)
+
+- **Yeniden üretim (gerçek Windows olayı):**
+  - Ortam: `windows-2022` CI.
+  - Helper `conhost` konsolu altında çalıştırıldı. Konsol penceresine `WM_CLOSE` gönderildi; `conhost` bunu `CTRL_CLOSE_EVENT` olarak iletti.
+  - Düzeltmeden önce **3/3 UNCLEAN**: helper 2–8 ms'de sonlandı; `shutdown_requested` dahi yazılmadı; `helper_stopped` yok, iz dosyası kaldı. Çalıştırma `p1e1-obs011` dalında, `windows-p1e1` iş akışı.
+- **Kök neden (H1 doğrulandı):** `ctrlc` 3.5.2 Windows işleyicisi her konsol olayında hemen `TRUE` döner; Windows `CTRL_CLOSE`/`LOGOFF`/`SHUTDOWN` olaylarında işleyici döner dönmez süreci sonlandırır. H2 ve H3 gerekmedi.
+- **Düzeltme (yalnız `windows-session`):**
+  - Windows'ta `ctrlc` yerine `console_ctrl.rs` (`SetConsoleCtrlHandler`) kullanılıyor.
+  - Close, Logoff ve Shutdown olaylarında işleyici kapanma bayrağını ayarlar. Ana döngünün izi silmesini **en çok 2 sn** bekleyip döner; kapanışı engellemez.
+  - Ctrl+C ve Ctrl+Break hemen döner (davranış değişmedi). Unix'te `ctrlc` sürer.
+  - Agent, IPC, SQLite ve kurulum betikleri değişmedi.
+- **Doğrulama:**
+  - Düzeltmeden sonra aynı test `-ExpectClean` ile **3/3 CLEAN**: işleyici 8–26 ms'de döndü; `shutdown_requested source=console_close`, `helper_stopped`, iz silindi.
+  - Windows birim testi: Ctrl+C anında döner; kapanış ana döngüyü bekler; döngü bitmezse en çok 2 sn.
+  - P1.A–P1.D regresyonu: [TASK-010](tasks.md) kaydında.
+- **Doğrulanmayan (NOT RUN):** gerçek oturum kapatma ve Windows yeniden başlatma (CI'da yapılamaz). Lenovo'da isteğe bağlı doğrulanır: oturumu kapat/aç → `previous_exit` satırı yok.

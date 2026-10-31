@@ -6,7 +6,7 @@ name: windows-p1e1
 
 on:
   push:
-    branches: [main, "p1e1-*"]
+    branches: [main]
   workflow_dispatch:
     inputs:
       expect_clean:

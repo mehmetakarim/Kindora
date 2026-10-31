@@ -5,7 +5,7 @@
 ## Son güncelleme
 
 - **Tarih:** 2026-10-31 (+03, Europe/Istanbul)
-- **Güncelleyen:** Claude Code — P1.D resmi kapanışı + P1.E keşfi (yalnız belgeler)
+- **Güncelleyen:** Claude Code — P1.E.0 (ADR-0016 taslağı) + P1.E.1 (BUG-011 düzeltmesi)
 
 ## Git durumu (son kontrol)
 
@@ -24,7 +24,8 @@
 
 - P1.E ürün kodu **başlamadı**.
 - Kısıtlama kodu (E.2+) için önce **E.0 kapısı** gerekir: PoC kabul kriterleri, geri alma yöntemi ve ADR-0016 kullanıcı onayıyla kesinleşir.
-- İlk uygulanabilir alt görev: **E.1 — OBS-011 sağlamlaştırma** (yalnız helper; E.0'dan bağımsız).
+- **E.0:** [ADR-0016 taslağı](docs/decisions/0016-yerel-kindora-kisitlamasi-poc.md) hazır; **onay bekliyor**.
+- **E.1:** BUG-011 düzeltildi. `ctrlc` konsol kapanışında hemen dönüyordu; Windows'ta artık `console_ctrl.rs` var. CI'da gerçek konsol kapanışında 3/3 CLEAN.
 
 **Kapanan aşamalar (geliştirme/test kabulü; üretim yayını değildir):**
 
@@ -73,7 +74,7 @@
 - **Yönetici hesap:** servis, görev ve dosyalar değiştirilebilir; tespit edilir, engellenmez (ADR-0012).
 - **`conhost --headless`:** belgelenmemiş bir parametreye bağımlılık.
 - **Kurtarma aralığı:** zamanlanmış denetime bağlı (en çok 5 dk).
-- **OBS-011:** oturum kapanışında `previous_exit state=unclean`. Hipotez H1: `ctrlc` işleyicisi `CTRL_CLOSE` olayında hemen `TRUE` dönüyor. Doğrulanmadı; BUG değil ([solutions](docs/solutions.md)).
+- **BUG-011 (eski OBS-011):** düzeltildi. Gerçek oturum kapatma ile Lenovo doğrulaması isteğe bağlı, NOT RUN.
 - **ADR durumları:**
   - ADR-0013/0014/0015 **Kabul edildi** (K-8, 2026-10-31); açık riskler korunur.
   - ADR-0006/0007/0011 Önerildi; ADR-0008…0010 açık.
@@ -81,10 +82,8 @@
 
 ## Sonraki somut adım (öneri — otomatik başlatma yetkisi değildir)
 
-1. Kullanıcı onayıyla **E.1 (OBS-011):**
-   - Windows CI'da `conhost` altında `CTRL_CLOSE` ile yeniden üret.
-   - H1 doğrulanırsa konsol işleyicisini düzelt (≤2 sn bekleme).
-2. Paralel olarak **E.0:** §3.2 serbest bırakma matrisi, §10 ölçütleri, §11 kurtarma yolu ve köprü rolü (K-6) için ADR-0016 taslağı → kullanıcı onayı.
+1. Kullanıcıdan ADR-0016 onayını al; gerekirse §11 açık kararlarını netleştir.
+2. Onay gelirse **E.2:** `restriction` durum makinesi ve zaman modeli (saf modül, benzetim saatiyle §4 matrisi testleri). Ürün yüzeyi yok.
 
 ## İlgili belgeler
 
