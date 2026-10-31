@@ -3,7 +3,7 @@
 - **Görev:** [TASK-009](../tasks.md)
 - **Karar:** [ADR-0015](../decisions/0015-bagimsiz-session-helper-ve-oturum-acilisi.md)
 - **Önceki aşama:** [P1.C](../screen-time/p1c-screen-time.md)
-- **Durum:** Kodlandı; macOS ve Windows CI'da test edildi; prerelease `p1d-windows-test.1`. **CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
+- **Durum:** Tamamlandı — **Lenovo Acceptance PASS** (D-01…D-10, 2026-10-31). Prerelease `p1d-windows-test.1`. Geliştirme/test kabulüdür, üretim yayını değildir.
 - **Kapsam dışı:** zorunlu kilit, site engelleme, program sonlandırma, uzaktan ebeveyn kontrolü, ebeveyn yetkilendirmesi.
 
 ## 1. Mimari ve helper yaşam döngüsü
@@ -196,3 +196,33 @@ CI sonuçları, prerelease ve SHA-256 değerleri [tasks.md TASK-009](../tasks.md
 - **Uyku:** P1.C C-08 bulgusu (uyku 0, ölçülemeyen arttı) açık. Güç olayları artık kaydediliyor; doğrulanamayan uyku `SUSPENDED` sayılmaz.
 - **Kurulum:** ebeveyn yetkilendirmesi, imzalı EXE ve kurucu (MSI/NSIS + görev) yok. DEV kurulum betikleri üretim kurucusu değildir.
 - **Teknik borç:** TS ↔ Rust tip eşlemesi elle yapılıyor (ADR-0010).
+
+## 10. Kapanış (2026-10-31)
+
+**Gerçek Lenovo kabulü:** D-01…D-10, 10/10 PASS.
+
+- Mevcut Lenovo hesabı ve `p1d-windows-test.1` kullanıldı; kullanıcı raporudur.
+- D-11 (uyku) ve D-12 (kullanıcı değiştirme) isteğe bağlıydı; **NOT RUN**.
+- Ayrıntılı kanıt tablosu: [TASK-009](../tasks.md).
+
+**CI kanıtları (gerçek cihaz kabulü değildir):**
+
+- `windows-p1a/b/c/d` iş akışları.
+- P1D paket betikleri uçtan uca testi.
+- P1.D.1 kurtarma yeniden üretimi: [41100377217](https://github.com/mehmetakarim/Kindora/actions/runs/41100377217). Olay 107/129 kanıtı, [NOTE-010](../solutions.md).
+
+**P1.D.1 sonucu korunur:**
+
+- Kurtarma bir sonraki zaman tetikleyicisinde (en çok 5 dk) gerçekleşir.
+- `0x800710E0`, `IgnoreNew` reddidir.
+- `RestartOnFailure` sonlandırmada etkisizdir.
+- Lenovo D-05 tekrarında planlı 00:29:04 tetiklemesinden sonra 00:29:05'te yeni helper başladı.
+
+**Açık riskler (kapanışta açık bırakıldı):**
+
+- **Yönetici hesap:** Kullanıcının hesabı yöneticiyse servisi, görevi ve dosyaları değiştirebilir veya kaldırabilir. Bu tespit edilebilir, engellenemez ([ADR-0012](../decisions/0012-mevcut-windows-hesabinda-calisma.md)).
+- **`conhost --headless` bağımlılığı:** Belgelenmemiş bir parametredir. Lenovo'da (Windows 11) ve Windows Server 2022 CI'da çalıştı; diğer sürümler doğrulanmadı.
+- **Kurtarma aralığı:** Kurtarma zamanlanmış denetim aralığına bağlıdır (en çok 5 dk). Bu sürede masaüstü açıksa köprü raporlar; değilse süre `UNKNOWN` sayılır.
+- **Oturum kapanışı:** `previous_exit state=unclean` gözlemi açıklanmadı ([OBS-011](../solutions.md)). Hata olarak sınıflandırılmadı.
+- **Doğrulanmamış kapsamlar:** Windows Home, ekran ölçeklendirmesi (%125/%150), uyku (D-11; [NOTE-008](../solutions.md)), hızlı kullanıcı değiştirme (D-12), standart kullanıcı hesabı.
+- **Teslim biçimi:** İmzalı EXE, kurucu ve ebeveyn yetkilendirmesi yok. DEV betikleri üretim kurucusu değildir.

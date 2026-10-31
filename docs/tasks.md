@@ -23,10 +23,29 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 
 ## Aktif / son görevler
 
+### TASK-010 — P1.E: Yerel Kindora kullanım kısıtlaması PoC'si (ölçüm odaklı)
+
+- **Öncelik:** Yüksek
+- **Durum:** Planlandı. Kapsam kararları K-1…K-10 kullanıcı tarafından verildi (2026-10-31). **Ürün kodu başlamadı.**
+- **Amaç ve kapsam:**
+  - ADR-0001 Kindora kısıtlamasının yerel, geri alınabilir ve ölçülebilir ilk sürümü.
+  - Kısıtlama yalnız DEV dosyasıyla uygulanır; varsayılan 10 dk, mutlak sınır 30 dk; fail-open; geçici Win32 kısıtlama ekranı.
+  - Klavye kancası, LocalSystem, Windows oturum kilidi, Supabase ve uzaktan kaldırma yok.
+  - Ayrıntı: [plans/p1e-proposal.md](plans/p1e-proposal.md).
+- **Kabul kriterleri:** E.0'da kesinleşir. Kesinleşmeden kısıtlama kodu (E.2+) başlamaz. Taslak: plan §3.2, §9, §10, §11.
+- **Alt görevler:**
+  - [ ] E.0 kabul kriterleri + geri alma yöntemi + ADR-0016 (belge; kullanıcı onayı)
+  - [ ] **E.1 OBS-011 sağlamlaştırma** (ilk uygulanabilir alt görev; yalnız helper)
+  - [ ] E.2…E.10 (plan §8)
+- **Bağımlılıklar:** TASK-009.
+- **İlgili dosyalar:** `docs/plans/p1e-proposal.md`, [OBS-011](solutions.md).
+- **Doğrulama sonucu:** NOT RUN.
+- **Yayın durumu:** Yok.
+
 ### TASK-009 — P1.D: Bağımsız Session Helper ve güvenilir arka plan kullanım süresi
 
 - **Öncelik:** Yüksek
-- **Durum:** Devam ediyor. Kod, macOS testleri ve Windows CI tamam; prerelease yayımlandı. **Kabul: CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
+- **Durum:** Tamamlandı — **Lenovo Acceptance PASS** (D-01…D-10: 10/10, kullanıcı raporu, 2026-10-31). Bu bir geliştirme/test kabulüdür; **üretim yayını değildir**.
 - **Amaç ve kapsam:**
   - Masaüstü kapalıyken de mevcut Windows oturumunda çalışan bağımsız helper ile kullanım süresi ölçümü.
   - Oturum açılışında kontrollü başlatma; güvenli kurulum ve kaldırma.
@@ -46,8 +65,8 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
   - [x] IPC güvenliği korunuyor (yeni komut yok; helper politikası ve BUG-003 ACE düzeltmesi değişmedi).
   - [x] Windows CI başarılı.
   - [x] Prerelease ve checksum yayımlandı.
-  - [ ] **Lenovo arka plan ölçümü kabulü (D-01…D-10)** — bekliyor.
-    - **D-05 (helper sonlandırılınca yeniden başlama) kabulü bekliyor.**
+  - [x] **Lenovo arka plan ölçümü kabulü (D-01…D-10)** — 10/10 PASS (`p1d-windows-test.1`, mevcut Lenovo hesabı, kullanıcı raporu, 2026-10-31). Kabul tablosu aşağıda.
+    - **D-05 geçmişi (P1.D.1):**
       - İlk Lenovo denemesinde yeniden başlama gözlenmedi. Kontrolün `NextRunTime`'dan sonra yapıldığı doğrulanmadı.
       - P1.D.1 araştırması: CI'da gerçek 5 dk'lık zaman tetikleyicisi helper'ı yeniden başlattı (olay 107/129). `0x800710E0` = "örnek zaten çalışıyor" reddi (olay 322). Yazılım hatası bulunamadı ([NOTE-010](solutions.md)).
       - CI kanıtı `2e340d3`:
@@ -55,6 +74,25 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
         - Akış: kill 17:53:48 → olay 107 17:58:13 → yeni helper. Olay 129'daki süreç yeni helper'ın üst süreci; olay 110 yok.
         - Raporlayıcı `DESKTOP_BRIDGE` → `BACKGROUND_LOGON_TASK`. Günlük toplam 362 sn, kurulumdan beri geçen 364 sn'yi aşmadı.
       - Tekrar rehberi: [p1d-d05-retest-tr.md](background/p1d-d05-retest-tr.md). Yeni prerelease gerekmedi.
+      - Tekrar testinde D-05 PASS (aşağıdaki tablo).
+- **Lenovo kabul tablosu (gerçek cihaz; CI kanıtından ayrıdır):**
+
+  | Test | Sonuç | Kanıt (kullanıcı raporu) |
+  |---|---|---|
+  | D-01 | PASS | Agent LocalService / Auto / Running; bağımsız helper ve Zamanlanmış Görev |
+  | D-02 | PASS | Masaüstü, arka plan raporlayıcısını ve tanılama bilgilerini gösterdi |
+  | D-03 | PASS | Masaüstü kapalıyken kullanım toplamı arttı |
+  | D-04 | PASS | `BACKGROUND_LOGON_TASK` önceliği; ikinci raporlar reddedildi |
+  | D-05 | PASS | Helper PID 32380 sonlandırıldı. Planlı tetikleme `NextRunTime` 31.10.2026 00:29:04; `LastRunTime` 00:29:05'te yeni PID 22152 başladı; raporlayıcı `BACKGROUND_LOGON_TASK`. Günlükte `previous_exit state=unclean previous="pid=32380 …"`, `helper_started pid=22152 kind=BACKGROUND_LOGON_TASK`, `connected`, `reporter_active`. |
+  | D-06 | PASS | Agent PID 26112 → 34656; helper PID 22152 korundu, `reconnects=1`; SQLite süreleri korundu |
+  | D-07 | PASS | Kilitli süre 0 → 152 sn; agent ve helper çalışmaya devam etti |
+  | D-08 | PASS | Oturum kapatılıp mevcut Lenovo hesabına giriş yapıldı; yeni helper PID 20380, oturum 2, `BACKGROUND_LOGON_TASK` |
+  | D-09 | PASS | Windows yeniden başlatıldı; agent PID 6952, helper PID 11408; kullanım verileri korundu |
+  | D-10 | PASS | Görev ve görev klasörü, program klasörü kaldırıldı; `sc.exe query KindoraAgentDev` → 1060; Kindora süreci yok; SQLite ve günlükler korundu |
+  | D-11 (uyku, isteğe bağlı) | NOT RUN | Raporlanmadı |
+  | D-12 (kullanıcı değiştirme, isteğe bağlı) | NOT RUN | Raporlanmadı |
+
+- **Açık gözlem (hata olarak sınıflandırılmadı):** D-08 ve D-09'da günlükte `event=session_ending`, ardından bir sonraki açılışta `event=previous_exit state=unclean` görüldü. Kabulü engellemedi; nedeni açıklanmadı ([OBS-011](solutions.md)).
 - **Bağımlılıklar:** TASK-008.
 - **İlgili dosyalar:**
   - `crates/windows-session/src/{lib,main,instance,session_end}.rs`

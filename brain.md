@@ -4,8 +4,8 @@
 
 ## Son güncelleme
 
-- **Tarih:** 2026-10-30 (+03, Europe/Istanbul)
-- **Güncelleyen:** Claude Code — TASK-009 (P1.D bağımsız Session Helper)
+- **Tarih:** 2026-10-31 (+03, Europe/Istanbul)
+- **Güncelleyen:** Claude Code — P1.D resmi kapanışı + P1.E keşfi (yalnız belgeler)
 
 ## Git durumu (son kontrol)
 
@@ -20,18 +20,20 @@
 
 ## Aktif hedef
 
-**TASK-009 (P1.D): CONDITIONAL PASS — Pending Lenovo Background Measurement Acceptance.**
+**TASK-010 (P1.E): Planlandı.** Kapsam onaylandı (K-1…K-10, 2026-10-31). Plan: [docs/plans/p1e-proposal.md](docs/plans/p1e-proposal.md).
 
-- Kullanıcı `p1d-windows-test.1` paketini [packaging/p1d/README-TEST-TR.md](packaging/p1d/README-TEST-TR.md) ile dener: `install-kindora-test.ps1 -AgentStartMode Auto -EnableHelperAutostart`, D-01…D-10.
+- P1.E ürün kodu **başlamadı**.
+- Kısıtlama kodu (E.2+) için önce **E.0 kapısı** gerekir: PoC kabul kriterleri, geri alma yöntemi ve ADR-0016 kullanıcı onayıyla kesinleşir.
+- İlk uygulanabilir alt görev: **E.1 — OBS-011 sağlamlaştırma** (yalnız helper; E.0'dan bağımsız).
+
+**Kapanan aşamalar (geliştirme/test kabulü; üretim yayını değildir):**
+
+- **TASK-009 (P1.D): Tamamlandı — Lenovo Acceptance PASS.**
+  - D-01…D-10: 10/10 PASS (2026-10-31). D-11/D-12 isteğe bağlıydı, NOT RUN.
+  - P1.D.1: kurtarma CI'da olay 107/129 ile kanıtlandı ([NOTE-010](docs/solutions.md)). Lenovo D-05 tekrarı PASS (00:29:04 planlı → 00:29:05 yeni PID).
 - **TASK-008 (P1.C):** Lenovo temel kabul PASS.
-  - C-01…C-10 PASS; C-11 NOT RUN.
+  - C-11 NOT RUN.
   - Uyku 0, ölçülemeyen arttı ([NOTE-008](docs/solutions.md)).
-  - Kaldırmada `1060` doğrulandı.
-- **P1.D.1 (D-05 kurtarma araştırması):**
-  - CI'da gerçek 5 dk zaman tetikleyicisiyle kurtarma kanıtlandı. `0x800710E0` = `IgnoreNew` reddi (olay 322).
-  - Yazılım hatası yok. `RestartOnFailure`'ın etkisiz olduğu belgeye işlendi ([NOTE-010](docs/solutions.md)).
-  - Yeni prerelease yok. Kullanıcı D-05'i [tekrar rehberiyle](docs/background/p1d-d05-retest-tr.md) yeniden dener.
-- **P1.E başlamadı.**
 
 ## Gerçek durum (kısa)
 
@@ -63,25 +65,27 @@
 
 ## Çalıştırılmamış testler
 
-- **Lenovo D-01…D-12 — NOT RUN.**
-- CI'da doğrulanamayanlar: gerçek oturum açılışı, oturum kapatma, kullanıcı değiştirme, Windows yeniden başlatma, uyku, standart kullanıcı, Windows Home, ekran ölçeği.
+- P1.D isteğe bağlı: D-11 (uyku), D-12 (kullanıcı değiştirme) — NOT RUN.
+- Hiçbir aşamada doğrulanmayanlar: Windows Home, %125/%150 ölçek, standart kullanıcı hesabı.
 
 ## Açık kararlar ve riskler
 
-- Aynı kullanıcı görevi devre dışı bırakabilir veya helper'ı sonlandırabilir. Bu tespit edilir, engellenmez (ADR-0012).
-- `conhost --headless` belgelenmemiş bir parametredir.
-- Kurtarma gecikmesi en çok 5 dk.
-- Kullanıcı başına süre yok.
-- Uyku nedeni doğrulanmadı ([NOTE-008](docs/solutions.md)).
-- ADR-0006/0007/0011/0013/0014/0015 Önerildi; ADR-0008…0010 açık.
-- Kurucu ve imzalama açık. R-14 (Bootstrap 6 alfa).
+- **Yönetici hesap:** servis, görev ve dosyalar değiştirilebilir; tespit edilir, engellenmez (ADR-0012).
+- **`conhost --headless`:** belgelenmemiş bir parametreye bağımlılık.
+- **Kurtarma aralığı:** zamanlanmış denetime bağlı (en çok 5 dk).
+- **OBS-011:** oturum kapanışında `previous_exit state=unclean`. Hipotez H1: `ctrlc` işleyicisi `CTRL_CLOSE` olayında hemen `TRUE` dönüyor. Doğrulanmadı; BUG değil ([solutions](docs/solutions.md)).
+- **ADR durumları:**
+  - ADR-0013/0014/0015 **Kabul edildi** (K-8, 2026-10-31); açık riskler korunur.
+  - ADR-0006/0007/0011 Önerildi; ADR-0008…0010 açık.
+- **Teslim:** kurucu ve imzalama yok. R-14 (Bootstrap 6 alfa).
 
 ## Sonraki somut adım (öneri — otomatik başlatma yetkisi değildir)
 
-1. Kullanıcıdan D-05 tekrar sonucunu (NextRunTime sonrası yeni PID) ve kalan D tablosunu al; TASK-009'a işle.
-2. D-11 yapıldıysa `power_event` satırlarıyla NOTE-008'i güncelle.
-3. Kabul gelirse durumu "Kabul edildi" yap. P1.E yalnız kullanıcı onayıyla başlar.
+1. Kullanıcı onayıyla **E.1 (OBS-011):**
+   - Windows CI'da `conhost` altında `CTRL_CLOSE` ile yeniden üret.
+   - H1 doğrulanırsa konsol işleyicisini düzelt (≤2 sn bekleme).
+2. Paralel olarak **E.0:** §3.2 serbest bırakma matrisi, §10 ölçütleri, §11 kurtarma yolu ve köprü rolü (K-6) için ADR-0016 taslağı → kullanıcı onayı.
 
 ## İlgili belgeler
 
-[AGENTS.md](AGENTS.md) · [docs/architecture.md](docs/architecture.md) · [docs/tasks.md](docs/tasks.md) · [docs/decisions/](docs/decisions/README.md) · [docs/background/p1d-background-helper.md](docs/background/p1d-background-helper.md) · [docs/screen-time/p1c-screen-time.md](docs/screen-time/p1c-screen-time.md) · [docs/solutions.md](docs/solutions.md)
+[AGENTS.md](AGENTS.md) · [docs/architecture.md](docs/architecture.md) · [docs/tasks.md](docs/tasks.md) · [docs/decisions/](docs/decisions/README.md) · [docs/background/p1d-background-helper.md](docs/background/p1d-background-helper.md) · [docs/plans/p1e-proposal.md](docs/plans/p1e-proposal.md) · [docs/screen-time/p1c-screen-time.md](docs/screen-time/p1c-screen-time.md) · [docs/solutions.md](docs/solutions.md)

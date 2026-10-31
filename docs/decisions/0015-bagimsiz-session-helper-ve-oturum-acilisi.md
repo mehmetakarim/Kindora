@@ -1,7 +1,10 @@
 # ADR-0015 — Bağımsız Session Helper, tek raporlayıcı ve oturum açılışında başlatma
 
 - **Tarih:** 2026-10-30
-- **Durum:** Önerildi (P1.D'de uygulandı; P1.D.1'de kurtarma CI'da gerçek zaman tetikleyicisiyle kanıtlandı; Lenovo D-05 kabulü bekliyor)
+- **Durum:** **Kabul edildi** (kullanıcı kararı K-8, 2026-10-31).
+  - P1.D'de uygulandı; P1.D.1'de kurtarma CI'da gerçek zaman tetikleyicisiyle kanıtlandı.
+  - **Lenovo Acceptance PASS** (D-01…D-10, 2026-10-31).
+  - Açık riskler korunur: yönetici hesap, `conhost --headless`, en çok 5 dk kurtarma, [OBS-011](../solutions.md).
 - **Karar türü:** Teknik uygulama yöntemi
 - **İlgili belgeler:** [P1.D raporu](../background/p1d-background-helper.md), [ADR-0006](0006-agent-surec-ve-hesap-modeli.md), [ADR-0012](0012-mevcut-windows-hesabinda-calisma.md), [ADR-0013](0013-masaustu-kabugu-helper-koprusu.md), [ADR-0014](0014-yerel-kullanim-suresi-motoru.md)
 

@@ -175,3 +175,23 @@ Yalnızca **gerçekte yaşanmış ve doğrulanmış** teknik sorunlar kaydedilir
 - **CI test düzeltmesi:** Kill öncesi henüz sınıflanmamış (bekleyen) süre sonradan sınıflandığı için "sonra − önce ≤ kesinti" denetimi geçersizdi. Doğru sınır, günlük toplamın kurulumdan beri geçen gerçek süreyi aşmamasıdır.
 - **Doğrulama yöntemi:** `ci/p1d-recovery-e2e.ps1` (`windows-p1d` iş akışı); Lenovo'da D-05 tekrarı ([rehber](background/p1d-d05-retest-tr.md)).
 - **İlgili görev, dosya veya commit:** TASK-009; `ci/p1d-recovery-e2e.ps1`, ADR-0015.
+
+### OBS-011 — Oturum kapanışında `session_ending` sonrası `previous_exit state=unclean` (gözlem; hata olarak sınıflandırılmadı)
+
+- **Gözlem (Lenovo, P1.D D-08 ve D-09):** Oturum kapatma ve Windows yeniden başlatma sırasında helper günlüğüne `event=session_ending` yazıldı. Bir sonraki açılışta yeni helper `event=previous_exit state=unclean` kaydetti. Kabulü engellemedi: helper yeniden başladı, süreler korundu.
+- **Beklenen:** `WM_ENDSESSION` sonrası ana döngü biter, iz dosyası (`activity.log.running`) silinir. Böylece bir sonraki açılış `unclean` yazmaz.
+- **Durum:** Neden **doğrulanmadı**. Günlükte `helper_stopped` satırının bulunup bulunmadığı raporlanmadı.
+- **Hipotezler [Çıkarım; cihazda doğrulanmadı]:**
+  - **H1 (koddan destekli):**
+    - Helper `ctrlc` 3.5.2 kullanıyor. Bu kütüphanenin Windows işleyicisi (`os_handler`) **her** konsol olayında, `CTRL_CLOSE_EVENT` / `CTRL_LOGOFF_EVENT` / `CTRL_SHUTDOWN_EVENT` dahil, kapanma bayrağını ayarlayıp hemen `TRUE` döner.
+    - Windows bu üç olayda işleyici döndükten sonra süreci **beklemeden sonlandırır**.
+    - Görev helper'ı `conhost --headless` altında başlattığı için oturum sonunda `conhost` `CTRL_CLOSE_EVENT` göndermiş olabilir. Bu durumda süreç, `WM_ENDSESSION` işleyicisinin 2 sn bekleme penceresinden önce sonlanır ve iz silinmez.
+  - **H2:** `WM_ENDSESSION` geldiğinde ana döngü, agent'a giden ve en çok 3 sn süren bir isteğin içindeyse 2 sn'lik pencere yetmeyebilir.
+  - **H3:** Windows oturum sonunda süreci zaman aşımıyla sonlandırdı.
+- **Etkisi:** Yalnız tanılama doğruluğu: temiz kapanış "unclean" görünür. Ölçüm, süre ve kurtarma etkilenmedi. Süre agent'ta sayılır; helper'ın kalıcı durumu yoktur.
+- **Doğrulama önerisi (onay gerekir, kod değişikliği):**
+  1. Lenovo günlüğünde `session_ending` ile bir sonraki `helper_started` arasında `helper_stopped` var mı, bakılır.
+  2. H1 için en küçük düzeltme: `CTRL_CLOSE`/`LOGOFF`/`SHUTDOWN` olaylarında işleyici, ana döngünün iz dosyasını silmesini kısa süre (≤2 sn) bekledikten sonra dönmeli.
+  3. Windows CI'da `GenerateConsoleCtrlEvent` ile `CTRL_CLOSE` benzetimi ve iz dosyası denetimi yapılır.
+- **Planlama:** P1.E'nin ilk alt görevi **E.1** olarak planlandı (K-9; [TASK-010](tasks.md), [plan §8](plans/p1e-proposal.md)).
+- **İlgili görev, dosya veya commit:** TASK-009, TASK-010; `crates/windows-session/src/{main,session_end}.rs`, `RunMarker`.
