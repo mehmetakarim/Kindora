@@ -24,6 +24,8 @@
 //! geçmiş için rapor gönderilmez.
 
 pub mod activity;
+#[cfg(windows)]
+pub mod console_ctrl;
 pub mod instance;
 #[cfg(windows)]
 pub mod session_end;

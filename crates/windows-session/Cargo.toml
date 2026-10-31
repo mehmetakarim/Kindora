@@ -14,10 +14,11 @@ path = "src/main.rs"
 [dependencies]
 ipc-protocol.workspace = true
 serde_json.workspace = true
-ctrlc.workspace = true
 
 [target.'cfg(unix)'.dependencies]
 libc.workspace = true
+# Windows'ta konsol olayları kendi işleyicimizle (console_ctrl.rs, OBS-011).
+ctrlc.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-sys.workspace = true

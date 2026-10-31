@@ -52,7 +52,7 @@ jobs:
       - name: Konsol kapanışı (CTRL_CLOSE_EVENT) — gerçek Windows olayı
         shell: pwsh
         env:
-          EXPECT_CLEAN: ${{ github.event_name == 'workflow_dispatch' && inputs.expect_clean || 'false' }}
+          EXPECT_CLEAN: ${{ github.event_name != 'workflow_dispatch' || inputs.expect_clean }}
         run: |
           $args = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'ci/p1e1-console-close.ps1', '-Helper', 'target/release/kindora-helper.exe')
           if ($env:EXPECT_CLEAN -eq 'true') { $args += '-ExpectClean' }

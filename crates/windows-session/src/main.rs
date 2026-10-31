@@ -108,12 +108,21 @@ fn activity(mut cfg: HelperConfig, log_file: Option<PathBuf>) -> ExitCode {
 
     let shutdown = Arc::new(AtomicBool::new(false));
     let stopped = Arc::new(AtomicBool::new(false));
-    let flag = shutdown.clone();
-    if let Err(e) = ctrlc::set_handler(move || {
-        log_event("shutdown_requested", &[("source", "ctrl_c".into())]);
-        flag.store(true, Ordering::SeqCst);
-    }) {
-        log_event("ctrl_c_handler_failed", &[("error", e.to_string())]);
+    // Windows: konsol kapanış / oturum sonu olaylarında izin silinmesini
+    // bekleyen kendi işleyicimiz (OBS-011). Unix: Ctrl+C (SIGINT).
+    #[cfg(windows)]
+    if let Err(e) = windows_session::console_ctrl::install(shutdown.clone(), stopped.clone()) {
+        log_event("console_handler_failed", &[("error", e.to_string())]);
+    }
+    #[cfg(unix)]
+    {
+        let flag = shutdown.clone();
+        if let Err(e) = ctrlc::set_handler(move || {
+            log_event("shutdown_requested", &[("source", "ctrl_c".into())]);
+            flag.store(true, Ordering::SeqCst);
+        }) {
+            log_event("ctrl_c_handler_failed", &[("error", e.to_string())]);
+        }
     }
     #[cfg(windows)]
     if let Err(e) = windows_session::session_end::watch(shutdown.clone(), stopped.clone()) {
