@@ -1,0 +1,60 @@
+# Kindora P1E.1 — OBS-011: helper'ın konsol kapanışında (CTRL_CLOSE_EVENT)
+# temiz çıkışı. Gerçek Windows olayı; hızlı, yalnız helper derlenir.
+# Tam regresyon (P1A–P1D) windows-p1a/b/c/d iş akışlarındadır.
+
+name: windows-p1e1
+
+on:
+  push:
+    branches: [main, "p1e1-*"]
+  workflow_dispatch:
+    inputs:
+      expect_clean:
+        description: "Temiz çıkış beklenir (düzeltme sonrası)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-p1e1-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: "1.94.0"
+
+jobs:
+  console-close:
+    name: Windows — helper konsol kapanışı (OBS-011)
+    runs-on: windows-2022
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Rust toolchain (rustup, sabit sürüm)
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --target x86_64-pc-windows-msvc
+          rustup default "$RUST_TOOLCHAIN"
+
+      - name: Helper — test + release derleme
+        run: |
+          cargo test -p windows-session --locked -- --nocapture
+          cargo build --release -p windows-session --locked
+
+      - name: Konsol kapanışı (CTRL_CLOSE_EVENT) — gerçek Windows olayı
+        shell: pwsh
+        env:
+          EXPECT_CLEAN: ${{ github.event_name == 'workflow_dispatch' && inputs.expect_clean || 'false' }}
+        run: |
+          $args = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'ci/p1e1-console-close.ps1', '-Helper', 'target/release/kindora-helper.exe')
+          if ($env:EXPECT_CLEAN -eq 'true') { $args += '-ExpectClean' }
+          powershell.exe @args
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
