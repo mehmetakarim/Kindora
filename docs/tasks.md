@@ -46,7 +46,9 @@ Görevlerin yürütülme, doğrulama ve yayın durumu. Ürün gereksinim envante
 - **Doğrulama sonucu (E.1):**
   - **Windows CI `windows-p1e1`** (gerçek `CTRL_CLOSE_EVENT`): 3/3 CLEAN; Windows birim testi PASS.
   - **macOS:** kök Rust testleri, fmt, clippy (+ `windows-session` için Windows hedefi) PASS.
-  - P1.A–P1.D regresyonu: `main` push'u sonrası `windows-p1a/b/c/d`.
+  - **P1.A–P1.D regresyonu (`658dbb3`):** [p1a](https://github.com/mehmetakarim/Kindora/actions/runs/41163273749), [p1b](https://github.com/mehmetakarim/Kindora/actions/runs/41163273806), [p1c](https://github.com/mehmetakarim/Kindora/actions/runs/41163273805), [p1d](https://github.com/mehmetakarim/Kindora/actions/runs/41163273863), [p1e1](https://github.com/mehmetakarim/Kindora/actions/runs/41163273809) — hepsi PASS.
+    - p1d'de zamanlanmış kurtarma yeniden geçti.
+    - Bilinçli sonlandırma (kill) testinde `previous_exit=unclean` beklendiği gibi sürüyor; düzeltme yalnız temiz kapanışı etkiler.
 - **Yayın durumu:** Yok (yeni prerelease oluşturulmadı).
 
 ### TASK-009 — P1.D: Bağımsız Session Helper ve güvenilir arka plan kullanım süresi
